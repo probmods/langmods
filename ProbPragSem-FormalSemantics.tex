@@ -1,0 +1,994 @@
+
+
+\documentclass[12pt]{article}
+%\usepackage{proceed2e}
+\usepackage{amsmath, amsthm, amssymb}
+\usepackage{graphicx}
+\usepackage{color}
+\usepackage{xcolor}
+\usepackage{listings}
+\usepackage{inconsolata}
+\usepackage[numbers]{natbib}
+\usepackage{hyperref}
+\usepackage{colonequals}
+\usepackage{todonotes}
+%\usepackage{bm}
+\usepackage{gb4e}
+%\usepackage{MnSymbol}
+%\usepackage{stmaryrd}
+%\usepackage{amsfonts}
+\usepackage[small]{caption}
+
+\newcommand{\llbracket}{\ensuremath{\left [\!\left [}}%
+     \newcommand{\rrbracket}{\ensuremath{\right ]\!\right ]}}
+\providecommand{\sv}[1]{\ensuremath{\llbracket #1 \rrbracket}}
+
+\newenvironment{AY11-12}{}{}
+
+
+\newcommand{\eq}[1]{
+\begin{equation}
+\begin{array}{lll}
+#1
+\end{array}
+\end{equation}
+}
+%\newcommand{\thet}[1]{\ensuremath{\theta_{\mathit{#1}}}}
+%\newcommand{\mc}[1]{\ensuremath{\mathcal{#1}}}
+%\newcommand{\mbb}[1]{\ensuremath{\mathbb{#1}}}
+%\newcommand{\set}[1]{\ensuremath{\{#1\}}}
+%\newcommand{\pbar}{\ |\ }
+%\newcommand{\pr}[2]{\ensuremath{p_{#1}(#2)}}
+%\newcommand{\church}[1]{\small{\ttfamily #1\rmfamily}\normalsize{}}
+
+\newcommand{\bei}{\begin{itemize}}
+\newcommand{\eni}{\end{itemize}}
+\newcommand{\lar}[1]{\ensuremath{\langle #1 \rangle}}
+\newcounter{definition}
+\setcounter{definition}{1}
+\newcommand{\defin}[2]{
+\vspace{.1in}
+\noindent \textbf{Definition \arabic{definition}} (#1). #2
+\vspace{.1in}
+\addtocounter{definition}{1}
+}
+
+%\usepackage[raggedright]{sidecap}
+%\usepackage{multirow}
+
+ 
+
+ 
+ \lstset{
+  language=Scheme, % Andreas Stuhlmüller. Scheme listings. https://github.com/stuhlmueller/scheme-listings.git
+  columns=fixed,
+  tabsize=2,
+  extendedchars=true,
+  breaklines=true,
+  frame=single,
+  numbers=left,
+  numbersep=5pt,
+  rulesepcolor=\color{solarized@base03},
+  numberstyle=\tiny\color{solarized@base01},
+  basicstyle=\scriptsize\ttfamily,
+  keywordstyle=\color{solarized@green},
+  stringstyle=\color{solarized@cyan}\ttfamily,
+  identifierstyle=\color{solarized@blue},
+  commentstyle=\color{solarized@base01},
+  emphstyle=\color{solarized@red}
+}
+
+\definecolor{solarized@base03}{HTML}{002B36}
+\definecolor{solarized@base02}{HTML}{073642}
+\definecolor{solarized@base01}{HTML}{586e75}
+\definecolor{solarized@base00}{HTML}{657b83}
+\definecolor{solarized@base0}{HTML}{839496}
+\definecolor{solarized@base1}{HTML}{93a1a1}
+\definecolor{solarized@base2}{HTML}{EEE8D5}
+\definecolor{solarized@base3}{HTML}{FDF6E3}
+\definecolor{solarized@yellow}{HTML}{B58900}
+\definecolor{solarized@orange}{HTML}{CB4B16}
+\definecolor{solarized@red}{HTML}{DC322F}
+\definecolor{solarized@magenta}{HTML}{D33682}
+\definecolor{solarized@violet}{HTML}{6C71C4}
+\definecolor{solarized@blue}{HTML}{268BD2}
+\definecolor{solarized@cyan}{HTML}{2AA198}
+\definecolor{solarized@green}{HTML}{859900}
+
+\oddsidemargin 0.0in 
+%%this makes the odd side margin go to the default of 1inch
+\textwidth 6.5in
+%%sets the textwidth to 6.5, which leaves 1 for the remaining right margin with 8 1/2X11inch paper 
+
+%\pagestyle{empty}
+ 
+
+\title{Uncertainty in Language and Thought}
+
+
+\begin{document}
+
+%\listoftodos
+%\pagebreak
+
+
+\maketitle
+
+\abstract{}
+
+
+\pagebreak
+
+\tableofcontents
+
+\pagebreak
+
+
+
+\section{Bayesian models of commonsense reasoning}
+\begin{itemize}
+
+\item  Knowledge as generative model, 
+  
+\item  Conditioning. Reasoning as conditional inference. Observations. More general conditions.
+  
+\item  Stochastic lambda calculus. Compositional sampling semantics. Universality. 
+\subitem ESLC: mem, xrps, query.
+  
+\item [(ndg)]  Example: tug-of-war domain. Elaborated model with 'match' events that have teams and winners, 'team' entities that have players and captains, 'player's that have strengths and maybe other properties. 
+  
+\item [(ndg)]  Basic effects: Explaining away + screening off. 
+\subitem  Observe sam beats jim, infer sam is stong. learn that jim is weak, explain away match outcome, so sam is ordinary strength again.
+\subitem  Observe sam beats jim, predict sam will beat jim again. Knowing jim and sam's strengths, finding out sam beat jim doesn't change prediction. 
+\subitem   Mention but don't illustrate other effects ---  Size principle / occam, transfer learning.
+  
+\item  Modularity vs joint inference: knowledge is modular, inference is not.
+  
+\end{itemize}
+ 
+ 
+ 
+\section{Meaning as condition}
+% Dan says: this section title is a bit too narrow for what it wants to do, I think.
+% maybe a better title: ``Language understanding as Bayesian update'', emphasizing continuity with section 1
+ 
+
+% Here's my first attempt at the following:
+%\item [dan]  Sentence meanings: in formal semantics there are two views of meaning. the belief update view (roughly, dynamic semantics) and the intensions---functions from world to truth---view (the Montague, Lewis, etc view). Which is ``correct''? What's the relationship between belief and truth?
+
+\subsection{Static and dynamic semantics}
+In formal semantics there are two main conceptions of sentence meaning. On the `static' view, sentences denote propositions: functions from possible worlds to truth-values. Sentences meanings pick out the conditions under which the sentence would be true, and are silent on their proper use --- when it would be appropriate or useful, for a speaker to utter such a sentence, or how a hearer should respond upon hearing such a sentence uttered. This view is frequently combined with an appeal to pragmatics to explain the information conveyed by an utterance and other effects that it may have. That is, the fact that a sentence has been uttered may affect the context of conversation and the beliefs of conversational participants in myriad ways, most obviously by making it public information that the sentence has been uttered. However, the proper bearer of information on this view is not a sentence itself, but the event that the sentence has been uttered. In the presence of certain enabling conditions---for instance, evidence that a speaker is truthful, cooperative, and well-informed---listeners may draw rich inferences and make adjustments to their beliefs. Nevertheless, the particular effects that an utterance has are not intrinsic to the meaning of the sentence according to the static approach. Rather, they are due to the interaction between a sentence's truth-condition and the beliefs and goals of the conversational participants, including participants' beliefs about each other \citep[cf.]{grice89,stalnaker78,stalnaker02,clark96}.
+
+In `dynamic' approaches, sentence meanings are treated as objects which update the context: functions that take the current conversational context (or scoreboard, or participants' belief states) to a new context (scoreboard, belief state). For instance, an utterance of ``A girl walked into the room'' can be thought of a function which adds a discourse referent to the stock of individuals currently under discussion, and also adds the information that this individual (whoever she is) walked into the room in question. The dynamic view has conceptual roots in \citet{karttunen69,stalnaker78,lewis79}, but was first stated in the way just described by \citet{heim82,kamp82}. 
+
+Dynamic theories are attractive for a number of reasons. They provide a formal model of the informational and discursive effects of utterances, and they are often able to account in precise terms for the effects that one utterance can be have on the interpretation of subsequent utterances. Moreover, dynamic theories frequently are able to provide insight into these effects without requiring the theorist to undertake the difficult task of providing a complete model of conversational participants' epistemic states. By contrast, deriving precise predictions from the combination of a static semantics and a rich pragmatics would require a much more complex model, one which incorporates and relates linguistic knowledge with causal and social knowledge.
+
+However, abstracting away from the details of conversational participants' epistemic states also creates problems. First, as we will argue below, there are many cases in the interpretations that listeners arrive at depend crucially on their richly structured theories of the world and of a speaker's beliefs and goals. If this is the case, a realistic theory of language understanding must incorporate linguistic knowledge, world knowledge, and social knowledge and relate these three components. Second, the inferences that listeners make often have a graded character that is difficult to model in standard dynamic theories. That is, it is not simply that two given interpretations $I$ and $I'$ of sentence $S$ are either available or not; frequently both are available but one is preferred to the other, or many interpretations are available. In such cases, determining the information that a sentence conveys requires a method for integrating over the multiple interpretations in a way that pays attention to the order of preference. 
+
+We will describe a probabilistic model of knowledge representation and linguistic interpretation which integrates the best features of the static and dynamic approaches to meaning. With static approaches, we assume that sentences pick out truth-conditions (perhaps stochastically), and that dynamic effects are properly located in the pragmatics rather than the semantics. With dynamic theories, we argue that a complete understanding of many linguistic phenomena requires an explicit formal model of information flow in conversation and the reasoning processes that are involved in interpretation. 
+
+\subsection{Deterministic and probabilistic update}
+%\item [dan]  Bayesian belief update is via conditioning, conditions are intensions (fns from env/world to truth). So there is a natural probabilistic view that treats meaning as both truth-functional intention and operator of belief update.
+%   (Note: any update of a distribution to another that doesn't make certain things uncertain can be represented as conditioning on a stochastic predicate. 
+%    Note, environment is natural notion of world... too weird for linguists?
+%    Note: introduce SF to LF translation function here.)
+Jermaine asks, ``Is it raining?'' and Bret answers ``No, it's snowing''. What information does Bret's answer convey? Naturally, the information that it's snowing (in the relevant time and place); or, equivalently, that the actual world is a member of the set of possible worlds in which it is snowing (in that time and place). Suppose that Jermaine's belief state when he asks the question is modeled as a set of worlds $B$, interpreted as his \emph{doxastically possible worlds} --- those that his beliefs fail to exclude. A common approach to modeling such an interaction is to suppose that --- so long as Jermaine trusts Bret and believes that Bret is well-informed --- Bret's response ``It's snowing'' will cause Jermaine to modify $B$ so that possibilities in which it is not snowing are excluded. 
+
+Suppose we have a function $\sv{\cdot}^{\mathcal{M},g}$ which maps linguistic expressions to their denotations, relative to a model $\mathcal{M}$ and an assignment function $g$. \sv{\cdot}^{\mathcal{M},g} will take a declarative sentence $u$ to (the characteristic function of) the set of worlds in which $u$ is true. The informational effect of the utterance ``It's snowing'' can be thought of as a mapping from belief states $B$ to different belief state $B' = B \cap \sv{\text{It's snowing}}^{\mathcal{M},g}$. On this model, the core operation of belief update is set intersection: under appropriate conditions, Bret's utterance will cause Jermaine to reduce the size of the his belief state in a way that amounts to adding the information that it is snowing. 
+
+The basic operation of Bayesian update is a natural extension of the intersection operation to probability spaces. Formally, a probability space is a triple consisting of a set of worlds $W$, a domain of propositions $\Phi \subseteq \wp(W)$, and a normalized measure function $P$. For simplicity we deal only with finite $W$ here, which allows us to set $\Phi = \wp(W)$. (The extension to countable $W$ is straightforward.)
+
+\defin{Probability space}{A probability space is a triple \lar{W, \wp(W), P} where
+\bei
+\item [(a)] $P: \wp(W) \rightarrow [0,1]$
+\item [(b)] $P(W) = 1$
+\item [(c)] $A \cap B = \emptyset \rightarrow P(A \cup B) = P(A) + P(B)$
+\eni
+}
+Let $P$ (equivalently, $P(\cdot)$) be a probability measure representing Jermaine's beliefs about the world. Note that $P$ is a strictly richer representation of Jermaine's belief state than $B$: the probability measure contains not only information about which propositions might be true according to Jermaine (those $A \subseteq W$ s.t.\ $P(A) \neq 0$), but also about the relative likelihood of any two propositions. 
+
+Extending the intersective concept of update described above, we can define a simple Bayesian rule for taking in the information contained in a declarative sentence using a combination of \emph{intersection} and \emph{renormalization}. (The 0 subscript in this listener's name will be explained shortly.) 
+
+\defin{Na\"ive Bayesian listener}{Let $P_{L_0}$ be the prior probability distribution of a listener $L_0$. We say that $L_0$ is a \emph{na\"ive Bayesian update} if and only if $L_0$ always responds to an utterance $u$ by adopting a new probability distribution $P'$ which is generated by assuming that $u$ is true and making appropriate modifications to $P_{L_0}$: 
+\bei
+\item If $P_{L_0}$ is defined in a probability space \lar{W, \wp(W), P_{L_0}}, then $P'$ is defined in the reduced space \lar{W', \wp(W'), P'}, where $W' = \{W \cap \sv{u}^{\mathcal{M},g}\}$.
+\item $P'(W') = 1$. 
+\item For all $X, Y \subseteq W'$, the ratio of posterior probabilities  
+$P'(X)/P'(Y)$ is proportional to the ratio of prior probabilities $P_{L_0}(X \cap \sv{u}^{\mathcal{M},g})/P_L(Y \cap \sv{u}^{\mathcal{M},g})$.
+\eni
+}
+The first condition requires that no worlds remain after update which fail to make $u$ true. The second ensures that $P'$ is a well-defined probability measure. The third ensures that update with \sv{u}^{\mathcal{M},g} does not add any information except the information that $u$ is true. It turns out that there is a simple and unique way to ensure that these requirements are satisfied: we can define $P'$ as the conditional probability measure $P_L(\cdot \ |\ \sv{u}^{\mathcal{M},g})$.
+
+\defin{Conditional probability measure}{
+Let \lar{W, \wp(W), P} be a probability space. Then for any $X, Y \in \wp(W)$, the conditional probability measure $P(\cdot \ |\ X)$ is
+$$
+P(Y \ |\ X) =_{\mathit{df}} P(Y \cap X) / P_L(X)
+$$
+This gives us a very simple theory of probabilistic update: if Jermaine trusts Bret absolutely, then, he will respond to Bret's utterance ``It is snowing'' by assigning the following probability to any proposition $A \subseteq W'$: 
+$$
+P'(A) = P_{L_0}(A \ |\ \sv{\text{It's snowing}}^{\mathcal{M},g}) = \frac{P_{L_0}(A \cap \sv{\text{It's snowing}}^{\mathcal{M},g}}{P(\sv{\text{It's snowing}}^{\mathcal{M},g})}
+$$
+}
+
+This theory does not immediately tell us how to deal with cases in which a listener is unsure of the speaker's reliability or the intended meaning. Modeling sensitivity to a speaker's reliability is actually not too difficult: we can simply add a latent variable $R$, representing the probability that the speaker is reliable. Suppose Jermaine believes that Bret is probably reliable ($P_{L_0}(R=1) = .8$), but also considers it possible that Bret's utterance is independent of the weather ($P_{L_0}(R=0) = .2$). The utterance is definitely true if Bret is reliable --- 
+\bei
+\item $P_{L_0}(\cdot \ |\ u, R=1) = P_{L_0}(\cdot \ |\ \sv{u}^{\mathcal{M},g})$
+\eni
+--- and we learn nothing if Bret is not reliable except that the utterance has been made. With this model in place, we can define a simple reliability-sensitive update rule:
+
+\defin{Reliability-sensitive Bayesian listener}{
+$L_R$ is a reliability-sensitive Bayesian listener if and only if $L_R$ always responds to an utterance $u$ by conditionalizing on the event that the speaker produced $u$, and then integrating prior information about the speaker's reliability $R$. That is, for any $A$, the posterior probability of $A$ will be $P_{L_R}(A\ |\ u)$, where
+$$
+P_{L_R}(A |\ u) = P_{L_R}(R=1) \times P_{L_R}(A \ |\ u, R=1) + P_{L_R}(R=0) \times P_{L_R}(A\ |\ u, R=0),
+$$
+a decomposition which follows straightforwardly from the definition of (conditional) probability. 
+}
+
+Bayesian update thus gives us a way of extending belief update to cases in which it is uncertain whether the speaker is reliable: we imagine what the posterior should be if the speaker is reliable or if he is not, and combine these quantities in a way that takes into account the listener's probabilistic beliefs about the speaker's reliability. Let $A$ be a proposition which is conditionally independent of $u$ given $R=0$ --- that is, any proposition whose probability is unaffected if we discover that Bret is unreliable. Since the utterance is definitely true if $R=1$, and $L$'s beliefs are unaffected if $R=0$, we have
+$$
+P_L(A\ |\ u) = .8 \times P_L(A \ |\ \sv{u}^{\mathcal{M},g}) + .2 \times P_L(A)
+$$
+%
+% use this as our linguistic example of screening off?
+%
+
+This line of investigation suggests several further enrichments. First, we may want to represent not only the probability that the speaker is reliable ($R$), but also the probability that the speaker is lying $L$, or speaking metaphorically ($M$), or being underinformative for the sake of politeness or personal gain ($U$), or making a joke ($J$), or any of the myriad reasons why an intelligent listener might not wish to respond to an utterance by simply conditioning on its literal truth. Knowing how to decide among these possibilities requires the listener to maintain a model of the speaker's beliefs and goals \citep[][etc.]{grice89,lewis69,clark96}. Rather than considering each variable separately, we combine them into a single interpretive rule:
+
+\defin{Level-1 pragmatic Bayesian listener}{$L_1$ is a level-1 pragmatic Bayesian listener if and only if $L_1$ always responds to an utterance $u$ by conditionalizing on the event that the speaker produced $u$, and then integrating this observation with a probabilistic model of the speaker's utterance planning process $P_{S}(\cdot)$. For any $A \subseteq W$, 
+$$
+P_{L_1}(A |\ u) \propto \frac{P_{S}(u \ |\ A) \times P_{L_1}(A)}{\sum_B\ P_{S}(u \ |\ B) \times P_{L_1}(B)},
+$$
+where the $B$'s form a partition of $W$ including $A$.
+
+That is, the probability that $A$ is true given that the speaker produced $u$ is proportional to the probability that the speaker would have produced $u$ if $A$ were true, multiplied by the prior probability that $A$ is true. The equation is a simple instantiation of Bayes' rule, along with the model assumption that $P_{L_1}(u \ |\ A) = P_{S}(u \ |\ A)$. Note that probabilities must be normalized by considering the $B$'s, representing all of the other events that might have caused the speaker to utter $u$.
+}
+
+This model allows us to wrap up all information about the speaker's reliability, willingness to lie, etc.\ into a single model of the speaker's behavior, given by $P_{S}(\cdot)$. If it is known that the speaker is fully reliable and maximally informative, for instance, then our speaker model will tell us that $P_{S}(\sv{u}^{\mathcal{M},g} \ |\ u) = 1$ and $P_{S}(u\ |\ \sv{u}^{\mathcal{M},g}) = 1$ --- $S$ speaks all and only true propositions. (Of course, no real speaker could or would behave in this way.)
+
+%
+% second enrichment is using a structured model (with Church)
+%
+
+%
+% Next: update on uncertain or inherently stochastic meanings -- Mishearing, ambiguity, vagueness(?)
+% above we introduced a function TR. we can introduce uncertainty about identity of TR here.
+
+
+
+\begin{itemize}  
+\item [dan] Bayesian belief update as the basic operation of literal meaning.
+\subitem     Conservative version uses standard deterministic semantics (world->truth) to update a prior distribution over worlds.
+\subitem     Generative world model has (at least) entities (objects, events, agents, ..) and properties. Recall tug-of-war world.
+\subitem[(ndg)]     Consequences:  Graded and non-monotonic effects: 
+"in match1 bob played against jim. bob won match1." ... "jim is the weakest player." : initial graded inference about bob's strength. explaining away. initially think bob strong, then probably not. effect of prior knowledge on these inferences: number of other players and strength variance.
+
+
+\item  Allow meanings to be non-deterministic themselves (i.e. world->score, or stochastic world->truth).
+\subitem     Consequences: 'Prototype'-like meanings? Soft meaning constraints ("flip him over").
+\subitem     Ambiguity:  homonomy/polysemy, structural ambiguity, scope ambiguity 
+\subitem     Example: manipulate prior for number of players in a match / number of matches on a day... "every player in the league was in a match on tuesday".
+\subitem     Stochastic meaning function or underspecified semantics? equivalent wrt distribution on interpretations.
+\subitem     Mention puns..??
+        
+\item  Compositional semantics for stochastic meanings via SLC.
+\subitem     Types useful in SLC but not in LC. (Eg potential locus of asymmetry between kinds and properties?)
+
+\end{itemize}
+
+ **Language and reference variables? Where do we need to introduce reference variables? meaning of "a", "the", "he", etc? only where standard semantics has existentials? any NP (e.g. any specifier)? 
+
+
+\section{Pragmatic interpretation}
+
+\begin{itemize}
+\item   The rational speech acts framework.
+\item  Example: reference via joint inference (effect of prior). FG'12 ref exprs. salience. (lewis "the cat"?)
+\item  Example: quantity implicatures, "captain" vs "player", "some" vs "all".
+\item  Speaker knowledge? (Not in detail...)
+\item  Relation to IBR and game-theoretic pragmatics.
+\end{itemize}
+
+
+
+\section{Reference variables}
+\begin{itemize}
+\item   Marked meanings and marked utterances: why basic model fails.
+\item  Lifting assignment fn to pragmatic listener. Semantic "existence" or "skolem" operator.  (Why do this and what should lift? Conventional vs coordinated indices? Lexical uncertainty?)
+\item  Example: horn implicatures. (example in tug-of-war domain?)
+\item  Example: gradeable adjs.
+\item  "the" vs "a": same basic meaning, but the variable from "the" is lifted to L1, hence is influenced by salience. (competition between "a" and "the"?)
+\item  presupposition accommodation: "the strong player" == the strongest.
+\item  Vagueness more generally.
+\end{itemize}
+
+
+
+\section{Conclusion}
+\begin{itemize}
+\item  Kinds of variables: discrete, ordered, and continuous variables.
+\item  Roles for uncertainty: world knowledge, SF to LF translation, stochastic meanings, pragmatic coordination.
+\item  Pervasive uncertainty and joint inference: understanding is analyzable but not modular.
+\end{itemize}
+
+
+
+
+
+\section{Scratch: example sentences}
+\begin{itemize}
+\item "in match1 bob played against jim. bob won match1." ... "jim is the weakest player." : initial graded inference about bob's strength. explaining away. initially think bob strong, then probably not.
+%\item  "teamA won match 3"
+\item : some noun with graded  prototype extent?
+\item "every player was in a match yesterday" : scope ambiguity treated either as stochastic meaning fn or underspecified semantics. manipulate priors...
+\item ("the match was aweful/awful for team A" : ambiguous homonym?)
+\item "teamA has two players. one is the captain. that player on teamA is strong." : implicates not talking about the captain?  FG'12 style ad-hoc implicature.
+%\item "a player on team A is strong" : implicature that not talking about the team captain???
+%\item "the player" : salience and definite reference. (something about lewis and cats??)
+\item "some of the women are stronger than jane" : implicature that not all of them are.
+\item "team A won some of the matches" : implicature that not all of them, unless speaker had not seen all matches.
+\item "team A won the match" vs "team A prevailed in the match" : example of horn implicature.. latter implies close match? (need notion of how close the match was?)
+\item "john is strong" : gradeable, depends on prior over strengths.
+\item "the strong player" : interpreted as strongest by joint inference of threshold and reference.
+\item "john is strong, jim is a little less strong. is jim strong?" : sorites.
+\end{itemize}
+
+
+\appendix
+
+\section{Old stuff we may want to draw on...}
+
+%%"The major portion of the proposal should consist of a clear description of the technical approach being proposed. This discussion should provide the technical foundation/justification for pursuing this particular approach/direction and why one could expect it to enable the objectives of the proposal to be met."
+
+Words are potentially one of the clearest windows on human knowledge and conceptual structure. If we understood the connection between words and mental representation, we could gain critical insights into almost every aspect of psychology, construct vastly more useful thinking machines, and interface the two. But what do words mean? In this project we aim to {\bf construct and explore a formal model of lexical semantics grounded, via pragmatic inference, in core conceptual structures}. We will do so using a set of modeling tools---chiefly the probabilistic programming language Church \cite{goodman2008}---that we have previously developed and used to explain  aspects of high-level human cognition.
+
+Flexible human cognition is derived in large part from our ability to imagine (or sample, or simulate) possible worlds. A rich set of concepts, intuitive theories, and other mental representations support imagining and reasoning about possible worlds---together we call these {\bf core cognition}\footnote{This phrase is chosen to connote the \emph{conceptual core} of human thinking, in contrast to the distal processes of low-level perception, attention, etc. There is no particular connection intended to the developmental claims of \emph{core knowledge}, except for a concern with concepts and high-level cognition.}. We can formalize key pieces of core cognition (such as intuitive physics and theory of mind) using probabilistic programming tools, developed in previous ONR-funded research  (``A framework for core cognition'', ONR N00014-09-1-0124), by viewing commonsense knowledge as a set of interrelated definitions (or concepts) in a probabilistic programming language. Probabilistic programs specify sampling procedures over possible program executions, each execution fixes (some of) the variables in that describe the world, hence each collection of concepts describes how to sample from a rich space of possible worlds. The inference (or conditioning, or query) operator describes how to use these distributions on worlds for reasoning.
+We have been able to explain many inferences that humans draw from sparse evidence using these tools. Here we posit that this collection of concepts also forms the set of primitive elements available for {\bf lexical semantics}: word meanings can be built from the pieces of core cognition.
+
+However, the connection between core concepts and lexical semantics is not direct: 
+first, 
+because language must flexibly adapt to the context of communication, the connection between lexical representation and interpreted meaning is mediated by pragmatic inference;
+second, 
+sentence meanings act as constraints on possible worlds, via their truth-value, whereas core concepts describe generation of possible worlds.
+%
+% [DL] I think the previous clause may be somewhat difficult to understand for people who don't know about our angle yet...
+%
+We propose to explore a model of language that formalizes and explains these differences, again using tools of probabilistic programming. 
+
+In recent work we have made preliminary progress at combining underspecified semantic representations with a general purpose pragmatic inference mechanism.
+This potentially allows us to account for subtle aspects of language use with relatively simple semantic denotations.
+%: aspects of conveyed meaning emerge from an interaction of semantic denotation with context and core conceptual structures.
+In particular, we view semantic representation as indivisible from core cognition, and the effective meaning of words as emerging from a pragmatic inference process. A synergistic ONR project (``Grounded language understanding as social cognition'', PI Chris Potts) proposes to study the details of the pragmatic mechanism. In particular, this related project will perform detailed experimental studies of coordination games, which model pragmatics with minimal need for semantics---thus verifying the pragmatic framework used here to support our investigations of lexical semantics.
+
+Our approach is similar in spirit to cognitive semantics, in that we attempt to ground semantics in mental representation, but we draw on the highly successful tools of Bayesian cognitive science to formalize these ideas. 
+Similarly, our approach draws heavily on the progress made in formal model-theoretic semantics \cite{montague1973,heimkratzer1998}, borrowing insights about how syntax drives semantic composition, but we compose elements of stochastic logics rather than deterministic ones.
+Finally, our approach is related to recent progress in robotics (and indeed our project will benefit from ongoing collaboration with roboticist Stefanie Tellex of Brown University), but is more systematic and systematically connected to cognitive and linguistic theory. 
+
+We propose to study lexical semantics in the setting of an architecture for language understanding that is described in section \ref{langaugemodels}. We first provide, in section \ref{background}, background on the probabilistic programming language Church and on using Church to describe core cognition. In section \ref{lex} we describe the case studies of lexical semantics that we propose to explore in this project. We will rely heavily on computational infrastructure for inference in the Church language; the models we propose push the envelope of what is currently possible and will require new inference techniques. In section \ref{infrastr} we describe proposed work on Church inference algorithms and implementations.
+
+
+\section{Commonsense reasoning}
+\label{background}
+
+Probabilities describe degrees of belief, and probabilistic inference describes rational reasoning under uncertainty. It is no wonder, then, that probabilistic models have exploded onto the scene of modern artificial intelligence, cognitive science, and applied statistics: these are all sciences of inference under uncertainty. But as probabilistic models have become more sophisticated, the tools to formally describe them and to perform probabilistic inference have wrestled with new complexity. Just as programming more than the simplest algorithms requires tools for abstraction and composition, complex probabilistic modeling requires new progress in model representation---\emph{probabilistic} programming languages. These languages provide compositional means for describing complex probability distributions; implementations of these languages provide \emph{generic} inference engines: tools for performing efficient probabilistic inference over an arbitrary program. 
+
+By providing a uniform and universal representation for probabilistic models, probabilistic programming provides a framework for unifying disparate Bayesian models of human cognition. Indeed, while Bayesian models have been extremely influential in cognitive science \cite[e.g.][]{tenenbaum2011}, 
+%
+% do you want ``How to grow a mind''? It's in the bib now as tenenbaum2011.
+%
+it is only recently that we have the tools to view the Bayesian approach as a general framework for mental representation.
+We next give a brief introduction to probabilistic programming, then an indication of how these tools can be used for modeling human cognition.
+
+\subsection{Probabilistic Programming Languages and Church}
+
+In their simplest form, probabilistic programming languages extend a well-specified deterministic programming language with primitive constructs for random choice. 
+This is a relatively old idea, with foundational work by Giry, Kozen, Jones, Moggi, Saheb-Djahromi, Plotkin, and others \cite[see e.g.][]{JP89}. Yet it has seen a resurgence thanks to new tools for probabilistic inference and new complexity of probabilistic modeling applications. There are a number of recent probabilistic programming languages \cite[e.g.][]{sato97,Pfeffer01,milch05,richardson06,Poole:2008wk,kiselyovS09,Pfeffer:2009wo,mccallum2009factorie,Kimmig:2011tn}
+embodying different tradeoffs in expressivity, efficiency, and perspicuity. 
+We will focus on the probabilistic programming language Church  \cite{goodman2008}, which has the benefits of being close to the core mathematical foundation (stochastic lambda calculus) yet having sufficient expressivity to easily represent abstract structures needed in cognitive modeling.
+
+Church extends (the purely functional subset of) Scheme \cite{Abelson1996} with elementary random primitives, such as \lstinline{flip} (a bernoulli), \lstinline{multinomial}, and \lstinline{gaussian}. In addition, Church includes language constructs that simplify modeling. For instance, \lstinline{mem}, a higher-order procedure that memoizes its input function, is useful for describing persistent random properties and lazy model construction. %(Interestingly, memoization has a semantic effect in probabilistic languages.)
+If we view the semantics of the underlying deterministic language as a map from programs to executions of the program, the semantics of the probabilistic language is a map from programs to distributions over executions. When the program halts with probability one, this induces a proper distribution over return values. Indeed, \emph{any} computable distribution can be represented as the distribution induced by a Church program in this way (see \cite[\S6]{Freer2012}, \cite[\S11]{ackerman2011}, and citations therein).
+
+%Probabilistic graphical models  \cite{koller2009}, aka Bayes nets, are one of the most important ideas of modern AI.
+Probabilistic programs extend probabilistic graphical models \cite{koller2009}, aka Bayes nets, one of the most important ideas of modern AI. Indeed, graphical models can be seen as flow diagrams for probabilistic programs---and just as flow diagrams for deterministic programs are useful but not powerful enough to represent general computation, graphical models are a useful but incomplete approach to probabilistic modeling. For an example of this, we need look no further than the fundamental operation for inference, probabilistic conditioning, which forms a posterior distribution from the prior distribution. Conditioning is typically viewed as a special operation that happens \emph{to} a probabilistic model (capturing observations or assumptions), not one that can be expressed \emph{as} a model. However, because probabilistic programs allow \emph{stochastic recursion}, conditioning can be defined as an ordinary probabilistic function (Fig.~\ref{query}, Top). 
+%(However see \cite{ackerman2011} for complications in the case of continuous values.) 
+Notice that, since conditioning is an ordinary function, conditioning can be nested inside other calls to the conditioning operator. This is a pattern that we will use in defining our language models in section \ref{langaugemodels}.
+
+In Church, conditioning is specified by the more convenient \lstinline{query} syntax (Fig.~\ref{query}, Bottom). A Church query first gives a set of stochastic function definitions, which set up the ``language'' of the query, then gives the query expression (whose value we will return) and finally the condition expression, which must return true. We also allow \lstinline{factor} statements which provide another way of constraining a query: the statement\\ \lstinline{(factor expr)} multiplies the value of \lstinline{expr} (assumed to be a real number) into the probability of the current execution. This provides a convenient way to add a soft constraint on the distribution of executions (via a side-effecting operation).
+
+\begin{figure}[tbp]
+\begin{center}
+
+\begin{minipage}[b]{0.7\linewidth}
+
+\begin{lstlisting}
+(define (rejection-query thunk condition)
+  (let ((val (thunk)))
+    (if (condition val)
+        val
+        (rejection-query thunk condition))))
+\end{lstlisting}
+\end{minipage}
+
+
+\begin{minipage}[b]{0.3\linewidth}
+\begin{lstlisting}
+(query
+  ...defines...
+  query-expression
+  condition-expression)
+\end{lstlisting}
+\end{minipage}
+\hspace{2em}
+%$\rightarrow$
+\begin{minipage}[b]{0.3\linewidth}
+\begin{lstlisting}
+(define (thunk)
+  ...defines...
+  (pair query-expression
+     condition-expression))
+(define condition rest)
+\end{lstlisting}
+\end{minipage}
+
+\caption{(Top) Defining conditional inference in Church as a stochastic recursion: rejection sampling represents the conditional probability of the thunk conditioned on the condition predicate being true. We typically use special query syntax (Bottom, left), which can be desugared into a query thunk (Bottom, right).}
+\label{query}
+\end{center}
+\end{figure}
+
+
+
+\begin{figure}[htbp]
+\begin{center}
+
+(a)\\
+\begin{minipage}[b]{0.7\linewidth}
+\begin{lstlisting}[mathescape]
+;;Strength is a persistent (memoized) property of each person:
+(define strength (mem (lambda (person) (gaussian 1.0 1.0))))
+
+;;Laziness varies from match to match:
+(define (lazy person) (flip 0.3))
+
+;;When a person is lazy they pull less:
+(define (pulling person) (if (lazy person) 
+                             (/ (strength person) 2) 
+                             (strength person)))
+
+;;Total pulling of the team is the sum:
+(define (total-pulling team) (sum (map pulling team)))
+          
+;;The winning team pulls hardest:    
+(define (winner team1 team2) 
+  (if ($<$ (total-pulling team1) (total-pulling team2)) 
+      team2 
+      team1))
+\end{lstlisting}
+\end{minipage}\\
+(b)\\
+\includegraphics*[scale=0.5]{BPPexpt1}
+
+\caption{Modeling intuitive concepts in the tug-of-war domain. (a) A Church model to capture core concepts.  While this model is simple, probabilistic queries can explain human reasoning from diverse evidence with high quantitative accuracy. (b) Comparison of the model to human judgements in Experiment 1 of \cite{gerstenberg2012}.}
+\label{tug}
+\end{center}
+\end{figure}
+
+
+
+\subsection{Core Cognition: Intuitive Theories and Conceptual Structure}
+
+Church programs can be used to express a wide variety of cognitive models, capturing concepts from core cognitive domains and core concepts from many specific areas of knowledge. For a complete tutorial on using Church to model human cognition, including many  examples, see \url{http://www.stanford.edu/~ngoodman/ProbMods.html}.
+
+To illustrate, we consider the problem of capturing commonsense knowledge about the game tug-of-war. Figure \ref{tug}a, gives Church functions specifying key concepts for this domain (though certainly not exhausting possible knowledge about the game). This ``conceptual library'' of probabilistic functions can be used to reason about many patterns of evidence, via different queries, without needing to specify ahead of time the set of people, the teams, or the matches. 
+A Church program provides a description of how to go about simulating a possible world in the domain (here, randomly choosing strengths, laziness, etc., and computing the winner of each match). To reason from evidence or hypotheses, this simulation process is directed: a query describes what assumptions to fix and what to simulate (for instance, fixing match outcomes and simulating strengths). 
+%The program thus enables a very large numbers of different inferences to be modeled. 
+%The ability to model many inferences is inherited from the productivity of the underlying programming language, while the ability to capture complex, graded commonsense reasoning is inherited from probabilistic inference by simulation.
+
+The predictions of this simple model match human intuitions quite well, Figure \ref{tug}b. In \cite{gerstenberg2012} we presented people with the results of a set of matches in a ``ping-pong tournament'', and asked for judgements about the strength of one of the players.
+We found a correlation of 0.98 between model and human judgements. This compelling fit suggests that the definitions in Figure \ref{tug}a capture important aspects of the concepts people have for reasoning about team games. However, connecting these concepts to natural language would provide a much more natural probe of people's intuitions. For instance, we would like to ask \emph{Is Bob strong?}~rather than asking for an arbitrary rating of Bob's strength; but how does the adjective \emph{strong} in this positive form relate to the conceptual degree of \lstinline{strength}? The connection must be indirect since, as discussed in section \ref{sec:GA}, a statement like \emph{Bob is strong} can be interpreted very differently in different contexts.
+More generally, how may we use concepts defined in a Church model for a given domain to build the semantics of natural language for this domain?
+ 
+
+%\todo{intuitive physics and ToM.}
+
+
+%%%%%%%%%%%%
+
+\section{Literal meaning as conditioning}
+\label{L0}
+
+The basic assumption of our probabilistic model of language interpretation is that sentences can be used to update the listener's belief distribution. Because probabilistic belief update is performed by \emph{conditioning} a prior distribution to get a posterior distribution, the meaning of a sentence should be a conditioning expression---an expression that evaluates to true or false.
+If we assume further that a listener's prior knowledge about the world is given by her concept definitions, then the literal interpretation of language can be given by the Church function: 
+\pagebreak
+\begin{lstlisting}
+;;The basic listener: how is the world, given that the utterance is true?
+(define (L0 utterance QUD)
+  (query
+    ...core concept definitions...
+    (eval QUD)
+    (eval (meaning utterance))))
+\end{lstlisting}
+This describes a listener \lstinline{L0} who hears \lstinline{utterance}, and is interested in the import for a given question-under-discussion\footnote{Conceptually, we think of the listener as forming a distribution over possible worlds. However worlds are unwieldy to represent (being infinitely large), so we represent this distribution instead by a function that can give the distribution over answers to every question that can be asked in a world. This QUD is a notion used widely in formal models of discourse \cite{kuppevelt95,ginzburg95a,ginzburg95b,roberts96,roberts04,beaverclark08}.} 
+(\lstinline{QUD}).
+The (meta-)operator \lstinline{eval} evaluates a given expression in the current environment. Here this means evaluating both the \lstinline{QUD} expression and the meaning of the utterance in an environment in which the core concept definitions are visible.
+The result is a posterior distribution for each possible \lstinline{QUD}---hence a posterior distribution over possible worlds.
+ 
+\paragraph{Meaning Composition}
+We assume that the utterance has already been parsed into a syntactic tree. We don't address this syntactic parsing problem in this project, but instead assume it can be effectively handled by existing tools. 
+Following standard practice of formal semantics \cite{heimkratzer1998} we construct the meaning of the sentence recursively along the syntactic tree:
+%
+% DL question: I haven't used SP, but doesn't the fact that it's a dependency parser make it a somewhat poor choice here? There are some option in the linguistics literature (e.g. http://pagesperso.lina.univ-nantes.fr/info/perso/permanents/dikovsky/publies/dgsemantics.pdf), but I think it's considered to be a non-trivial problem. Of course you can throw some fancy machine learning at the problem, e.g. in Percy Liang's stuff, but I don't think the syntax-driven Heim & Kratzer-style approach will work.
+%
+\begin{lstlisting}
+;;Meanings are constructed by recursive composition along the (syntactic) tree:
+(define (meaning utterance)
+  (if (lexical-item? utterance)
+      (lexicon utterance)
+      (pair (meaning (left utterance)) (meaning (right utterance)))))
+\end{lstlisting}  
+Here the predicate \lstinline{lexical-item?} determines if the remaining utterance is a single lexical item (entry in the lexicon), the function \lstinline{left} returns the left subtree of the utterance (which we assume is the operator---possibly through a syntactic transformation), and \lstinline{right} returns the right subtree. By combining meanings with the \lstinline{pair} operator, we are implying that composition happens by function application: when the meaning is evaluated (in \lstinline{L0}) the left subtree meaning will be applied to the right subtree meaning.
+
+
+\paragraph{Lexical Meanings}
+The function \lstinline{lexicon} looks up the meaning of a word, returning an expression that can be evaluated in the current environment. Because this environment contains core concept definitions, the meanings of words can (and will) refer to non-linguistic mental representations: meanings of words are about the possible worlds that a listener considers. The lexicon is described in detail in section \ref{lex}. 
+(In later sections use the standard notation \sv{\mathit{word}} for \lstinline{(lexicon} {\it word}\lstinline{)}.)
+
+
+\subsection{Ambiguity}
+
+  
+\section{L1 Model: Pragmatic enrichment}
+The literal meaning, as encoded by \lstinline{lexicon} and interpreted by \lstinline{L0}, forms the stable contribution of words to meaning across contexts; however meaning can often be strengthened or changed in particular communicative contexts by pragmatic inference.
+Here we model pragmatic enrichment of the literal meaning following \cite{Frank2012,Goodman2013,stuhlmuller2012dynamic}. 
+Critically, because \lstinline{query} is an ordinary function that may be nested in itself, we are able to model a listener reasoning about a speaker, who reasons about a literal listener. This model formalizes the idea that a listener is trying to infer what the speaker intended, while a speaker is trying to make the listener form a particular belief. 
+
+The reflective speaker makes a speech act in order to lead the listener to infer a particular value of the question under discussion:
+\begin{lstlisting}
+;;The speaker: what should I say, so that the listener forms the right interpretation?
+(define (S1 val QUD)
+  (query
+    (define utterance (language-prior))
+    utterance
+    (equal? val (L0 utterance QUD))))
+\end{lstlisting}
+This function describes a soft-max optimal speaker 
+%
+% \cite{luce59,suttonbarto98} ? Might be worth saying in a few words what this means, e.g. ``describes a speaker who uses a soft-max rule \cite{luce59,suttonbarto98} to choose utterances $u$ according to the probability that $u$ will lead the literal listener to the right answer to QUD'' ?
+%
+whose goal is for the literal listener to arrive at a given interpretation. 
+The \lstinline{language-prior} forms the \emph{a priori} (non-contextual and non-semantic) distribution over linguistic forms, which may be modeled with a probabilistic context free grammar or similar model. 
+This prior inserts a \emph{cost} for each utterance: using a less likely utterance will be dispreferred \emph{a priori}.
+%---that is a speaker incurs a cost for using a more complex utterance.
+
+The pragmatic listener can now be modeled as a Bayesian agent inferring the value of the question under discussion, given that the reflective speaker has bothered to make a particular speech act:
+\begin{lstlisting}
+;;The pragmatic listener: what value does the QUD have, given that a speaker chose this utterance to express it?    
+(define (L1 utterance QUD)
+  (query
+    ...core concept definitions...
+    (define val (eval QUD))
+    val
+    (equal? utterance (S1 val QUD))))
+\end{lstlisting}
+This model gives rise to standard scalar implicatures (e.g.~\emph{some} implies \emph{not all}) and has been shown to predict human judgements with high quantitative accuracy in several language understanding tasks \cite{Frank2012,Goodman2013}. Ongoing research aims to further explore the ability of this model to predict human behavior in reference games and simple language understanding tasks.
+
+\subsection{Scalar implicature}
+
+
+
+ 
+\section{L1-sv Model: Free semantic variables}
+
+
+\begin{figure}[tbhp]
+\begin{center}
+\begin{minipage}{0.7\linewidth}
+\begin{lstlisting}
+(define (L0 utterance QUD sv)
+  (query
+    ...core concept definitions...
+    (eval QUD)
+    (eval (meaning utterance))))
+
+(define (S1 val QUD sv)
+  (query
+    (define utterance (language-prior))
+    utterance
+    (equal? val (L0 utterance QUD sv))))
+
+(define (L1-sv utterance QUD)
+  (query
+    ...core concept definitions...
+    (define sv (semvar-prior))
+    (define val (eval QUD))
+    val
+    (equal? utterance (S1 val QUD sv))))
+\end{lstlisting}
+\end{minipage}
+\caption{A probabilistic model of natural language understanding incorporating a literal listener \lstinline{L0}, a reflective speaker \lstinline{S1}, and a pragmatic listener \lstinline{L1-sv} who reasons about the question under discussion and the value of free semantic variables.}
+\label{L1-sv}
+\end{center}
+\end{figure}
+
+Under standard linguistic analysis, the literal meaning of a sentence frequently leaves some aspects underspecified; to assign a complete meaning to the sentence, pragmatic inference is required to fill in the value of these \emph{free variables}. This occurs, for example, in sentences such as \emph{He is drinking a martini}, which cannot receive a determinate meaning until the intended referent of \emph{He} is identified (see section \ref{indexicals}). It is believed that the same holds for \emph{Sam is tall}, since literal meaning underdetermines the height required to count as \emph{tall} (see section \ref{sec:GA}); or again for \emph{Moose have horns}, where the semantics does not determine what proportion of moose must have horns in order for this sentence to be true (see section \ref{sec:generics}). This type of context-dependence is widespread in language, but a general and precise framework for understanding how speakers and listeners make use of and resolve underspecified meanings has not previously been proposed.
+
+In our approach, semantic context-dependence is connected with pragmatic inference by instantiating semantic variables at the \lstinline{L1} level and passing them down to lower levels. The complete model is shown in Figure \ref{L1-sv}.
+In this model, a reflective listener \lstinline{L1-sv} evaluates candidate resolutions of the free semantic variables \lstinline{sv} jointly with possible values for the \lstinline{QUD}.
+As we describe in section \ref{lex}, this results in an interaction that produces powerful context-sensitive usage of words despite relatively impoverished semantic representations.
+
+For a fully compositional theory of natural language semantics, a mechanism is needed to account for the fact that expressions with free semantic variables (such as the pronoun \emph{he}) can occur in arbitrarily embedded positions in a sentence.
+Notice that when the \lstinline{QUD} and the meaning of the utterance are evaluated in \lstinline{L0} of this model, they are evaluated in an environment in which the semantic variables (\lstinline{sv}) are bound variables (because these are arguments to the \lstinline{L0} function). These variables are thus free with respect to the lexical entries, but not with respect to the full language model---they have been filled in by the pragmatic listener model. Using an environment to bind the free variables in this way is similar to the approach of relativizing the meaning function to a fixed set of parameters \cite{lewis79,lewis97,barker02}.
+An alternative approach would be to adopt the assumptions about compositionality associated with \emph{variable-free semantics} \citep{szabolcsi87,steedman01,jacobson99,barker07}. In this approach, the standard mechanism of function application is augmented, making it possible to lift a free variable out of deeply embedded syntactic positions, to the top level of literal meaning.
+
+
+%For instance, example \ref{e.1a} is assigned the semantic representation in example \ref{e.1b}, with the variable $x$ representing the pronoun lifted up to the top level despite being buried deeply in the embedded clause.
+%\begin{exe}
+%\ex{\label{e.1} 	 	}
+%\begin{xlist}
+%\ex{\label{e.1a} 	Sam thinks that Bill knows that she is drinking a martini.	}
+%\ex{\label{e.1b} 	$\lambda x : \textbf{female}(x) [\textbf{think}(\textbf{Sam})(\textbf{know}(\textbf{Bill})(\textbf{drinking-a-martini}(x)))]$	}
+%\end{xlist}
+%\end{exe}
+%Similarly, in examples involving gradable adjectives surveyed below the threshold variable $\theta$ is lifted to the top level from arbitrarily embedded positions, as in example \ref{e.2}. 
+%\begin{exe}
+%\ex{\label{e.2} 	 	}
+%\begin{xlist}
+%\ex{\label{e.2a} 	Sam thinks that Bill knows that Mary is tall.	}
+%\ex{\label{e.2b} 	$\lambda \theta [\textbf{think}(\textbf{Sam})(\textbf{know}(\textbf{Bill})(\mathit{height}(\textbf{Mary}) > \theta))]$	}
+%\end{xlist}
+%\end{exe}
+
+
+
+
+
+%%%%%%%%%%%%
+
+The language architecture described above predicts the interpretation of an utterance given its semantic content and context; fixing the semantic content of particular (classes of) words makes this abstract architecture concrete by grounding language use into the concepts of core cognition. In this section we describe our proposal to study several classes of words as representative case studies in which concepts, uncertainty, and inference interact in important ways. We place particular emphasis on the cases in which free semantic variables are needed to allow contextual flexibility in semantic interpretation.
+
+\subsection{Indexicals and referring expressions}
+\label{indexicals}
+
+Perhaps the simplest case where semantic free variables are needed is in the meanings of referring expressions. 
+For instance, the meaning of \emph{He is drinking a martini} can be taken to be (approximately): $\text{male}(x)\wedge \text{drinking}(x,y) \wedge \text{martini}(y)$, where $x$ and $y$ are free semantic variables that range over individual entities. The semantic contribution of \emph{he} to this meaning is two-fold: it introduces a free variable, and it constrains that free variable to be a male. However, in order to compose properly with the surrounding sentence, the return value of \emph{he} must be only the variable $x$. We can add the constraint, without affecting the return value, by using a Church factor statement: \\
+\indent \sv{\mathit{he}}$=$\lstinline[keepspaces]{(begin (factor (if (male x) 1.0 0.1)) x)}. \\
+This definition adds the constraint as a side-effect, then goes on to return the value of the free variable \lstinline{x}.
+Notice that the constraint that \emph{he} be male is a soft constraint: in a situation where no male referent for $x$ is plausible, it can be interpreted as a non-male. (For instance, in a situation in which we are discussing the best way to cook a burger the sentence \emph{Wait until he's just brown, then flip him} can be interpreted as referring to the burger.) Interpretation of the pronoun is guided by the semantics, but driven by probabilistic inference of the sentence meaning (similar to the conclusion of \citet{kehler08}).
+
+The constraints in this approach are determined by the conceptual content, but so are the potential referents: the possible values of $x$ are not entities in the world, but entities in the possible world represented by the listener \lstinline{L1-sv}. This is particularly striking in the case of
+indexicals such as \emph{I/here/now/that}. The free variable for \emph{now} ranges over times, that for \emph{I} over people, and each must have meta-access to the speech act itself. For instance, \\
+\indent \sv{I}$=$\lstinline[keepspaces]{(begin (factor (if (eq? x (speaker-of utterance)) 1.0 0.1)) x)}; \\
+where we have made use of the fact that the utterance is bound in the environment in which \sv{I} is evaluated (being an argument to \lstinline{L0}), and assumed that the \lstinline{speaker-of} function returns the individual who performed a speech act.
+
+
+Horn's \emph{division of pragmatic labor} \cite{Horn1984} presents a more subtle case for the pragmatic fixing of reference. This principle dictates that, in the absence of distinguishing semantic content, simple utterances should be interpreted as un-marked (i.e.~simple/probable/good) meanings and complex utterances as marked (i.e.~deviant/unlikely/bad) meanings. For instance \emph{I got the car started} is interpreted as doing something unusual to start the car, since the simpler phrase \emph{I started the car} is available to be interpreted as simply turning the ignition.
+To formalize this, imagine cheap/costly utterances \emph{u1}/\emph{u2} and \emph{a priori} likely/unlikely interpretations of the QUD \lstinline{val1}/\lstinline[mathescape]{val2}.
+We would like the less costly expression to be interpreted as the more likely interpretation: 
+\sv{u1}${=}$\lstinline{val1}, \sv{u2}${=}$\lstinline{val2}. 
+This is a simple signaling game \cite{Franke2009}, and this solution is a Nash equilibrium; however, there are many equally good Nash equilibria for this game. A number of attempts have been made to explain why this particular equilibrium should be chosen, but all require ad-hoc stipulations on the equilibrium concept.
+Indeed, the simple model \lstinline{L1}, with no semantic free variables, is unable to arrive at the correct interpretations.
+We have shown in \cite{bergen12} that the \lstinline{L1-sv} model does arrive at the correct interpretations in this case.
+Many questions and difficulties remain to integrate this result with lexical semantics more generally. In particular, how does the division of labor play out in situations with similar but not equivalent semantic meaning, and what semantic work can we rely on this  effect to do?
+
+We propose to use the \lstinline{L1-sv} framework with constrained entity variables to study the details of how referring expressions can be flexibly interpreted. 
+As illustrated above, complex interpretation patterns can be expected as context, concepts, and inference interact.
+We will explore the ways that context allows semantic constraints to be violated, the conceptual grounding of indexicals, the effect of alternative referring expressions, and the use of division of pragmatic labor in simplifying semantic denotations.
+
+
+\subsection{Scalar Adjectives}
+  \label{sec:GA}
+  
+Many words resist simple truth-functions that could be used to tell with certainty when they hold. For instance, exactly how tall must a person be to be a \emph{tall person}?
+Vagueness of meanings has been the subject of much discussion in philosophy and linguistics, and is of critical importance in the psychological literature on graded concepts \cite{rosch78,oshersonsmith81,armstrong83,kamppartee95,fodorlepore96,hampton07}. 
+Vagueness is particularly clear in the meanings of gradable adjectives, such as \emph{tall/short}, \emph{wide/narrow}, \emph{happy/sad}, \emph{wet/dry}, and \emph{full/empty}. 
+These adjectives serve to express measurement along a scale (\emph{Sam is six feet tall}); they are grammatically gradable (\emph{Sam is very tall}), are typically vague, and are highly context-sensitive \cite[e.g.~][]{kamp75,fine75,cresswell76,vonstechow84,williamson94,kennedymcnally05,kennedy07}. 
+%For example:
+%\begin{exe}
+%\ex{\label{e1} 	 Measurement and gradation:		}
+%\begin{xlist}
+%\ex{\label{e1a} 	.	}
+%\ex{\label{e1b} 	This glass is 50\%/completely full.	}
+%\end{xlist}
+%\end{exe}
+
+Vagueness can be seen from the existence of \emph{borderline cases}: individuals for whom it is unclear whether an adjective applies. A seven-foot-tall man is obviously tall, and a five-foot-tall man is obviously not; but does a man who is $6'2''$ count as ``tall''? When asked a question of this type, speakers typically express uncertainty, and show disagreement in responses to a forced-choice \citep{bonini99,schmidtetal09,verheyen10,alxatib11}. 
+The vagueness of adjectives appears to be related to statistical properties of a \emph{comparison class} \citep{bierwisch89,schmidtetal09,solt11}, which can be implicit in the context or provided explicitly as in: 
+\emph{Sam is rich for a janitor/politician} or \emph{Michael Jordan is tall for a man/basketball player}.
+
+Our approach to gradable adjectives starts with a scalar theory of their lexical semantics. 
+%We assume that the lexical entry of a gradable adjective contains only a specification of the relevant scale---a triple \lar{D, \leq, \delta}, as in [K07]. 
+We adopt a degree semantics in which adjectives relate individuals to a threshold value\footnote{Or rather: \sv{A}${=}$ \texttt{($\lambda$ (x) (> ($\mu_A$ x) $\theta$)}, but we have used the more familiar mathematical notation where it is clearer.}: \sv{A} $= \lambda x [ \mu_A(x) > \thet{A}]$, where $\thet{A}$ is a free threshold variable on $A$'s scale and $\mu_A(x)$ is the degree of $x$ on this scale. We will further assume that the function $\mu_A(x)$ is a concept defined in core cognition. For example, if \lstinline{height} is a persistent property of an individual (here drawn from a fixed gaussian for simplicity), the basic meaning of \emph{tall} is:
+\begin{lstlisting}[mathescape]
+;;core concept definitions:
+(define height (mem ($\lambda$ (x) (gaussian 6.0 1.0))))
+...
+
+;;lexicon:
+$\sv{tall} =$ ($\lambda$ (x) (> (height x) $\theta$))
+\end{lstlisting}
+%
+%\begin{exe}
+%\ex{\label{etall} $\sv{\mathit{tall}} = \lambda x [\mathit{height}(x) > \theta ]$	\\
+%``\emph{tall} is true of an individual $x$ if and only if $x$'s height is greater than $\theta$''
+%	}
+%\end{exe}
+Crucially, $\theta$ is left as a free variable in the semantic representation. The meaning of \emph{Sam is tall}, then, is simply that Sam's height is at least $\theta$; the task of inferring $\theta$ in order to derive a meaning for this sentence will be preformed by the full interpretation model, \lstinline{L1-sv}. This approach to the interpretation of vague adjectives captures the insights of previous probabilistic accounts \citep{edgington97,schmidtetal09,frazeebeaver10,lassiter11}, but improves on them in several ways, notably in providing a clear lexical semantics from which the probabilities follow.
+
+
+To illustrate, imagine a situation in which a speaker is attempting to communicate Sam's height to a listener who does not know how tall Sam is, but knows that Sam is an adult male. The \lstinline{QUD} is \lstinline{(height `sam)}. We assume that listener and speaker share the common prior knowledge that heights of people are approximately normally distributed. The meaning of the sentence \emph{Sam is tall}, as constructed by the \lstinline{meaning} function, will be simply \lstinline[mathescape,keepspaces]{(> (height `sam) theta)}.
+The listener \lstinline{L1-sv} will then do a joint inference of Sam's height and the threshold variable \lstinline{theta}.
+
+\begin{figure}[tbp]
+\begin{center}
+\includegraphics[scale=0.24]{GA-figs/heights-onr}
+\includegraphics[scale=0.24]{GA-figs/fullness-onr}
+\caption{Predictions of the \lstinline{L1-sv} model for a threshold semantics for adjectives, with prior distribution over degrees appropriate to \emph{tall/short} and \emph{full/empty}. These simulations used Markov Chain Monte Carlo to draw 30,000 samples from the joint posterior on 
+degree and $\theta$, with $\alpha = 4$, the utterance prior of $u \propto \text{length}(u)$, a burn-in of 5000 samples, and a lag of 100. Plots show the kernel density of the relevant variables. 
+The alternative utterances considered are to say nothing or to use the positive (e.g.~\emph{tall}) or negative (e.g.~\emph{short}) adjective.
+}
+\label{GA}
+\end{center}
+\end{figure}
+
+%We assume that speakers and listeners share a uniform prior on $\theta$. Let $h$ represent Sam's height. A listener who does not know how tall Sam is, but knows that Sam is an adult male, will have some prior distribution over $h$ (e.g., a Gaussian). The probability that a speaker will utter $u$ under this parameterization is sensitive to this statistical knowledge, because the speaker's utility function refers to the statement's informativity to the literal listener $L_0$.
+%\eq{\label{5}
+%p_{S_{1}}(h\ |\ w, \theta) & \propto & \text{exp}(\alpha \times \text{log}(\mathbb{EU}_{S_1}(u; h, \theta)))\\
+%& \propto & \text{exp}(\alpha \times \text{log}(1/p_{L_0}(h\ |\ u, \theta) - C(u)))
+%}
+%
+If the value of \lstinline{theta} is very low (e.g., one foot), the utterance \emph{Sam is tall}  is extremely uninformative: the listener already has a strong belief that Sam is more than one foot tall. On the other hand, if \lstinline{theta} is extremely high, the utterance will be extremely informative since the prior probability that Sam's height is greater than \lstinline{theta} is very low. 
+This means that \emph{Sam is tall} was much more likely to be uttered by \lstinline{S1} if the value of \lstinline{theta} is high.
+But this pressure to infer high \lstinline{theta}, and hence large heights, is balanced by the low prior probability of very large heights. The posterior distribution on heights given the utterance (shown in Figure \ref{GA}) reflects this balancing process. In effect, interpretations are preferred which make Sam significantly taller than average, but not implausibly tall. 
+%This does indeed seem to be the inferred meaning of \emph{Sam is tall} in context. 
+Our model thus gives precise form to an intuition about the meaning of scalar adjectives which has been stated repeatedly in the linguistic and philosophical literature \cite[e.g.][]{bierwisch89,fara00,kennedy07}.
+
+
+There is an immediate explanation in this approach of the context-dependence of scalar adjectives: different comparison classes have different prior distributions, which affects the joint inference carried out by \lstinline{L1-sv}. This can explain not only quantitative shifting of the threshold depending on context (e.g.~tall man vs.~tall basketball player), it can also explain qualitative differences between different types of adjectives. For instance, absolute adjectives, like \emph{full/closed}, also refer to a degree along some scale, but behave differently than relative adjectives (like \emph{tall}): absolute adjectives compare a degree to a (fairly) fixed extreme point \cite{rotsteinwinter04,kennedymcnally05,kennedy07}\footnote{There are also differences in modification patterns between relative and absolute adjectives. For example, we can modify \emph{full} as \emph{completely full} but we cannot usually say not \emph{completely tall}.}. 
+For instance, a closed door is not one that's more closed than average, it's \emph{closed}.
+%
+% [DL] On the last sentence: You convinced me at some point that this isn't a categorical distinction, plus it's not clear here what its significance is. You could say more about degree modification, but I suspect it's not really necessary here; instead you could just cite e.g. \cite{rotsteinwinter04,kennedymcnally05,kennedy07} for the intuition that there's a distinction in the postive-form meaning in that the absolute adjectives are closer to an endpoint. Probably worth using and definig the term ``absolute adjective'' explicitly here as well, since it's used below.
+%
+Prior distributions which have significant probability mass near the edges of a scale result in very different interpretation than those with thin tails (Figure \ref{GA} left vs right): the interpreted meaning is strongly peaked near the extreme point of the degree. The difference between relative and absolute adjectives can thus be explained by qualitative differences in the prior distributions which they invoke. These differences in prior distribution are a consequence of non-linguistic knowledge represented in concepts of the domain.
+
+
+\paragraph{Sorites paradox} The much-discussed \emph{sorites paradox} is a key puzzle of gradable adjectives, for example:
+\begin{exe}
+\ex{\label{e2} 	 Sorites paradox:	}
+\begin{xlist}
+\ex{\label{e2a} 	A man who is 7 feet tall is tall.	}
+\ex{\label{e2b} 	A man who is 0.01 inches less tall than someone who is tall is also tall.	}
+\ex{\label{e2c} 	Therefore, a man who is 4 feet tall is tall.	}
+\end{xlist}
+\end{exe}
+This argument is logically valid, and the premises \ref{e2a} and \ref{e2b} appear to be reasonable; but the conclusion \ref{e2c} is clearly false. An account of vagueness should explain both the logical puzzle (which premise is incorrect?) and the psychological problem (why do people find the premises so compelling, while also maintaining that the conclusion is completely implausible? \cite[Cf.][]{fara00}).
+
+Our approach to adjective interpretation offers a new account of the sorites paradox. The argument is logically unsound because the second premise \ref{e2b} is not \emph{strictly true}: if $x$'s height is very close to the cutoff, $\theta$, then $x$ may count as ``tall'' while someone just slightly shorter does not. However, the second premise is  \emph{highly plausible} because the probability that $\theta$ and $x$'s height will be so close is small. 
+%In other words, the posterior distribution on $\theta$ describes the inferred meaning of ``tall'' in a particular context; the distribution on $w$ described the height of someone known to be ``tall'' given this distribution on meanings. 
+Indeed, if we choose the height $h$ of $x$ and the threshold $\theta$ from the joint posterior distribution that \lstinline{L1-sv} defines given the utterance \emph{$x$ is tall},
+%$p_{L_1}(h, \theta \ |\ u)$ defined by our model, 
+the probability that $h - \theta > 0.01$ (i.e.~premise \ref{e2b} holds) is approximately 95\%.
+%This high probability makes the inductive premise intuitively compelling; but since its probability is less than 1, repeated use as a premise does not preserve high probability: the conclusion of the sorites paradox need not hold.
+This explains the psychological puzzle described above: why is the second premise so compelling, if it is not strictly true? The answer is that this premise has high probability (a fact which does not justify its repeated use as a premise in logical arguments \cite{kyburg61}).
+
+Absolute adjectives are different: the second premise is less intuitively plausible for an adjective like \emph{closed} (``A door that is 0.1 inches less closed than a closed door is also closed'') \cite{kennedy07}.
+We suggest that this is essentially because the posterior variance of the threshold is lower for absolute adjectives. In simulations using a prior peaked slightly near the boundary (as in Figure \ref{GA} right), the second premise has much lower probability (65\%).
+%
+% the next sentence seems kind of out of place ... also, maybe we should say something about the world-model connection, why it makes the assumption of different priors reasonable, and how we plan to test the model assumptions that drive this empirical result?
+%
+ Our model thus suggests that the difference in sorites susceptibility between relative and absolute adjectives may be a difference in the degree of uncertainty after hearing the adjective statement, rather than a qualitative difference between kinds of uncertainty.
+
+
+%\paragraph{Plural comparison}
+%\todo{add something on plural comparison?}
+
+
+%\subsubsection{Spatial, Emotion, and Number Terms}  
+%\label{domains}
+%The semantics for gradable adjectives introduced in section \ref{sec:GA} relies on a degree function which is specific to each adjective, assumed to be a concept from core cognition. Any intuitive theory that contains an analog magnitude representation can potentially support an adjective in this way. Conversely, the adjectives used to describe a particular domain will offer insights about the (latent) analog magnitude representations within people's theory of that domain. We propose to study several cases of words derived from cognitively interesting intuitive theories: in this section we briefly discuss spatial and affective language, and natural number terms. In each case the proposed research offers insights about language derived from conceptual representations, but also offers detailed probes of conceptual structure by using the quantitative linguistic theory we have described above.
+%
+%\paragraph{Spatial terms} 
+%We have a rich set of terms for describing spatial relations, many of which show signs of gradability. For instance, \emph{near} seems to function like a relative adjective whose scale is distance between two objects (or locations): \emph{the ring is near the box}. We will explore this meaning: \sv{\mathit{near}}${=}\lambda x \lambda y [\mathit{distance}(x,y)<\theta]$. Other prepositions, such as \emph{in/on} also appear to have scalar semantics, but the scale is less apparent. In these cases assuming a simple scalar threshold semantics and measuring usage across situations will allow us to \emph{infer} the scale structure: thus using the linguistic theory to map out conceptual representations.
+%
+%\begin{figure}[tbhp]
+%\begin{center}
+%\includegraphics*[scale=0.12]{Spatial-figs/C}
+%\includegraphics*[scale=0.12]{Spatial-figs/W}
+%\includegraphics*[scale=0.12]{Spatial-figs/W-1}
+%\caption{What does \emph{in front of} mean in each context? Preliminary data shows that interpretation is affected by geometric context (position of the box on the table) and speaker's perspective.}
+%\label{boxexpt}
+%\end{center}
+%\end{figure}
+%
+%Many spatial terms also show signs of indexicality, or perspective sensitivity. For instance in the description \emph{the ring is in front of the box}, the \emph{front} may be specified by an intrinsic property of the box, by the geometric context, by the speaker's point of view, or the listener's. Figure \ref{boxexpt} shows three situations from a pilot experiment in which we varied properties of the geometric context (position of the box on the table) and the speaker's perspective. Interpretation of the phrase varies in a systematic but subtle interaction of these factors. We propose to model \emph{in front of} as a scalar term with an additional free variable: the reference angle. Joint inference fixes both the intended position and the reference angle, but the reference angle is influenced also by the perspective of speaker and listener, leading to indexical properties of the meaning.
+%
+%
+%\paragraph{Emotion terms} 
+%When do we use different emotion terms to describe someone's reactions? What properties of a situation lead us to describe someone as \emph{happy/sad/angry/surprised/disgusted/afraid/content/disappointed}? These emotion adjectives pattern with scalar adjectives, discussed above, 
+%suggesting that there is an underlying scale for each. By measuring the use of the emotion adjectives in systematically varying contexts we can draw conclusions about the underlying scale for each emotion, and the relation of these scales to each other.
+%
+%In a pilot experiment, we showed participants a player on a game show spinning a wheel and receiving a prize based on where the wheel landed; we then asked for ratings for several emotion words. See Figure \ref{spinners}. Initial analysis of this data suggests that the majority of variance is explained by one primary emotion scale derived from the \emph{prediction error} (actual reward less expected reward). Each emotion word acts as a scalar adjective along a non-linear transform of prediction error (in particular, a quadratic term appears important). Yet there are hints in the data that additional factors are also relevant: nearly missing a better outcome, regret, and social factors are all important aspects that we will continue to explore.
+%
+%\begin{figure}[tb]
+%\begin{center}
+%\fbox{
+%\includegraphics*[scale=0.7]{SpinnerExpt}
+%}
+%\caption{An example of the outcome and response format from a pilot experiment examining the nature of emotion scales.}
+%\label{spinners}
+%\end{center}
+%\end{figure}
+%
+%
+%\paragraph{Number terms}
+%The meanings of numbers are usually thought to be fixed and precise. In mathematics, the number 30 has a precise meaning that clearly distinguishes it from 32 and 1000. In everyday language, however, numbers are treated much more flexibly: people do not always mean what they say when using number words.
+%Imprecise use of number words is an instance of \emph{pragmatic halo} \cite{lewis79,lasersohn1999}:
+%for instance, \emph{I'll be there in 30 minutes} means approximately 30 minutes, while \emph{I'll be there in 31 minutes} means exactly 31 minutes. A more radical usage is \emph{Hyperbole}, or the use of exaggeration to convey affective subtext: \emph{I waited for a million hours} means roughly ``I waited for a while and I didn't like it''.
+%Each of these effects seems to violate the literal meaning of the number words in order to convey a richer interpretation.
+%
+%We propose to explore the pragmatics of number word interpretation, and what this in turn tells us about conceptual representation of numerosity, using a set of modeling tools inspired by our treatment of scalar adjectives and indexicals. By treating the lexical semantics of numbers as containing a free ``slack'' variable (affecting variance of the meaning) we can derive pragmatic halo from the pragmatic division of labor, discussed in section \ref{indexicals}. By simultaneously reasoning about the numerical content and the affective subtext of an utterance we can explain why exaggeration carries additional, non-numeric, meaning.
+%  
+
+
+%\subsubsection{Generics and Quantifiers}
+%\label{sec:generics}
+%Generic sentences are a ubiquitous way of communicating about the properties of categories \citep{carlson77}:
+%\begin{exe}
+%\ex{\label{e3} 		}
+%\begin{xlist}
+%\ex{\label{e3a} 	Birds fly.	}
+%\ex{\label{e3b} 	Ducks lay eggs.	}
+%\ex{\label{e3c} 		Mosquitoes carry West Nile Virus.	}
+%\end{xlist}
+%\end{exe}
+%The meaning of generic sentences has been a longstanding puzzle to psychologists, philosophers, and linguists alike \citep{carlson77,krifka95,cohen99,cohen99b,pelletier97,leslie08,gelman04,cimpian10}. 
+%A first guess might be that ``Birds fly'' means that \emph{all} birds fly; but this is not right, since the existence of penguins does not make \ref{e3a} false. Weakening the meaning to \emph{most} or \emph{usually} is not sufficient either, in light of \ref{e3b}-\ref{e3c}: fewer than half of ducks ever lay eggs (the female ones who survive and reproduce), and only a small proportion of mosquitoes carry West Nile Virus. 
+%%
+%Assuming a maximally weak meaning (\emph{some}) seems like the only truth-functional meaning consistent with \ref{e3a}-\ref{e3c}; but this is problematic as well: experimental results indicate that, in the absence of prior knowledge, people usually infer from a generic sentence like \ref{e3a} that the property is highly prevalent \citep{cimpian10}. 
+%%
+%In contrast to these semantic complications, generics seem to be one of the \emph{simplest} linguistic constructions on many other dimensions: they require no explicitly marked operator (contra quantifiers like \emph{some/all}), they are acquired early and used abundantly in child-directed speech \cite{gelman04}, and they have high frequency in everyday speech.
+%
+%What is needed, it seems, is a meaning for generic sentences that makes them semantically simple---for instance by explaining the subtleties of usage through pragmatic inference. Something along the following lines: \emph{Birds fly} is true if the rate of flying among birds is greater than what you would expect if you did not know anything about birds; \emph{Ducks lay eggs} is true if the rate of egg-laying among ducks is greater than that of animals in general; and so on. This kind of sensitivity to prior expectations is reminiscent of the analysis of gradable adjectives in section \ref{sec:GA} above.
+%
+%We propose to treat generic statements in a way that parallels scalar adjectives, with the scale being \emph{probability}: the generic statement \emph{Kind Property} imposes a (free variable) threshold on the probability of the property holding for members of the kind: \\
+%\indent \sv{\mathit{Kind\ Property}} $= P(\text{Prop}(x) \ |\ x\sim \text{Kind}) {>} \theta$.\\
+%That is, the probability that an object drawn from the distribution over objects \emph{Kind} has property \emph{Prop} is greater than an underspecified threshold $\theta$. If we wish to encode this purely in terms of the sampling semantics of Church (i.e.~not requiring a reflection operator that exposes the probability directly), we could write:\\
+%\indent \sv{\mathit{Kind\ Property}}{=}\lstinline[mathescape]{(all (repeat theta ($\lambda$ () (Prop (Kind)))))}.\\
+%That is: draw \lstinline{theta} samples by sampling a \lstinline{Kind} object and evaluating \lstinline{Prop}, return true if all samples are true.
+%(The two versions of the semantics, explicit probability threshold and repeated sampling, are equivalent in expectation up to a transformation of the free variable.)
+%
+%This probability threshold semantics for generics results in a strong interpretation when there is no prior knowledge: Figure \ref{generics}a shows that with uniform prior over property rate the generic is only endorsed when the property is usually true for this kind (i.e.~a meaning close to \emph{all}, though tolerating exceptions). However, background knowledge about the property can radically alter interpretation of the generic. Figure \ref{generics}b shows that if the property is believed \emph{a priori} to be rare, then the generic can be endorsed even if the property fairly infrequent for this kind. This is reminiscent of \emph{mosquitos have West Nile virus}, assuming background knowledge that carrying a disease is rare even when possible. 
+%Figure \ref{generics}c shows the predictions for a case like \emph{birds fly}, where naive reasoners assume biological characteristics of animals to be \emph{homogeneous} \cite[see][]{nisbett1983}: an animal kind will have either a very high or very low rate of most properties. In this situation the interpretation of the generic is very strong---again close to \emph{all}. 
+%%
+%Finally, what of cases like \emph{Ducks lay eggs}? Figure \ref{generics}d shows an appropriate prior for egg-laying: at most half of animals in a kind do it. The prediction is an interpretation requiring around half of animals in the kind to lay eggs.
+%
+%These preliminary results are encouraging; we propose to build a more complete model of generics using these techniques, and evaluate it against the significant empirical literature on generic usage. Having verified this approach to generics, we will have a sharp tool for exploring people's intuitions about kinds and properties.
+%
+%\begin{figure}[tbhp]
+%\begin{center}
+%\begin{tabular}{cccc}
+%(a) &
+%\includegraphics*[scale=0.3]{Generics-figs/uniform} &
+%(b) &
+%\includegraphics*[scale=0.3]{Generics-figs/rare} \\
+%(c) &
+%\includegraphics*[scale=0.3]{Generics-figs/most-or-few} &
+%(d) &
+%\includegraphics*[scale=0.3]{Generics-figs/gendered}
+%\end{tabular}
+%\caption{Prediction of the generics model for four different prior expectations about frequencies of the property.}
+%\label{generics}
+%\end{center}
+%\end{figure}
+%
+%
+%\paragraph{Quantifiers} The standard linguistic analysis of quantifiers is as deterministic logical operators on sets. However, the above analysis for generics suggests an interesting analogy: Modifiers for scalar adjectives can strengthen meaning, e.g.~\emph{very tall}, and even  squeeze out much vagueness, e.g.~\emph{completely closed}. What if quantifiers are analogous modifiers for the generic, which we have given a scalar interpretation? That is, perhaps \emph{all} plays a similar role in \emph{all dogs have fur} that \emph{completely} does in \emph{the door is completely closed}. 
+%%
+%% [DAN SUGGESTION: something like] A similar approach has been proposed in linguistics by \cite{lasersohn1999,brisson2003}, though without the connection to genericity and without an explicit quantitative framework.
+%%
+%This would explain why generics appear as the un-marked form of quantification, and would explain why even strong quantifiers like \emph{all} are found experimentally to have some slack \cite{sloman1998}. However a number of potential problems with this semantics for quantifiers must be explored. For instance, how does this modifier semantics explain scope ambiguity? What predictions follow about vagueness and slack in quantifier meaning, and are these empirically viable? 
+%
+%  
+%\subsubsection{Modal Verbs and Adverbs}
+%\label{modals}
+%%"John wants Mary to know his birthday. It is likely that she does."
+%%  - epistemic modals, 
+%%  - belief / knowledge verbs, 
+%%  - desire verbs.
+%   
+%Modals are a class of linguistic expressions whose meanings are deeply bound up with reasoning about beliefs and desires, for instance: 
+% \begin{exe}
+%\ex{\label{e5} 			}
+%\begin{xlist}
+%\ex{\label{e5a} 	Mary \underline{wants} to have a birthday party.	}
+%\ex{\label{e5b} 	I \underline{believe} it is \underline{likely} that she will.	}
+%\ex{\label{e5c} Mary doesn't \underline{want} John to \underline{know} about her party.}
+%%\ex{\label{e5c}	 	\underline{Because} he is out of town, Sam will not be \underline{able} to come.	}
+%\end{xlist}
+%\end{exe}
+%%These expressing concepts such as possibility, uncertainty, doubt, desire, obligation, ability, and opportunity. 
+% %The sentences in \ref{e5} illustrate modal language involving desires, uncertain beliefs, and causation and ability, respectively. 
+%Modal language offers an opportunity to draw close connections between semantics and the intuitive theories of belief, desire, observation, etc.~(that is Theory of Mind).
+%%
+%Recent research has formulated a rich probabilistic framework for 
+%%both for uncertain reasoning \citep{heit98,sanjanatenenbaum03,kemptenenbaum09} and for 
+%theory of mind \citep{bakeretal09,Goodman2009a,baker11,jern11}; at the same time, semantic research on modality has begun to move toward representations based on related tools from probability and decision theory \citep{levinson03,yalcin07,yalcin10a,yalcin12a,lassiter10a,lassiter11c,lassiter11b,klecha12}. 
+%The latter line of research emphasizes the graded nature of belief and desire, but has not drawn systematic connections with the relevant cognitive science research---rather than inheriting these structures from theories of mental representation, they posit them as part of semantics.
+%%, leaving it as a mystery why the structures underlying the meanings of modal expressions should resemble so closely the cognitive mechanisms which they are used to describe.
+%In our approach the meanings of linguistic expressions of uncertainty, desire, and causation are not \emph{sui generis}, but are defined in terms of the concepts that agents use to reason about their own and others' actions and motivations. 
+%
+%The key technical idea is that the intuitive theory of mind provides for each person a distribution over worlds. Rather than reifying worlds directly, we can represent beliefs as mappings from expressions (the question of interest, \lstinline{QOI}) to values. Thus Bob's beliefs, \lstinline{(beliefs `bob)}, will be a function from expressions to values, and\\ \lstinline[keepspaces]{((beliefs `bob) `(sky-is `blue))} represents (the probability that) Bob believes the sky is blue.
+%The belief function for a rational Bayesian agent can be written:
+%\begin{lstlisting}[mathescape]
+%(define (beliefs person)
+%  ($\lambda$ (QOI)
+%    (query
+%      ...intuitive theories...
+%      (eval QOI)
+%      (observations person))))
+%\end{lstlisting}
+%That is, the agent conditions on their observations in the context of their intuitive theories (prior knowledge) to form a posterior distribution over the question of interest. We do not assume that all agents have rational beliefs, however, only that their beliefs can be represented as a similar distribution.
+%
+%Using this core notion of belief, we can understand the semantics of \emph{believes} as:\\
+%\indent  \sv{believes}${=}$ \lstinline[mathescape]{($\lambda$ (person expr) (all (repeat theta ($\lambda$ () ((beliefs person) expr)))))}.\\
+%That is, \emph{Bob believes expr} is a scalar construction, much like generics in section \ref{sec:generics}, that requires Bob's degree of belief in \lstinline{expr} to be above a (semantics free variable) threshold. (Here we have implemented the threshold by taking \lstinline{theta} samples from Bob's belief distribution and requiring that \lstinline{expr} be true for each.)
+%When the literal listener, \lstinline{L0}, conditions on a belief statement, it places a constraint on the belief distribution of the agent in question.
+%
+%The intuitive theory of mind is not propositional in any important way: it
+% describes beliefs as a generative distribution on worlds (given observations, etc). 
+%However, the semantics of \emph{X believes Y} constructs a constraint on this belief distribution out of the proposition \emph{Y}. 
+%In this way, belief \emph{language} is propositional, while belief \emph{representations} themselves are non-propositional---providing an interesting take on the question of propositional attitudes in theory of mind.
+%
+%%That is, if people's intuitive theories about others' graded beliefs are indeed best understood in terms of embedded probability distributions (as our Church-based theory-of-mind models would have it), then we expect that the language used to discuss beliefs overtly should have probabilistic structure as well.  The same goes, mutatis mutandis, for desire language and expected utility structure.
+%
+%We propose to explore and extend this semantics of belief terms, and to integrate it with our previous work 
+%on epistemic modals (\emph{plausible/likely/certain/...}) \citep{lassitergoodman12}. We further plan to explore modals of desire (e.g.~\emph{wants}), and the embedding of these modals in each other---capturing the meanings of statements like \ref{e5}a-c, above.
+%
+
+
+
+
+\end{document}
+
+
+
+
+Desiderata for world / language fragment:
+
+-world model shows explaining away, in/ab/de-duction, size principle.
+
+-world model contains 
+  -objects (people: player, captain, ...) 
+  -events? (match, win, ...)
+  -continuous and discrete properties (strength, gender, ...)
+  -causal structure that depends on object properties ( match(teamA,teamB) --> win(teamA) ..)
+
+-lexicon contains: 
+  -names?
+  -kinds / graded NPs, for prototype-like effects, e.g. typicality?
+  -simple (and mostly un-grounded) verbs: 
+  -sources of lexical ambiguity? or just use scope?
+  -entailment related ref expr, for quantity implicature
+  -ambiguous referring expressions, for horn implicature
+  -quantifiers some/all, for scalar implicature 
+  -gradeable adjs, for vagueness
+  -"saw" in order to get knowledge effects?
+
+sentences we want to handle:
+ -"teamA won match 3"
+ -"every player was in a match" --> scope ambiguity treated either as stochastic meaning fn or underspecified semantics.
+ (-"the match was aweful/awful for team A" --> ambiguous homonym?)
+ -"some of the women are stronger than jane" --> not all of them are.
+ -"team A won some of the matches" --> not all of them, unless speaker had not seen all matches.
+ -"a player on team A is strong" --> not talking about the captain???
+ - "team A won the match" vs "team A managed to prevail in the match" --> example of horn implicature..? (need notion of how close the match was?)
+ -"john is strong"
+ -"john is strong, jim is a little less strong. is jim strong?"
+
+
+
+
+Notes:
+
+Cf Tuggy 1998: ambiguity, polysemy, vagueness lie along a spectrum.
+
+
+
