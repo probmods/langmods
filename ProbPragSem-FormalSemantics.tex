@@ -359,7 +359,7 @@ This model allows us to wrap up all information about the speaker's reliability,
 \item strong: $\lambda x . \mathit{strength}(x) > \theta_{\mathit{strong}}$
 \item score1, score2: auxiliary functions with apply to a match and return the score of the team listed first/second 
 \item close: $\lambda x . \mathit{match}(x): \mathit{score1}(x) - \mathit{score2}(x)| < \theta_{\mathit{close}}$ [presupposes argument is a match, asserts it was theta-close]
-\item the: a (stochastic) function from properties to individuals who satisfy the property. We could make it a hard max, but I think softmax would be more appropriate, since \emph{the dog} is supposed to be bad not only when there are two equally salient dogs, but also gradedly bad when there are two dogs of which one is just more salient than the other.
+\item the: a choice function, i.e., a function from a property to some individual who satisfies the property; the prior distribution is uniform over all individuals who have the property. (The graded salience effects should kick in at L1, in reasoning about who it's more likely that the speaker would be talking about.)
 \item less: a function from an adjective (\emph{close, strong}) and a degree $d$ to properties of individuals $x$, returning true iff the adjective holds of $x$ to a degree less than $d - \epsilon$. By default, $r = 0$. 
 \item A little: a modifier of \emph{less} s.t.\ , where epsilon is a free parameter which we can vary to make the point about how the sorites works.
 \item -est: function from domains and adjectives to adjectives, where the latter is true only of individuals with argmax degree of the property in the domain
