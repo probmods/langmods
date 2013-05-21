@@ -347,7 +347,7 @@ This model allows us to wrap up all information about the speaker's reliability,
 \item player: function from individuals (names) to $\{0,1\}$
 \item men, women: function from individuals (names) to $\{0,1\}$, constrained so that $\mathit{player}(x) \rightarrow \mathit{man}(x) \vee \mathit{woman}(x)$
 \item captain: function from teams t to functions from individuals x to 1 if x is t's captain, else 0
-\item match: a function $D_e \rightarrow \{0,1\}$, true of matches only, with an optional integer argument (since we want both _a match_ and _in match n_) 
+\item match: a function $D_e \rightarrow \{0,1\}$, true of matches only, with an optional integer argument (since we want both \emph{a match} and \emph{in match n}) 
 \item play: a function from an integer n and two teams x,y to $\{0,1\}$: x played y in match n
 \item win: $\mathit{win}(y)(x)$ is true iff y is a match and x is the winner in y
 \item team: a set of players
