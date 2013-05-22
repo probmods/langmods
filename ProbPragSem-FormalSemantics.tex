@@ -1,5 +1,3 @@
-
-
 \documentclass[12pt]{article}
 %\usepackage{proceed2e}
 \usepackage{amsmath, amsthm, amssymb}
@@ -330,11 +328,46 @@ This model allows us to wrap up all information about the speaker's reliability,
 \item "some of the women are stronger than jane" : implicature that not all of them are.
 \item "team A won some of the matches" : implicature that not all of them, unless speaker had not seen all matches.
 \item "team A won the match" vs "team A prevailed in the match" : example of horn implicature.. latter implies close match? (need notion of how close the match was?)
-\item "john is strong" : gradeable, depends on prior over strengths.
+     		% closeness = smallness of difference in score
+\item "john is strong" : gradable, depends on prior over strengths.
 \item "the strong player" : interpreted as strongest by joint inference of threshold and reference.
 \item "john is strong, jim is a little less strong. is jim strong?" : sorites.
 \end{itemize}
 
+\noindent Basic ontology: 
+\begin{itemize}
+\item players: some humans
+\item the set of teams: a partition of the set of players, each associated with a unique name (a capital letter) and a distinguished player (the captain)
+\item matches: a set of data structures consisting of an integer (the match number), 2 teams, and a winner
+\item $D_e: \{x|\mathit{player}(x)\} \cup \{x|\mathit{match}(x)\} \cup \{x|\mathit{team}(x)\}$
+\item $D_t = \{0,1\}$
+\item $D_d = (0,1)$
+\end{itemize}
+
+\noindent Vocabulary:
+\begin{itemize}
+\item some names of individual players which we set out stipulatively
+\item player: function from individuals (names) to $\{0,1\}$
+\item men, women: function from individuals (names) to $\{0,1\}$, constrained so that $\mathit{player}(x) \rightarrow \mathit{man}(x) \vee \mathit{woman}(x)$
+\item captain: function from teams t to functions from individuals x to 1 if x is t's captain, else 0
+\item match: a function $D_e \rightarrow \{0,1\}$, true of matches only, with an optional integer argument (since we want both \emph{a match} and \emph{in match n}) 
+\item play: a function from an integer n and two teams x,y to $\{0,1\}$: x played y in match n
+\item win: $\mathit{win}(y)(x)$ is true iff y is a match and x is the winner in y
+\item team: a set of players
+\item strength: function from players to $(0,1)$, Gaussian prior (separate priors for men and woman would be useful but perhaps unnecessarily controversial)
+\item $\theta_A$: free variables with $\mathcal{U}(0,1)$ prior, one for each adjective $A$
+\item a, some of: $\lambda P \lambda Q . \exists x P(x) \wedge Q(x)$
+\item every/all of: $\lambda P \lambda Q . \forall x P(x) \rightarrow Q(x)$
+\item quantifier scope ambiguities: I think we should just give the truth-conditions of the two interpretations, mention various options for computing them but not commit to one. [The key is just that both options are possible interpretations and the pragmatic listener optimizes the probability of the disambiguated utterance given the speaker model; the mechanism for generating the LFs probably isn't important.]
+\item strong: $\lambda x . \mathit{strength}(x) > \theta_{\mathit{strong}}$
+\item score1, score2: auxiliary functions with apply to a match and return the score of the team listed first/second 
+\item close: $\lambda x . \mathit{match}(x): \mathit{score1}(x) - \mathit{score2}(x)| < \theta_{\mathit{close}}$ [presupposes argument is a match, asserts it was theta-close]
+\item the: a choice function, i.e., a function from a property to some individual who satisfies the property; the prior distribution is uniform over all individuals who have the property. (The graded salience effects should kick in at L1, in reasoning about who it's more likely that the speaker would be talking about.)
+\item less: a function from an adjective (\emph{close, strong}) and a degree $d$ to properties of individuals $x$, returning true iff the adjective holds of $x$ to a degree less than $d - \epsilon$. By default, $r = 0$. 
+\item A little: a modifier of \emph{less} s.t.\ , where epsilon is a free parameter which we can vary to make the point about how the sorites works.
+\item -est: function from domains and adjectives to adjectives, where the latter is true only of individuals with argmax degree of the property in the domain
+\item a little: make this a vocabulary item  
+\end{itemize} 
 
 \appendix
 
