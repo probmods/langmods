@@ -130,10 +130,10 @@
 
 \item  Knowledge as generative model, 
   
-\item  Conditioning. Reasoning as conditional inference. Observations. More general conditions.
+\item  Conditioning. Reasoning as conditional inference. Observations. Sequences of observations are sequences of conditioning. More general conditions.
   
 \item  Stochastic lambda calculus. Compositional sampling semantics. Universality. 
-\subitem ESLC: mem, xrps, query.
+\subitem ESLC: xrps, query. mem or do random worlds variation?
   
 \item [(ndg)]  Example: tug-of-war domain. Elaborated model with 'match' events that have teams and winners, 'team' entities that have players and captains, 'player's that have strengths and maybe other properties. 
   
@@ -152,6 +152,8 @@
 % Dan says: this section title is a bit too narrow for what it wants to do, I think.
 % maybe a better title: ``Language understanding as Bayesian update'', emphasizing continuity with section 1
  
+\todo{Want to motivate meaning as conditioning from very general distributional assumptions. Sentences as observations. Assume sentences are independent (in literal meaning -- pragmatics changes this). Implies sentence composition by sequential conditioning.}
+
 
 % Here's my first attempt at the following:
 %\item [dan]  Sentence meanings: in formal semantics there are two views of meaning. the belief update view (roughly, dynamic semantics) and the intensions---functions from world to truth---view (the Montague, Lewis, etc view). Which is ``correct''? What's the relationship between belief and truth?
@@ -290,7 +292,7 @@ This model allows us to wrap up all information about the speaker's reliability,
 
 
 
-\section{Reference variables}
+\section{Free semantic variables}
 \begin{itemize}
 \item   Marked meanings and marked utterances: why basic model fails.
 \item  Lifting assignment fn to pragmatic listener. Semantic "existence" or "skolem" operator.  (Why do this and what should lift? Conventional vs coordinated indices? Lexical uncertainty?)
@@ -299,6 +301,7 @@ This model allows us to wrap up all information about the speaker's reliability,
 \item  "the" vs "a": same basic meaning, but the variable from "the" is lifted to L1, hence is influenced by salience. (competition between "a" and "the"?)
 \item  presupposition accommodation: "the strong player" == the strongest.
 \item  Vagueness more generally.
+\item  Relation to (hierarchical) lexical uncertaity.
 \end{itemize}
 
 
@@ -696,7 +699,7 @@ The vagueness of adjectives appears to be related to statistical properties of a
 
 Our approach to gradable adjectives starts with a scalar theory of their lexical semantics. 
 %We assume that the lexical entry of a gradable adjective contains only a specification of the relevant scale---a triple \lar{D, \leq, \delta}, as in [K07]. 
-We adopt a degree semantics in which adjectives relate individuals to a threshold value\footnote{Or rather: \sv{A}${=}$ \texttt{($\lambda$ (x) (> ($\mu_A$ x) $\theta$)}, but we have used the more familiar mathematical notation where it is clearer.}: \sv{A} $= \lambda x [ \mu_A(x) > \thet{A}]$, where $\thet{A}$ is a free threshold variable on $A$'s scale and $\mu_A(x)$ is the degree of $x$ on this scale. We will further assume that the function $\mu_A(x)$ is a concept defined in core cognition. For example, if \lstinline{height} is a persistent property of an individual (here drawn from a fixed gaussian for simplicity), the basic meaning of \emph{tall} is:
+We adopt a degree semantics in which adjectives relate individuals to a threshold value\footnote{Or rather: \sv{A}${=}$ \texttt{($\lambda$ (x) (> ($\mu_A$ x) $\theta$)}, but we have used the more familiar mathematical notation where it is clearer.}: \sv{A} $= \lambda x [ \mu_A(x) > \theta{A}]$, where $\theta{A}$ is a free threshold variable on $A$'s scale and $\mu_A(x)$ is the degree of $x$ on this scale. We will further assume that the function $\mu_A(x)$ is a concept defined in core cognition. For example, if \lstinline{height} is a persistent property of an individual (here drawn from a fixed gaussian for simplicity), the basic meaning of \emph{tall} is:
 \begin{lstlisting}[mathescape]
 ;;core concept definitions:
 (define height (mem ($\lambda$ (x) (gaussian 6.0 1.0))))
