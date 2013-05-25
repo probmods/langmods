@@ -315,9 +315,14 @@ This model allows us to wrap up all information about the speaker's reliability,
 
 
 
-\section{Scratch: example sentences}
+\section{Example sentences}
 \begin{itemize}
-\item "in match1 bob played against jim. bob won match1." ... "jim is the weakest player." : initial graded inference about bob's strength. explaining away. initially think bob strong, then probably not.
+\item "the teams in match1 were bob against jim. bob won match1." ... "jim is the weakest player." : initial graded inference about bob's strength. explaining away. initially think bob strong, then probably not.
+\subitem LoT translation of "the teams in match1 were bob against jim": \lstinline{(eq? (teams-in-match `match1) `(Bob) `(Jim))}. (Note converting each person into the set which is his team....)
+\subitem LoT translation of "bob won match1": \lstinline{(eq? (winner `match1) `(Bob))} (Note again converting Bob to his team.)
+\subitem LoT translation of "jim is the weakest player": \lstinline{(eq? 'Jim (est (< (strength x) t) players))}  (Est has to grab the threshold and set it to highest value s.t. set is non-empty.)
+
+
 %\item  "teamA won match 3"
 \item : some noun with graded  prototype extent?
 \item "every player was in a match yesterday" : scope ambiguity treated either as stochastic meaning fn or underspecified semantics. manipulate priors...
@@ -337,6 +342,7 @@ This model allows us to wrap up all information about the speaker's reliability,
 \noindent Basic ontology: 
 \begin{itemize}
 \item players: some humans
+\item strength and other properties of people.
 \item the set of teams: a partition of the set of players, each associated with a unique name (a capital letter) and a distinguished player (the captain)
 \item matches: a set of data structures consisting of an integer (the match number), 2 teams, and a winner
 \item $D_e: \{x|\mathit{player}(x)\} \cup \{x|\mathit{match}(x)\} \cup \{x|\mathit{team}(x)\}$
@@ -368,6 +374,36 @@ This model allows us to wrap up all information about the speaker's reliability,
 \item -est: function from domains and adjectives to adjectives, where the latter is true only of individuals with argmax degree of the property in the domain
 \item a little: make this a vocabulary item  
 \end{itemize} 
+
+
+
+\begin{lstlisting}
+
+;;Basic ontology: 
+;;Note, made team-players, etc, into memoized random functions for simplicity, though we're not interested in the randomness.
+(define people '(Bob Jim Mary Sue))
+(define strength (mem (lambda (p) (gaussian 0 1))))
+(define gender (mem (p) (if (flip) 'man 'woman)))
+
+
+(define team-size 2)
+(define players-on-team (mem (lambda (team) (repeat team-size (lambda () (uniform-draw players))))))
+(define (captain team) (mem (lambda (team) (uniform-draw (players-on-team team)))))
+
+(define (teams-in-match match) ...)
+(define (winner match) ...)
+
+
+
+
+;;lexicon:
+
+
+
+
+
+\end{lstlisting}
+
 
 \appendix
 
