@@ -18,8 +18,9 @@
 \usepackage[small]{caption}
 
 \newcommand{\llbracket}{\ensuremath{\left [\!\left [}}%
-     \newcommand{\rrbracket}{\ensuremath{\right ]\!\right ]}}
+\newcommand{\rrbracket}{\ensuremath{\right ]\!\right ]}}
 \providecommand{\sv}[1]{\ensuremath{\llbracket #1 \rrbracket}}
+\providecommand{\textsv}[1]{\ensuremath{\llbracket \text{#1} \rrbracket}}
 
 \newenvironment{AY11-12}{}{}
 
@@ -122,20 +123,56 @@
 \pagebreak
 
 
+\todo[inline]{this intro (taken from the lexsem grant) needs to be edited into something short and to the point...}
+
+Words are potentially one of the clearest windows on human knowledge and conceptual structure. If we understood the connection between words and mental representation, we could gain critical insights into almost every aspect of psychology, construct vastly more useful thinking machines, and interface the two. But what do words mean? In this project we aim to {\bf construct and explore a formal model of lexical semantics grounded, via pragmatic inference, in core conceptual structures}. We will do so using a set of modeling tools---chiefly the probabilistic programming language Church \cite{goodman2008}---that we have previously developed and used to explain  aspects of high-level human cognition.
+
+Flexible human cognition is derived in large part from our ability to imagine possible worlds (or situations). A rich set of concepts, intuitive theories, and other mental representations support imagining and reasoning about possible worlds---together we call these the conceptual lexicon. 
+
+We can formalize the conceptual lexicon using probabilistic programming tools, viewing commonsense knowledge as a set of interrelated definitions (or concepts) in a probabilistic programming language. Probabilistic programs specify sampling procedures over possible program executions, each execution fixes (some of) the variables in that describe the world, hence each collection of concepts describes how to sample from a rich space of possible worlds. The inference (or conditioning, or query) operator describes how to use these distributions on worlds for reasoning.
+We have been able to explain many inferences that humans draw from sparse evidence using these tools. Here we posit that this collection of concepts also forms the set of primitive elements available for {\bf lexical semantics}: word meanings can be built from the pieces of core cognition.
+
+However, the connection between core concepts and lexical semantics is not direct: 
+first, because language must flexibly adapt to the context of communication, the connection between lexical representation and interpreted meaning is mediated by pragmatic inference;
+second, sentence meanings act as constraints on possible worlds, via their truth-value, whereas core concepts describe generation of possible worlds.
+We propose to explore a model of language that formalizes and explains these differences, again using tools of probabilistic programming. 
+
+In recent work we have made preliminary progress at combining underspecified semantic representations with a general purpose pragmatic inference mechanism.
+This potentially allows us to account for subtle aspects of language use with relatively simple semantic denotations.
+%: aspects of conveyed meaning emerge from an interaction of semantic denotation with context and core conceptual structures.
+In particular, we view semantic representation as indivisible from core cognition, and the effective meaning of words as emerging from a pragmatic inference process. 
+
+Our approach is similar in spirit to cognitive semantics, in that we attempt to ground semantics in mental representation, but we draw on the highly successful tools of Bayesian cognitive science to formalize these ideas. 
+Similarly, our approach draws heavily on the progress made in formal model-theoretic semantics \cite{montague1973,heimkratzer1998}, borrowing insights about how syntax drives semantic composition, but we compose elements of stochastic logics rather than deterministic ones.
+Finally, our approach is related to recent progress in robotics (and indeed our project will benefit from ongoing collaboration with roboticist Stefanie Tellex of Brown University), but is more systematic and systematically connected to cognitive and linguistic theory. 
+
+We propose to study lexical semantics in the setting of an architecture for language understanding that is described in section \ref{langaugemodels}. We first provide, in section \ref{background}, background on the probabilistic programming language Church and on using Church to describe core cognition. In section \ref{lex} we describe the case studies of lexical semantics that we propose to explore in this project. We will rely heavily on computational infrastructure for inference in the Church language; the models we propose push the envelope of what is currently possible and will require new inference techniques. In section \ref{infrastr} we describe proposed work on Church inference algorithms and implementations.
+
+
+
+Probabilities describe degrees of belief, and probabilistic inference describes rational reasoning under uncertainty. It is no wonder, then, that probabilistic models have exploded onto the scene of modern artificial intelligence, cognitive science, and applied statistics: these are all sciences of inference under uncertainty. But as probabilistic models have become more sophisticated, the tools to formally describe them and to perform probabilistic inference have wrestled with new complexity. Just as programming more than the simplest algorithms requires tools for abstraction and composition, complex probabilistic modeling requires new progress in model representation---\emph{probabilistic} programming languages. These languages provide compositional means for describing complex probability distributions; implementations of these languages provide \emph{generic} inference engines: tools for performing efficient probabilistic inference over an arbitrary program. 
+
+By providing a uniform and universal representation for probabilistic models, probabilistic programming provides a framework for unifying disparate Bayesian models of human cognition. Indeed, while Bayesian models have been extremely influential in cognitive science \cite[e.g.][]{tenenbaum2011}, 
+it is only recently that we have the tools to view the Bayesian approach as a general framework for mental representation.
+We next give a brief introduction to probabilistic programming, then an indication of how these tools can be used for modeling human cognition.
+
+
+
 
 \section{Bayesian models of commonsense reasoning}
 \begin{itemize}
 
-\item  Knowledge as generative model, 
+%\item  Knowledge as generative model, 
   
-\item  Conditioning. Reasoning as conditional inference. Observations. Sequences of observations are sequences of conditioning. More general conditions.
+%\item  Conditioning. Reasoning as conditional inference. Observations. Sequences of observations are sequences of conditioning. More general conditions.
   
 \item  Stochastic lambda calculus. Compositional sampling semantics. Universality. 
 \subitem ESLC: xrps, query. mem or do random worlds variation?
+\subitem possible worlds, partial worlds, and the minimal-situation property of eval/query.
   
-\item [(ndg)]  Example: tug-of-war domain. Elaborated model with 'match' events that have teams and winners, 'team' entities that have players and captains, 'player's that have strengths and maybe other properties. 
+\item Example: tug-of-war domain. Elaborated model with 'match' events that have teams and winners, 'team' entities that have players and captains, 'player's that have strengths and genders. show elaborated strength models that depends on players gender in an unknown way (i.e. simple mixture model)...  
   
-\item [(ndg)]  Basic effects: Explaining away + screening off. 
+\item Basic effects: Explaining away + screening off. 
 \subitem  Observe sam beats jim, infer sam is stong. learn that jim is weak, explain away match outcome, so sam is ordinary strength again.
 \subitem  Observe sam beats jim, predict sam will beat jim again. Knowing jim and sam's strengths, finding out sam beat jim doesn't change prediction. 
 \subitem   Mention but don't illustrate other effects ---  Size principle / occam, transfer learning.
@@ -144,13 +181,68 @@
   
 \end{itemize}
  
+
+Uncertainty is a key property of the world we live in, thus we should expect reasoning with uncertainty to be a key operation of our cognition. At the same time our world is built from a complex web of causal and other structures, so we expect structure within our representations of uncertainty. Structured knowledge of an uncertain world can be naturally captured by \emph{generative} models: the ability to flexibly imagine (or simulate) possible worlds (or situations) in proportion to their likelihood. The tools of structured probabilistic modeling, and particularly the stochastic lambda calculus we will use in this chapter, allow us to formalize these notions. In this section, we first introduce the basic operations for dealing with uncertainty---degrees of belief and probabilistic conditioning---we then introduce formal tools for adding compositional structure to these models---the stochastic lambda calculus---and finally we demonstrate how these tools let us build generative models of the world and capture commonsense reasoning.
+
+Probability is fundamentally a set of tools for manipulating degrees of belief. The probability\footnote{Everything we say here applies equally well to probability densities, and more generally probability measures, but we describe in terms of probabilities for simplicity.} of a fact $A$ is simply a real number between $0$ and $1$ denoting the degree of belief $P(A)$ in that fact; more generally a situation (or random variable) with many mutually exclusive values assigns a probability $P(A{=}a)$ to each such that $\sum_a P(A{=}a)=1$. The joint probability, $P(A,B)$, of two facts (or random variable values) is the degree of belief we assign to both being true. 
+
+The fundamental operation for incorporating new information, or assumptions, is \emph{probabilistic conditioning} moving from the \emph{a priori} probability of $A$, $P(A)$, to the probability of $A$ given that $B$, written $P(A|B)$. We can define the conditional probability by:
+\begin{equation}
+\label{conditionaldef}
+P(A|B) = \frac{P(A,B)}{P(B)} 
+\end{equation}
+This unassuming definition is the basis for much recent progress in modeling human reasoning \cite[e.g.][]{tenenbaum2011}---by phrasing people's uncertain beliefs as probabilities, we can understand reasoning as probabilistic conditioning. In particular, imagine a person who is trying to establish which hypothesis $H\in\{h_1,\dots,h_m\}$ best explains a situation, and does so on the basis of a series of observations $\{o_i\}_{i=1}^N$. We can describe this inference as the conditional probability:
+\begin{equation}
+P(H|o_1,\dots,o_N) = \frac{P(H)P(o_1,\dots,o_N|H)}{P(o_1,\dots,o_N)}.
+\end{equation}
+This useful equality, which follows immediately from the definition in equation \ref{conditionaldef}, is called Bayes' rule. If we additionally assume that the observations provide no information about each other, that is they are \emph{independent}, then $P(o_i|o_j)=P(o_i)$ for all $i\neq j$. It follows that:
+\begin{equation}
+P(H|o_1,\dots,o_N) = \frac{P(H)P(o_1|H)\cdots P(o_N|H)}{P(o_1|H)\cdots P(o_N|H)}.
+\end{equation}
+From this it is a simple calculation to verify that we can perform the conditioning operation sequentially rather than all at once: the \emph{a posteriori} degree of belief given observations $o_1,\dots,o_i$ becomes the \emph{a priori} degree of belief for incorporating observation $o_{i+1}$.
+\todo[inline]{explain more, or put in as theorem? we want to call back to this in explaining the basic dynamic of belief updating from literal meaning...}
+
+Probability as described so far provides a notation for indicating degrees of belief and conditional information, but requires that the actual degrees of belief (the numbers) be specified separately; this quickly becomes unmanageable when we wish to describe complex knowledge---relations among many beliefs. The stochastic lambda calculus provides a formal, compositional language for describing probabilities over complex sets of interrelated beliefs. We assume some familiarity with the (deterministic) lambda calculus \cite{lambda}.
+
+
+
+
+
+
+ 
+ 
+ \begin{figure}[htbp]
+\begin{center}
+ \begin{lstlisting}[mathescape]
+
+;;Basic ontology: 
+;;Note, made team-players, etc, into memoized random functions for simplicity, though we are not interested in the randomness.
+(define people `(Bob Jim Mary Sue))
+(define strength (mem ($\lambda$ (p) (gaussian 0 1))))
+(define gender (mem (p) (if (flip) `man `woman)))
+
+(define lazy (mem ($\lambda$ (p m) (flip 0.2))))
+
+(define team-size 2)
+(define players-on-team (mem ($\lambda$ (team) (repeat team-size ($\lambda$ () (uniform-draw players))))))
+(define (captain team) (mem ($\lambda$ (team) (uniform-draw (players-on-team team)))))
+
+(define (teams-in-match match) ...)
+(define (winner match) ...)
+
+\end{lstlisting}
+\caption{An intuitive theory (or conceptual lexicon) for the tug-of-war domain.}
+\label{theory}
+\end{center}
+\end{figure} 
+ 
  
  
 \section{Meaning as condition}
 % Dan says: this section title is a bit too narrow for what it wants to do, I think.
 % maybe a better title: ``Language understanding as Bayesian update'', emphasizing continuity with section 1
  
-\todo{Want to motivate meaning as conditioning from very general distributional assumptions. Sentences as observations. Assume sentences are independent (in literal meaning -- pragmatics changes this). Implies sentence composition by sequential conditioning.}
+\todo[inline]{Want to motivate meaning as conditioning from very general distributional assumptions. Sentences as observations. Assume sentences are independent (in literal meaning -- pragmatics changes this). Implies sentence composition by sequential conditioning.}
 
 
 % Here's my first attempt at the following:
@@ -317,10 +409,10 @@ This model allows us to wrap up all information about the speaker's reliability,
 
 \section{Example sentences}
 \begin{itemize}
-\item "the teams in match1 were bob against jim. bob won match1." ... "jim is the weakest player." : initial graded inference about bob's strength. explaining away. initially think bob strong, then probably not.
-\subitem LoT translation of "the teams in match1 were bob against jim": \lstinline{(eq? (teams-in-match `match1) `(Bob) `(Jim))}. (Note converting each person into the set which is his team....)
-\subitem LoT translation of "bob won match1": \lstinline{(eq? (winner `match1) `(Bob))} (Note again converting Bob to his team.)
-\subitem LoT translation of "jim is the weakest player": \lstinline{(eq? 'Jim (est (< (strength x) t) players))}  (Est has to grab the threshold and set it to highest value s.t. set is non-empty.)
+\item "the teams in match1 were bob and jim. bob won match1." ... "jim is the weakest player." : initial graded inference about bob's strength. explaining away. initially think bob strong, then probably not.
+\subitem \textsv{the teams in match1 were bob and jim}= \lstinline{(eq? (teams-in-match `match1) `((Bob) (Jim)))}. (Note converting each person into the set which is his team....)
+\subitem \textsv{bob won match1}= \lstinline{(eq? (winner `match1) `(Bob))} (Note again converting Bob to his team.)
+\subitem \textsv{jim is the weakest player}= \lstinline{(eq? 'Jim (est (< (strength x) t) players))}  (Est has to grab the threshold and set it to highest value s.t. set is non-empty.) 
 
 
 %\item  "teamA won match 3"
@@ -339,6 +431,25 @@ This model allows us to wrap up all information about the speaker's reliability,
 \item "john is strong, jim is a little less strong. is jim strong?" : sorites.
 \end{itemize}
 
+
+
+\section{Modeling sketch}
+
+\begin{table}[htdp]
+\caption{default}
+\begin{center}
+\begin{tabular}{llc}
+\sv{`players}&= & $`(Bob\ Jim ...)$ \\
+\sv{`Bob}&= & $`Bob$ or $`(Bob)$ \\
+\sv{player}&= & $\lambda.x (x\in players) $ \\
+ 
+\end{tabular}
+\end{center}
+\label{default}
+\end{table}%
+
+
+
 \noindent Basic ontology: 
 \begin{itemize}
 \item players: some humans
@@ -352,7 +463,7 @@ This model allows us to wrap up all information about the speaker's reliability,
 
 \noindent Vocabulary:
 \begin{itemize}
-\item some names of individual players which we set out stipulatively
+\item some names of individual players which we set out stipulatively, and the set of players (or people).
 \item player: function from individuals (names) to $\{0,1\}$
 \item men, women: function from individuals (names) to $\{0,1\}$, constrained so that $\mathit{player}(x) \rightarrow \mathit{man}(x) \vee \mathit{woman}(x)$
 \item captain: function from teams t to functions from individuals x to 1 if x is t's captain, else 0
@@ -375,34 +486,6 @@ This model allows us to wrap up all information about the speaker's reliability,
 \item a little: make this a vocabulary item  
 \end{itemize} 
 
-
-
-\begin{lstlisting}
-
-;;Basic ontology: 
-;;Note, made team-players, etc, into memoized random functions for simplicity, though we're not interested in the randomness.
-(define people '(Bob Jim Mary Sue))
-(define strength (mem (lambda (p) (gaussian 0 1))))
-(define gender (mem (p) (if (flip) 'man 'woman)))
-
-
-(define team-size 2)
-(define players-on-team (mem (lambda (team) (repeat team-size (lambda () (uniform-draw players))))))
-(define (captain team) (mem (lambda (team) (uniform-draw (players-on-team team)))))
-
-(define (teams-in-match match) ...)
-(define (winner match) ...)
-
-
-
-
-;;lexicon:
-
-
-
-
-
-\end{lstlisting}
 
 
 \appendix
