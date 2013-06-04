@@ -166,9 +166,9 @@ We next give a brief introduction to probabilistic programming, then an indicati
   
 %\item  Conditioning. Reasoning as conditional inference. Observations. Sequences of observations are sequences of conditioning. More general conditions.
   
-\item  Stochastic lambda calculus. Compositional sampling semantics. Universality. 
-\subitem ESLC: xrps, query. mem or do random worlds variation?
-\subitem possible worlds, partial worlds, and the minimal-situation property of eval/query.
+%\item  Stochastic lambda calculus. Compositional sampling semantics. Universality. 
+%\subitem ESLC: xrps, query. mem or do random worlds variation?
+%\subitem possible worlds, partial worlds, and the minimal-situation property of eval/query.
   
 \item Example: tug-of-war domain. Elaborated model with 'match' events that have teams and winners, 'team' entities that have players and captains, 'player's that have strengths and genders. show elaborated strength models that depends on players gender in an unknown way (i.e. simple mixture model)...  
   
@@ -202,8 +202,13 @@ P(H|o_1,\dots,o_N) = \frac{P(H)P(o_1|H)\cdots P(o_N|H)}{P(o_1|H)\cdots P(o_N|H)}
 From this it is a simple calculation to verify that we can perform the conditioning operation sequentially rather than all at once: the \emph{a posteriori} degree of belief given observations $o_1,\dots,o_i$ becomes the \emph{a priori} degree of belief for incorporating observation $o_{i+1}$.
 \todo[inline]{explain more, or put in as theorem? we want to call back to this in explaining the basic dynamic of belief updating from literal meaning...}
 
-Probability as described so far provides a notation for indicating degrees of belief and conditional information, but requires that the actual degrees of belief (the numbers) be specified separately; this quickly becomes unmanageable when we wish to describe complex knowledge---relations among many beliefs. The stochastic lambda calculus provides a formal, compositional language for describing probabilities over complex sets of interrelated beliefs. We assume some familiarity with the (deterministic) lambda calculus \cite{lambda}.
+Probability as described so far provides a notation for indicating degrees of belief and conditional information, but requires that the actual degrees of belief (the numbers) be specified separately; this quickly becomes unmanageable when we wish to describe complex knowledge---relations among many beliefs. The stochastic lambda calculus (SLC) provides a formal, compositional language for describing probabilities over complex sets of interrelated beliefs. We assume some familiarity with the (deterministic) lambda calculus \cite{lambda}. At it's core SLC simply extends the lambda calculus with a primitive operator for random choice between two expressions and an additional reduction rule that reduces such a choice expression to it's left or right sub-expression with equal probability. While this reduction process results in a single expression after any sequence of reductions, it can be viewed as a distribution over such reduction sequences, and hence a distribution over the final expression: SLC expressions denote (sub-)distributions over normal form SLC expressions. It can be shown that this system can represent any computable distribution in an appropriate sense \cite[see for example][]{PfefferRamsey,FreeRoy}.
 
+This simple calculus is universal but cumbersome to work with; we instead introduced an enriched version of SLC that can be directly realized as a probabilistic programming language (much the way that LISP is simply an enriched lambda calculus), called Church \cite{Goodman}.
+
+\todo[inline]{give definitional interpreter (eval) for ESLC. need: define, xrps, query, mem. factor?}
+
+An important observation is that a set of stochastic function definitions in Church can be interpreted as a distribution over possible worlds: A world consists of a value for each well-formed expression that can be made from the defined functions (in each calling position). To evaluate any particular expression or query requires evaluating only a small subset of this infinitude of expressions. That is, an particular query only depends on the partial world of expressions actually constructed during the evaluation process. The relationship between the idealized complete possible worlds and these partial worlds is coherent because taking the marginal sum over any expressions that are evaluated but that don't impact the value of the query (condition or query expressions) results in the same distribution as if we didn't evaluate them. \todo{need to state more formally?} For this reason we can comfortably speak interchangeably about possible worlds, partial worlds, and situations.
 
 
 
