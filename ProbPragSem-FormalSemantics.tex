@@ -160,7 +160,7 @@ We next give a brief introduction to probabilistic programming, then an indicati
 
 
 \section{Bayesian models of commonsense reasoning}
-\begin{itemize}
+%\begin{itemize}
 
 %\item  Knowledge as generative model, 
   
@@ -170,16 +170,16 @@ We next give a brief introduction to probabilistic programming, then an indicati
 %\subitem ESLC: xrps, query. mem or do random worlds variation?
 %\subitem possible worlds, partial worlds, and the minimal-situation property of eval/query.
   
-\item Example: tug-of-war domain. Elaborated model with 'match' events that have teams and winners, 'team' entities that have players and captains, 'player's that have strengths and genders. show elaborated strength models that depends on players gender in an unknown way (i.e. simple mixture model)...  
+%\item Example: tug-of-war domain. Elaborated model with 'match' events that have teams and winners, 'team' entities that have players and captains, 'player's that have strengths and genders. show elaborated strength models that depends on players gender in an unknown way (i.e. simple mixture model)...  
   
-\item Basic effects: Explaining away + screening off. 
-\subitem  Observe sam beats jim, infer sam is stong. learn that jim is weak, explain away match outcome, so sam is ordinary strength again.
-\subitem  Observe sam beats jim, predict sam will beat jim again. Knowing jim and sam's strengths, finding out sam beat jim doesn't change prediction. 
-\subitem   Mention but don't illustrate other effects ---  Size principle / occam, transfer learning.
+%\item Basic effects: Explaining away + screening off. 
+%\subitem  Observe sam beats jim, infer sam is stong. learn that jim is weak, explain away match outcome, so sam is ordinary strength again.
+%\subitem  Observe sam beats jim, predict sam will beat jim again. Knowing jim and sam's strengths, finding out sam beat jim doesn't change prediction. 
+%\subitem   Mention but don't illustrate other effects ---  Size principle / occam, transfer learning.
+%  
+%\item  Modularity vs joint inference: knowledge is modular, inference is not.
   
-\item  Modularity vs joint inference: knowledge is modular, inference is not.
-  
-\end{itemize}
+%\end{itemize}
  
 
 Uncertainty is a key property of the world we live in, thus we should expect reasoning with uncertainty to be a key operation of our cognition. At the same time our world is built from a complex web of causal and other structures, so we expect structure within our representations of uncertainty. Structured knowledge of an uncertain world can be naturally captured by \emph{generative} models: the ability to flexibly imagine (or simulate) possible worlds (or situations) in proportion to their likelihood. The tools of structured probabilistic modeling, and particularly the stochastic lambda calculus we will use in this chapter, allow us to formalize these notions. In this section, we first introduce the basic operations for dealing with uncertainty---degrees of belief and probabilistic conditioning---we then introduce formal tools for adding compositional structure to these models---the stochastic lambda calculus---and finally we demonstrate how these tools let us build generative models of the world and capture commonsense reasoning.
@@ -210,36 +210,99 @@ This simple calculus is universal but cumbersome to work with; we instead introd
 
 An important observation is that a set of stochastic function definitions in Church can be interpreted as a distribution over possible worlds: A world consists of a value for each well-formed expression that can be made from the defined functions (in each calling position). To evaluate any particular expression or query requires evaluating only a small subset of this infinitude of expressions. That is, an particular query only depends on the partial world of expressions actually constructed during the evaluation process. The relationship between the idealized complete possible worlds and these partial worlds is coherent because taking the marginal sum over any expressions that are evaluated but that don't impact the value of the query (condition or query expressions) results in the same distribution as if we didn't evaluate them. \todo{need to state more formally?} For this reason we can comfortably speak interchangeably about possible worlds, partial worlds, and situations.
 
+In this chapter we use sets of stochastic functions in Church to specify the intuitive knowledge---or theory---that a person has about the world. To make this more precise we now describe an example, the tug-of-war game, which we will use later in the chapter as the basis for a fragment of natural language semantics. Tug-of-war is a simple game in which two teams pull on either side of a rope; the team that pulls hardest will win. Our intuitive knowledge of this domain (and indeed most similar team games) rests on a set of interrelated concepts: players, teams, strength, matches, winners, etc. We now sketch a simple realization of these concepts in Church. To start, each player has some traits that influence his or her contribution to the game: strength, which may depend on gender.
+\begin{lstlisting}[mathescape]
+(define gender (mem (p) (if (flip) `male `female)))
+(define gender-mean-strength (mem ($\lambda$ (g) (gaussian 0 2))))
+(define strength (mem ($\lambda$ (p) (gaussian (gender-mean-strength (gender p)) 1))))
+\end{lstlisting}
+We have defined the strength of a person as a \emph{mixture model}: strength depends on a latent class, gender, through the (a priori unknown) gender means. Note that we are able to describe the properties of people (\lstinline{strength}, \lstinline{gender}) without needing to specify the people---instead we assume that each person is represented by a unique symbol, and memoize the functions on this symbol, resulting in functions which create the properties of a person only when needed (but then hold those properties persistently). In particular, the person argument, \lstinline{p}, is never used in the function \lstinline{gender}, but it matters because the function is memoized---a gender will be persistently associated to each person though generating that gender initially doesn't depend on the person. We will exploit this pattern often below.
+We are now already in a position to make useful inferences. We could, for instance observe the strengths and genders of several players, and then Pat's strength but not gender, and ask for the latter:
+\begin{lstlisting}[mathescape]
+(query
+  (define gender (mem (p) (if (flip) `man `woman)))
+  (define gender-mean-strength (mem ($\lambda$ (g) (gaussian 0 2))))
+  (define strength (mem ($\lambda$ (p) (gaussian (gender-mean-strength (gender p)) 1))))
+  
+  (gender 'Pat)
+  
+  (and (eq? (gender `Bob) `male) (= (strength `Bob) -1.1)
+       (eq? (gender `Jane) `female) (= (strength `Bob) 0.5)
+       (eq? (gender `Jim) 'male) (= (strength `Bob) -0.3)))
+\end{lstlisting}
+\todo[inline]{We could already talk about explaining away and screening off here... should we?}
 
+In the game of tug-of-war players are on teams, which themselves have properties such as captains:
+\begin{lstlisting}[mathescape]
+(define players `(Bob Jim Mary Sue))
+(define team-size 2)
+(define players-on-team (mem ($\lambda$ (team) (draw-n team-size players))))
+(define captain (mem ($\lambda$ (team) (uniform-draw (players-on-team team)))))
+\end{lstlisting}
+Here the \lstinline{draw-n} ERP draws uniformly but without replacement from a list.
+%
+In addition to players and teams, we have matches: events that have two teams and a winner, the winner depends on how hard each team is pulling, which depends on how hard each team member is pulling.
+\begin{lstlisting}[mathescape]
+(define teams `(team1 team2 team3))
 
+(define teams-in-match (mem ($\lambda$ (match) (draw-n 2 teams))))
+(define pulling (mem ($\lambda$ (player match) (+ (strength player) (gaussian 0 0.5)))))
+(define team-pulling (mem ($\lambda$ (team match) 
+                                     (sum (map pulling (players-on-team team))))))
+(define (winner match) 
+  (let ([teamA (first (teams-in-match match))]
+        [teamB (second (teams-in-match match))])
+    (if (< (team-pulling teamA) (team-pulling teamB))
+        teamA
+        teamB)))
+\end{lstlisting}
+Notice that the team pulling is simply the sum of how hard each member is pulling; each player pulls with their intrinsic strength, plus a random amount that indicates their effort on this match. \todo{i have left laziness implicit. do we need it anywhere?}
 
-
+Altogether the conceptual lexicon of functions for the tug-of-war domain is given in Figure \ref{theory}.
  
  
- \begin{figure}[htbp]
+ \begin{figure}[tbh]
 \begin{center}
  \begin{lstlisting}[mathescape]
+(define players `(Bob Jim Mary Sue))
+(define teams `(team1 team2 team3))
+(define matches `(match1 match2))
 
-;;Basic ontology: 
-;;Note, made team-players, etc, into memoized random functions for simplicity, though we are not interested in the randomness.
-(define people `(Bob Jim Mary Sue))
-(define strength (mem ($\lambda$ (p) (gaussian 0 1))))
-(define gender (mem (p) (if (flip) `man `woman)))
-
-(define lazy (mem ($\lambda$ (p m) (flip 0.2))))
+(define gender (mem (p) (if (flip) `male `female)))
+(define gender-mean-strength (mem ($\lambda$ (g) (gaussian 0 2))))
+(define strength (mem ($\lambda$ (p) (gaussian (gender-mean-strength (gender p)) 1))))
 
 (define team-size 2)
-(define players-on-team (mem ($\lambda$ (team) (repeat team-size ($\lambda$ () (uniform-draw players))))))
-(define (captain team) (mem ($\lambda$ (team) (uniform-draw (players-on-team team)))))
+(define players-on-team (mem ($\lambda$ (team) (draw-n team-size players))))
+(define captain (mem ($\lambda$ (team) (uniform-draw (players-on-team team)))))
 
-(define (teams-in-match match) ...)
-(define (winner match) ...)
-
+(define teams-in-match (mem ($\lambda$ (match) (draw-n 2 teams))))
+(define pulling (mem ($\lambda$ (player match) (+ (strength player) (gaussian 0 0.5)))))
+(define team-pulling (mem ($\lambda$ (team match) 
+                                     (sum (map pulling (players-on-team team))))))
+(define (winner match) 
+  (let ([teamA (first (teams-in-match match))]
+        [teamB (second (teams-in-match match))])
+    (if (< (team-pulling teamA) (team-pulling teamB))
+        teamA
+        teamB)))
 \end{lstlisting}
 \caption{An intuitive theory (or conceptual lexicon) for the tug-of-war domain.}
 \label{theory}
 \end{center}
 \end{figure} 
+ 
+ 
+ \todo[inline]{
+-Basic effects: Explaining away + screening off. 
+  -Observe sam beats jim, infer sam is stong. learn that jim is weak, explain away match outcome, so sam is ordinary strength again.
+  -Observe sam beats jim, predict sam will beat jim again. Knowing jim and sam's strengths, finding out sam beat jim doesn't change prediction. 
+  -Mention but don't illustrate other effects ---  Size principle / occam, transfer learning.
+  
+-Modularity vs joint inference: knowledge is modular, inference is not.
+}
+ 
+ 
  
  
  
