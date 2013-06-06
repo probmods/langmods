@@ -61,6 +61,7 @@
  \lstset{
   language=Scheme, % Andreas Stuhlmüller. Scheme listings. https://github.com/stuhlmueller/scheme-listings.git
   columns=fixed,
+  keepspaces,
   tabsize=2,
   extendedchars=true,
   breaklines=true,
@@ -101,6 +102,9 @@
 
 %\pagestyle{empty}
  
+
+\newcommand{\theory}{...ToW theory...}
+
 
 \title{Uncertainty in Language and Thought}
 
@@ -258,13 +262,12 @@ In addition to players and teams, we have matches: events that have two teams an
 \end{lstlisting}
 Notice that the team pulling is simply the sum of how hard each member is pulling; each player pulls with their intrinsic strength, plus a random amount that indicates their effort on this match. \todo{i have left laziness implicit. do we need it anywhere?}
 
-Altogether the conceptual lexicon of functions for the tug-of-war domain is given in Figure \ref{theory}.
  
  
  \begin{figure}[tbh]
 \begin{center}
  \begin{lstlisting}[mathescape]
-(define players `(Bob Jim Mary Sue))
+(define players `(Bob Jim Alice Sue))
 (define teams `(team1 team2 team3))
 (define matches `(match1 match2))
 
@@ -272,7 +275,7 @@ Altogether the conceptual lexicon of functions for the tug-of-war domain is give
 (define gender-mean-strength (mem ($\lambda$ (g) (gaussian 0 2))))
 (define strength (mem ($\lambda$ (p) (gaussian (gender-mean-strength (gender p)) 1))))
 
-(define team-size 2)
+(define team-size 1)
 (define players-on-team (mem ($\lambda$ (team) (draw-n team-size players))))
 (define captain (mem ($\lambda$ (team) (uniform-draw (players-on-team team)))))
 
@@ -292,16 +295,51 @@ Altogether the conceptual lexicon of functions for the tug-of-war domain is give
 \end{center}
 \end{figure} 
  
- 
- \todo[inline]{
--Basic effects: Explaining away + screening off. 
-  -Observe sam beats jim, infer sam is stong. learn that jim is weak, explain away match outcome, so sam is ordinary strength again.
-  -Observe sam beats jim, predict sam will beat jim again. Knowing jim and sam's strengths, finding out sam beat jim doesn't change prediction. 
-  -Mention but don't illustrate other effects ---  Size principle / occam, transfer learning.
-  
--Modularity vs joint inference: knowledge is modular, inference is not.
-}
- 
+
+The conceptual lexicon of functions for the tug-of-war domain is given altogether in Figure \ref{theory}.
+A conceptual lexicon like this one describes generative knowledge about the world---interrelated concepts that can be used to describe the causal story of how various observations come to be; by using \lstinline{query} we can use this knowledge to reason from observations to predictions or latent states. Let us illustrate how a generative model is used to capture key patterns of reasoning. Imagine that Bob is playing Jim in match 1; we can infer Bob's strength before observing the outcome of this match:
+\begin{lstlisting}[mathescape]
+(query
+  ...ToW theory...
+  (strength 'Bob)
+  (and 
+    (eq? (players-on-team 'bobsteam) '(Bob))
+    (eq? (players-on-team 'jimsteam) '(Jim))
+    (eq? (teams-in-match 'match1) '(bobsteam jimsteam))
+    (eq? (winner 'match1) 'bobsteam)))
+\end{lstlisting}
+In this and all that follows \lstinline{...ToW theory...} is an abbreviation for the definitions in figure \ref{theory}. The result of this strength is simply the prior belief about Bob's strength: a distribution with mean 0.0.
+Now imagine that Bob wins this match:
+\begin{lstlisting}[mathescape]
+(query
+  ...ToW theory...
+  (strength 'Bob)
+  (and 
+    (eq? (players-on-team 'bobsteam) '(Bob))
+    (eq? (players-on-team 'jimsteam) '(Jim))
+    (eq? (teams-in-match 'match1) '(bobsteam jimsteam))))
+\end{lstlisting}
+If we evaluate this query we find that Bob is inferred to be relatively strong: his mean strength after observing this match is XXX (higher than his a priori mean strength of $0.0$). However, imagine that we then learned that Jim is a weak player:
+ \begin{lstlisting}[mathescape]
+(query
+  ...ToW theory...
+  (strength 'Bob)
+  (and 
+    (eq? (players-on-team 'bobsteam) '(Bob))
+    (eq? (players-on-team 'jimsteam) '(Jim))
+    (eq? (teams-in-match 'match1) '(bobsteam jimsteam))
+    (eq? (winner 'match1) 'bobsteam))
+    (= (strength 'Jim) -2.0))
+\end{lstlisting}
+Now, we have very little evidence about Bob's strength---the inferred mean strength from this query goes back to (almost) 0.0. This is an example of \emph{explaining away}: the assumption that Jim is weak has explained the observation that  Bob beat Jim, which otherwise would have provided evidence that Bob is strong. Notice that we have gone through a non-monotonic reasoning sequence: Our degree of belief that Bob is strong went up from the first piece of evidence, and then back down from the second. The explaining away pattern is extremely common in probabilistic inference over structure models. It is characterized by a priori independent variables (such as Bob and Jim's strengths) becoming coupled together by an observation (such as the outcome of match 1). Another way of saying this is that our knowledge of the world, the generative model, can have a significant amount of modularity; our inferences after making observations will generally not be modular in this way, instead complex patterns of influence can couple together disparate pieces of the model.
+
+Another common pattern is \emph{screening off}: 
+ \todo[inline]{Observe sam beats jim, predict sam will beat jim again. Knowing jim and sam's strengths, finding out sam beat jim doesn't change prediction. }
+
+There are a number of other patterns of reasoning that are common results of probabilistic inference over structured models. These include Occam's razor (complexity of hypotheses is automatically penalized), transfer learning (an inductive bias learned from one domain constrains interpretation of evidence in a new domain), and the blessing of abstraction (abstract knowledge can be learned faster than concrete knowledge). These will be less important in what follows, but we note that they are potentially important for the question of language learning---when we view learning as an inference, the dynamics of probabilistic inference come to bear on the learning problem.
+
+
+
  
  
  
