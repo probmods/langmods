@@ -56,7 +56,6 @@
 %\usepackage{multirow}
 
  
-
  
  \lstset{
   language=Scheme, % Andreas Stuhlmüller. Scheme listings. https://github.com/stuhlmueller/scheme-listings.git
@@ -305,8 +304,7 @@ A conceptual lexicon like this one describes generative knowledge about the worl
   (and 
     (eq? (players-on-team 'bobsteam) '(Bob))
     (eq? (players-on-team 'jimsteam) '(Jim))
-    (eq? (teams-in-match 'match1) '(bobsteam jimsteam))
-    (eq? (winner 'match1) 'bobsteam)))
+    (eq? (teams-in-match 'match1) '(bobsteam jimsteam))))
 \end{lstlisting}
 In this and all that follows \lstinline{...ToW theory...} is an abbreviation for the definitions in figure \ref{theory}. The result of this strength is simply the prior belief about Bob's strength: a distribution with mean 0.0.
 Now imagine that Bob wins this match:
@@ -317,7 +315,8 @@ Now imagine that Bob wins this match:
   (and 
     (eq? (players-on-team 'bobsteam) '(Bob))
     (eq? (players-on-team 'jimsteam) '(Jim))
-    (eq? (teams-in-match 'match1) '(bobsteam jimsteam))))
+    (eq? (teams-in-match 'match1) '(bobsteam jimsteam))
+    (eq? (winner 'match1) 'bobsteam)))
 \end{lstlisting}
 If we evaluate this query we find that Bob is inferred to be relatively strong: his mean strength after observing this match is XXX (higher than his a priori mean strength of $0.0$). However, imagine that we then learned that Jim is a weak player:
  \begin{lstlisting}[mathescape]
@@ -333,14 +332,13 @@ If we evaluate this query we find that Bob is inferred to be relatively strong: 
 \end{lstlisting}
 Now, we have very little evidence about Bob's strength---the inferred mean strength from this query goes back to (almost) 0.0. This is an example of \emph{explaining away}: the assumption that Jim is weak has explained the observation that  Bob beat Jim, which otherwise would have provided evidence that Bob is strong. Notice that we have gone through a non-monotonic reasoning sequence: Our degree of belief that Bob is strong went up from the first piece of evidence, and then back down from the second. The explaining away pattern is extremely common in probabilistic inference over structure models. It is characterized by a priori independent variables (such as Bob and Jim's strengths) becoming coupled together by an observation (such as the outcome of match 1). Another way of saying this is that our knowledge of the world, the generative model, can have a significant amount of modularity; our inferences after making observations will generally not be modular in this way, instead complex patterns of influence can couple together disparate pieces of the model.
 
-Another common pattern is \emph{screening off}: 
- \todo[inline]{Observe sam beats jim, predict sam will beat jim again. Knowing jim and sam's strengths, finding out sam beat jim doesn't change prediction. }
+%Another common pattern is \emph{screening off}: 
+% \todo[inline]{Observe sam beats jim, predict sam will beat jim again. Knowing jim and sam's strengths, finding out sam beat jim doesn't change prediction. }
 
-There are a number of other patterns of reasoning that are common results of probabilistic inference over structured models. These include Occam's razor (complexity of hypotheses is automatically penalized), transfer learning (an inductive bias learned from one domain constrains interpretation of evidence in a new domain), and the blessing of abstraction (abstract knowledge can be learned faster than concrete knowledge). These will be less important in what follows, but we note that they are potentially important for the question of language learning---when we view learning as an inference, the dynamics of probabilistic inference come to bear on the learning problem.
+There are a number of other patterns of reasoning that are common results of probabilistic inference over structured models. For instance, \emph{screening off} describes the situation when two variables that were a priori dependent become independent after an observation (in some sense the opposite of explaining away).
+Other patterns include Occam's razor (complexity of hypotheses is automatically penalized), transfer learning (an inductive bias learned from one domain constrains interpretation of evidence in a new domain), and the blessing of abstraction (abstract knowledge can be learned faster than concrete knowledge). These will be less important in what follows, but we note that they are potentially important for the question of language learning---when we view learning as an inference, the dynamics of probabilistic inference come to bear on the learning problem.
 
 
-
- 
  
  
  
@@ -350,102 +348,145 @@ There are a number of other patterns of reasoning that are common results of pro
  
 \todo[inline]{Want to motivate meaning as conditioning from very general distributional assumptions. Sentences as observations. Assume sentences are independent (in literal meaning -- pragmatics changes this). Implies sentence composition by sequential conditioning.}
 
+We view the basic function of language understanding as belief update: moving from a prior belief distribution over worlds (or situations) to a posterior belief distribution given the \emph{literal meaning} of a sentence. We can formalize this idea naturally by defining the literal listener as:
+\begin{lstlisting}
+(define (literal-listener utterance QUD)
+  (query
+    ...theory...
+    (eval QUD)
+    (eval (meaning utterance))))
+\end{lstlisting}
+This function specifies the posterior distribution over values of the \lstinline{QUD} given that the literal meaning of the utterance is true. \todo{make sure the use of eval is clear. or remove?} Notice that the prior distribution is specified by a conceptual lexicon---the \lstinline{...theory...}. The \lstinline{meaning} function is a map from strings to Church expressions (possibly calling functions from \lstinline{...theory...}); any appropriate syntactic theory could be used. For concreteness, consider the simple case where the constituency structure is known and where meanings are combined only by (left or right) application:
+\begin{lstlisting}
+(define (meaning utterance)
+  (if (lexical-item? utterance)
+      (lexicon utterance)
+      (if (flip)
+          (pair (meaning (left utterance)) (meaning (right utterance)))
+          (pair (meaning (right utterance)) (meaning (left utterance))))))
+\end{lstlisting}  
+Here the predicate \lstinline{lexical-item?} determines if the remaining utterance is a single lexical item (entry in the lexicon), the function \lstinline{left} returns the left subtree of the utterance, and \lstinline{right} returns the right subtree. By combining meanings with the \lstinline{pair} operator, we are implying that composition happens by function application: when the meaning is evaluated (as part of \lstinline{literal-listener}) the one subtree meaning will be applied to the other subtree meaning. We leave the direction of composition ambiguous, choosing between them with a random \lstinline{flip}: the \lstinline{meaning} function need not be deterministic, as we discuss further below\footnote{If type errors are interpreted as non-true values in the \lstinline{query} of the \lstinline{literal-listener} function, then ill-typed applications will be eliminated from the posterior interpretation.}.
 
-% Here's my first attempt at the following:
-%\item [dan]  Sentence meanings: in formal semantics there are two views of meaning. the belief update view (roughly, dynamic semantics) and the intensions---functions from world to truth---view (the Montague, Lewis, etc view). Which is ``correct''? What's the relationship between belief and truth?
+To understand what the \lstinline{iteral-listener} does, consider rejection sampling: we evaluate both the \lstinline{QUD} and meaning expressions, constructing whatever intermediate expressions are required; if the meaning expression has value \lstinline{true}, then we return the value of \lstinline{QUD}, otherwise we try again. More concretely, return to the tug-of-war example from the previous section, and now let us begin to build a lexicon for talking about this domain in natural language. 
 
-\subsection{Static and dynamic semantics}
-In formal semantics there are two main conceptions of sentence meaning. On the `static' view, sentences denote propositions: functions from possible worlds to truth-values. Sentences meanings pick out the conditions under which the sentence would be true, and are silent on their proper use --- when it would be appropriate or useful, for a speaker to utter such a sentence, or how a hearer should respond upon hearing such a sentence uttered. This view is frequently combined with an appeal to pragmatics to explain the information conveyed by an utterance and other effects that it may have. That is, the fact that a sentence has been uttered may affect the context of conversation and the beliefs of conversational participants in myriad ways, most obviously by making it public information that the sentence has been uttered. However, the proper bearer of information on this view is not a sentence itself, but the event that the sentence has been uttered. In the presence of certain enabling conditions---for instance, evidence that a speaker is truthful, cooperative, and well-informed---listeners may draw rich inferences and make adjustments to their beliefs. Nevertheless, the particular effects that an utterance has are not intrinsic to the meaning of the sentence according to the static approach. Rather, they are due to the interaction between a sentence's truth-condition and the beliefs and goals of the conversational participants, including participants' beliefs about each other \citep[cf.]{grice89,stalnaker78,stalnaker02,clark96}.
 
-In `dynamic' approaches, sentence meanings are treated as objects which update the context: functions that take the current conversational context (or scoreboard, or participants' belief states) to a new context (scoreboard, belief state). For instance, an utterance of ``A girl walked into the room'' can be thought of a function which adds a discourse referent to the stock of individuals currently under discussion, and also adds the information that this individual (whoever she is) walked into the room in question. The dynamic view has conceptual roots in \citet{karttunen69,stalnaker78,lewis79}, but was first stated in the way just described by \citet{heim82,kamp82}. 
 
-Dynamic theories are attractive for a number of reasons. They provide a formal model of the informational and discursive effects of utterances, and they are often able to account in precise terms for the effects that one utterance can be have on the interpretation of subsequent utterances. Moreover, dynamic theories frequently are able to provide insight into these effects without requiring the theorist to undertake the difficult task of providing a complete model of conversational participants' epistemic states. By contrast, deriving precise predictions from the combination of a static semantics and a rich pragmatics would require a much more complex model, one which incorporates and relates linguistic knowledge with causal and social knowledge.
+\subsection{Probabilistic meanings}
 
-However, abstracting away from the details of conversational participants' epistemic states also creates problems. First, as we will argue below, there are many cases in the interpretations that listeners arrive at depend crucially on their richly structured theories of the world and of a speaker's beliefs and goals. If this is the case, a realistic theory of language understanding must incorporate linguistic knowledge, world knowledge, and social knowledge and relate these three components. Second, the inferences that listeners make often have a graded character that is difficult to model in standard dynamic theories. That is, it is not simply that two given interpretations $I$ and $I'$ of sentence $S$ are either available or not; frequently both are available but one is preferred to the other, or many interpretations are available. In such cases, determining the information that a sentence conveys requires a method for integrating over the multiple interpretations in a way that pays attention to the order of preference. 
+Note that any transition from distribution $P_{\text{before}}$ to distribution $P_{\text{after}}$ such that the support (i.e. region of non-zero probability) of $P_{\text{after}}$ is a subset of the support of $P_{\text{after}}$ can be written as multiplying by a real-valued function and then renormalizing. That is, any belief update can be written as conditioning.
 
-We will describe a probabilistic model of knowledge representation and linguistic interpretation which integrates the best features of the static and dynamic approaches to meaning. With static approaches, we assume that sentences pick out truth-conditions (perhaps stochastically), and that dynamic effects are properly located in the pragmatics rather than the semantics. With dynamic theories, we argue that a complete understanding of many linguistic phenomena requires an explicit formal model of information flow in conversation and the reasoning processes that are involved in interpretation. 
 
-\subsection{Deterministic and probabilistic update}
-%\item [dan]  Bayesian belief update is via conditioning, conditions are intensions (fns from env/world to truth). So there is a natural probabilistic view that treats meaning as both truth-functional intention and operator of belief update.
+
+%
+%% Here's my first attempt at the following:
+%%\item [dan]  Sentence meanings: in formal semantics there are two views of meaning. the belief update view (roughly, dynamic semantics) and the intensions---functions from world to truth---view (the Montague, Lewis, etc view). Which is ``correct''? What's the relationship between belief and truth?
+%
+%\subsection{Static and dynamic semantics}
+%In formal semantics there are two main conceptions of sentence meaning. On the `static' view, sentences denote propositions: functions from possible worlds to truth-values. Sentences meanings pick out the conditions under which the sentence would be true, and are silent on their proper use --- when it would be appropriate or useful, for a speaker to utter such a sentence, or how a hearer should respond upon hearing such a sentence uttered. This view is frequently combined with an appeal to pragmatics to explain the information conveyed by an utterance and other effects that it may have. That is, the fact that a sentence has been uttered may affect the context of conversation and the beliefs of conversational participants in myriad ways, most obviously by making it public information that the sentence has been uttered. However, the proper bearer of information on this view is not a sentence itself, but the event that the sentence has been uttered. In the presence of certain enabling conditions---for instance, evidence that a speaker is truthful, cooperative, and well-informed---listeners may draw rich inferences and make adjustments to their beliefs. Nevertheless, the particular effects that an utterance has are not intrinsic to the meaning of the sentence according to the static approach. Rather, they are due to the interaction between a sentence's truth-condition and the beliefs and goals of the conversational participants, including participants' beliefs about each other \citep[cf.]{grice89,stalnaker78,stalnaker02,clark96}.
+%
+%In `dynamic' approaches, sentence meanings are treated as objects which update the context: functions that take the current conversational context (or scoreboard, or participants' belief states) to a new context (scoreboard, belief state). For instance, an utterance of ``A girl walked into the room'' can be thought of a function which adds a discourse referent to the stock of individuals currently under discussion, and also adds the information that this individual (whoever she is) walked into the room in question. The dynamic view has conceptual roots in \citet{karttunen69,stalnaker78,lewis79}, but was first stated in the way just described by \citet{heim82,kamp82}. 
+%
+%Dynamic theories are attractive for a number of reasons. They provide a formal model of the informational and discursive effects of utterances, and they are often able to account in precise terms for the effects that one utterance can be have on the interpretation of subsequent utterances. Moreover, dynamic theories frequently are able to provide insight into these effects without requiring the theorist to undertake the difficult task of providing a complete model of conversational participants' epistemic states. By contrast, deriving precise predictions from the combination of a static semantics and a rich pragmatics would require a much more complex model, one which incorporates and relates linguistic knowledge with causal and social knowledge.
+%
+%However, abstracting away from the details of conversational participants' epistemic states also creates problems. First, as we will argue below, there are many cases in the interpretations that listeners arrive at depend crucially on their richly structured theories of the world and of a speaker's beliefs and goals. If this is the case, a realistic theory of language understanding must incorporate linguistic knowledge, world knowledge, and social knowledge and relate these three components. Second, the inferences that listeners make often have a graded character that is difficult to model in standard dynamic theories. That is, it is not simply that two given interpretations $I$ and $I'$ of sentence $S$ are either available or not; frequently both are available but one is preferred to the other, or many interpretations are available. In such cases, determining the information that a sentence conveys requires a method for integrating over the multiple interpretations in a way that pays attention to the order of preference. 
+%
+%We will describe a probabilistic model of knowledge representation and linguistic interpretation which integrates the best features of the static and dynamic approaches to meaning. With static approaches, we assume that sentences pick out truth-conditions (perhaps stochastically), and that dynamic effects are properly located in the pragmatics rather than the semantics. With dynamic theories, we argue that a complete understanding of many linguistic phenomena requires an explicit formal model of information flow in conversation and the reasoning processes that are involved in interpretation. 
+%
+%\subsection{Deterministic and probabilistic update}
+%%\item [dan]  Bayesian belief update is via conditioning, conditions are intensions (fns from env/world to truth). So there is a natural probabilistic view that treats meaning as both truth-functional intention and operator of belief update.
+%%   (Note: any update of a distribution to another that doesn't make certain things uncertain can be represented as conditioning on a stochastic predicate. 
+%%    Note, environment is natural notion of world... too weird for linguists?
+%%    Note: introduce SF to LF translation function here.)
+%Jermaine asks, ``Is it raining?'' and Bret answers ``No, it's snowing''. What information does Bret's answer convey? Naturally, the information that it's snowing (in the relevant time and place); or, equivalently, that the actual world is a member of the set of possible worlds in which it is snowing (in that time and place). Suppose that Jermaine's belief state when he asks the question is modeled as a set of worlds $B$, interpreted as his \emph{doxastically possible worlds} --- those that his beliefs fail to exclude. A common approach to modeling such an interaction is to suppose that --- so long as Jermaine trusts Bret and believes that Bret is well-informed --- Bret's response ``It's snowing'' will cause Jermaine to modify $B$ so that possibilities in which it is not snowing are excluded. 
+%
+%Suppose we have a function $\sv{\cdot}^{\mathcal{M},g}$ which maps linguistic expressions to their denotations, relative to a model $\mathcal{M}$ and an assignment function $g$. \sv{\cdot}^{\mathcal{M},g} will take a declarative sentence $u$ to (the characteristic function of) the set of worlds in which $u$ is true. The informational effect of the utterance ``It's snowing'' can be thought of as a mapping from belief states $B$ to different belief state $B' = B \cap \sv{\text{It's snowing}}^{\mathcal{M},g}$. On this model, the core operation of belief update is set intersection: under appropriate conditions, Bret's utterance will cause Jermaine to reduce the size of the his belief state in a way that amounts to adding the information that it is snowing. 
+%
+%The basic operation of Bayesian update is a natural extension of the intersection operation to probability spaces. Formally, a probability space is a triple consisting of a set of worlds $W$, a domain of propositions $\Phi \subseteq \wp(W)$, and a normalized measure function $P$. For simplicity we deal only with finite $W$ here, which allows us to set $\Phi = \wp(W)$. (The extension to countable $W$ is straightforward.)
+%
+%\defin{Probability space}{A probability space is a triple \lar{W, \wp(W), P} where
+%\bei
+%\item [(a)] $P: \wp(W) \rightarrow [0,1]$
+%\item [(b)] $P(W) = 1$
+%\item [(c)] $A \cap B = \emptyset \rightarrow P(A \cup B) = P(A) + P(B)$
+%\eni
+%}
+%Let $P$ (equivalently, $P(\cdot)$) be a probability measure representing Jermaine's beliefs about the world. Note that $P$ is a strictly richer representation of Jermaine's belief state than $B$: the probability measure contains not only information about which propositions might be true according to Jermaine (those $A \subseteq W$ s.t.\ $P(A) \neq 0$), but also about the relative likelihood of any two propositions. 
+%
+%Extending the intersective concept of update described above, we can define a simple Bayesian rule for taking in the information contained in a declarative sentence using a combination of \emph{intersection} and \emph{renormalization}. (The 0 subscript in this listener's name will be explained shortly.) 
+%
+%\defin{Na\"ive Bayesian listener}{Let $P_{L_0}$ be the prior probability distribution of a listener $L_0$. We say that $L_0$ is a \emph{na\"ive Bayesian update} if and only if $L_0$ always responds to an utterance $u$ by adopting a new probability distribution $P'$ which is generated by assuming that $u$ is true and making appropriate modifications to $P_{L_0}$: 
+%\bei
+%\item If $P_{L_0}$ is defined in a probability space \lar{W, \wp(W), P_{L_0}}, then $P'$ is defined in the reduced space \lar{W', \wp(W'), P'}, where $W' = \{W \cap \sv{u}^{\mathcal{M},g}\}$.
+%\item $P'(W') = 1$. 
+%\item For all $X, Y \subseteq W'$, the ratio of posterior probabilities  
+%$P'(X)/P'(Y)$ is proportional to the ratio of prior probabilities $P_{L_0}(X \cap \sv{u}^{\mathcal{M},g})/P_L(Y \cap \sv{u}^{\mathcal{M},g})$.
+%\eni
+%}
+%The first condition requires that no worlds remain after update which fail to make $u$ true. The second ensures that $P'$ is a well-defined probability measure. The third ensures that update with \sv{u}^{\mathcal{M},g} does not add any information except the information that $u$ is true. It turns out that there is a simple and unique way to ensure that these requirements are satisfied: we can define $P'$ as the conditional probability measure $P_L(\cdot \ |\ \sv{u}^{\mathcal{M},g})$.
+%
+%\defin{Conditional probability measure}{
+%Let \lar{W, \wp(W), P} be a probability space. Then for any $X, Y \in \wp(W)$, the conditional probability measure $P(\cdot \ |\ X)$ is
+%$$
+%P(Y \ |\ X) =_{\mathit{df}} P(Y \cap X) / P_L(X)
+%$$
+%This gives us a very simple theory of probabilistic update: if Jermaine trusts Bret absolutely, then, he will respond to Bret's utterance ``It is snowing'' by assigning the following probability to any proposition $A \subseteq W'$: 
+%$$
+%P'(A) = P_{L_0}(A \ |\ \sv{\text{It's snowing}}^{\mathcal{M},g}) = \frac{P_{L_0}(A \cap \sv{\text{It's snowing}}^{\mathcal{M},g}}{P(\sv{\text{It's snowing}}^{\mathcal{M},g})}
+%$$
+%}
+%
+%This theory does not immediately tell us how to deal with cases in which a listener is unsure of the speaker's reliability or the intended meaning. Modeling sensitivity to a speaker's reliability is actually not too difficult: we can simply add a latent variable $R$, representing the probability that the speaker is reliable. Suppose Jermaine believes that Bret is probably reliable ($P_{L_0}(R=1) = .8$), but also considers it possible that Bret's utterance is independent of the weather ($P_{L_0}(R=0) = .2$). The utterance is definitely true if Bret is reliable --- 
+%\bei
+%\item $P_{L_0}(\cdot \ |\ u, R=1) = P_{L_0}(\cdot \ |\ \sv{u}^{\mathcal{M},g})$
+%\eni
+%--- and we learn nothing if Bret is not reliable except that the utterance has been made. With this model in place, we can define a simple reliability-sensitive update rule:
+%
+%\defin{Reliability-sensitive Bayesian listener}{
+%$L_R$ is a reliability-sensitive Bayesian listener if and only if $L_R$ always responds to an utterance $u$ by conditionalizing on the event that the speaker produced $u$, and then integrating prior information about the speaker's reliability $R$. That is, for any $A$, the posterior probability of $A$ will be $P_{L_R}(A\ |\ u)$, where
+%$$
+%P_{L_R}(A |\ u) = P_{L_R}(R=1) \times P_{L_R}(A \ |\ u, R=1) + P_{L_R}(R=0) \times P_{L_R}(A\ |\ u, R=0),
+%$$
+%a decomposition which follows straightforwardly from the definition of (conditional) probability. 
+%}
+%
+%Bayesian update thus gives us a way of extending belief update to cases in which it is uncertain whether the speaker is reliable: we imagine what the posterior should be if the speaker is reliable or if he is not, and combine these quantities in a way that takes into account the listener's probabilistic beliefs about the speaker's reliability. Let $A$ be a proposition which is conditionally independent of $u$ given $R=0$ --- that is, any proposition whose probability is unaffected if we discover that Bret is unreliable. Since the utterance is definitely true if $R=1$, and $L$'s beliefs are unaffected if $R=0$, we have
+%$$
+%P_L(A\ |\ u) = .8 \times P_L(A \ |\ \sv{u}^{\mathcal{M},g}) + .2 \times P_L(A)
+%$$
+%%
+%% use this as our linguistic example of screening off?
+%%
+%
+%This line of investigation suggests several further enrichments. First, we may want to represent not only the probability that the speaker is reliable ($R$), but also the probability that the speaker is lying $L$, or speaking metaphorically ($M$), or being underinformative for the sake of politeness or personal gain ($U$), or making a joke ($J$), or any of the myriad reasons why an intelligent listener might not wish to respond to an utterance by simply conditioning on its literal truth. Knowing how to decide among these possibilities requires the listener to maintain a model of the speaker's beliefs and goals \citep[][etc.]{grice89,lewis69,clark96}. Rather than considering each variable separately, we combine them into a single interpretive rule:
+%
+%\defin{Level-1 pragmatic Bayesian listener}{$L_1$ is a level-1 pragmatic Bayesian listener if and only if $L_1$ always responds to an utterance $u$ by conditionalizing on the event that the speaker produced $u$, and then integrating this observation with a probabilistic model of the speaker's utterance planning process $P_{S}(\cdot)$. For any $A \subseteq W$, 
+%$$
+%P_{L_1}(A |\ u) \propto \frac{P_{S}(u \ |\ A) \times P_{L_1}(A)}{\sum_B\ P_{S}(u \ |\ B) \times P_{L_1}(B)},
+%$$
+%where the $B$'s form a partition of $W$ including $A$.
+%
+%That is, the probability that $A$ is true given that the speaker produced $u$ is proportional to the probability that the speaker would have produced $u$ if $A$ were true, multiplied by the prior probability that $A$ is true. The equation is a simple instantiation of Bayes' rule, along with the model assumption that $P_{L_1}(u \ |\ A) = P_{S}(u \ |\ A)$. Note that probabilities must be normalized by considering the $B$'s, representing all of the other events that might have caused the speaker to utter $u$.
+%}
+%
+%This model allows us to wrap up all information about the speaker's reliability, willingness to lie, etc.\ into a single model of the speaker's behavior, given by $P_{S}(\cdot)$. If it is known that the speaker is fully reliable and maximally informative, for instance, then our speaker model will tell us that $P_{S}(\sv{u}^{\mathcal{M},g} \ |\ u) = 1$ and $P_{S}(u\ |\ \sv{u}^{\mathcal{M},g}) = 1$ --- $S$ speaks all and only true propositions. (Of course, no real speaker could or would behave in this way.)
+%
+%%
+%% second enrichment is using a structured model (with Church)
+%%
+%
+
+
+
+
+
+%\item  Sentence meanings: in formal semantics there are two views of meaning. the belief update view (roughly, dynamic semantics) and the intensions---functions from world to truth---view (the Montague, Lewis, etc view). Which is ``correct''? What's the relationship between belief and truth?
+
+
+%\item Bayesian belief update is via conditioning, conditions are intensions (fns from env/world to truth). So there is a natural probabilistic view that treats meaning as both truth-functional intention and operator of belief update.
 %   (Note: any update of a distribution to another that doesn't make certain things uncertain can be represented as conditioning on a stochastic predicate. 
 %    Note, environment is natural notion of world... too weird for linguists?
 %    Note: introduce SF to LF translation function here.)
-Jermaine asks, ``Is it raining?'' and Bret answers ``No, it's snowing''. What information does Bret's answer convey? Naturally, the information that it's snowing (in the relevant time and place); or, equivalently, that the actual world is a member of the set of possible worlds in which it is snowing (in that time and place). Suppose that Jermaine's belief state when he asks the question is modeled as a set of worlds $B$, interpreted as his \emph{doxastically possible worlds} --- those that his beliefs fail to exclude. A common approach to modeling such an interaction is to suppose that --- so long as Jermaine trusts Bret and believes that Bret is well-informed --- Bret's response ``It's snowing'' will cause Jermaine to modify $B$ so that possibilities in which it is not snowing are excluded. 
 
-Suppose we have a function $\sv{\cdot}^{\mathcal{M},g}$ which maps linguistic expressions to their denotations, relative to a model $\mathcal{M}$ and an assignment function $g$. \sv{\cdot}^{\mathcal{M},g} will take a declarative sentence $u$ to (the characteristic function of) the set of worlds in which $u$ is true. The informational effect of the utterance ``It's snowing'' can be thought of as a mapping from belief states $B$ to different belief state $B' = B \cap \sv{\text{It's snowing}}^{\mathcal{M},g}$. On this model, the core operation of belief update is set intersection: under appropriate conditions, Bret's utterance will cause Jermaine to reduce the size of the his belief state in a way that amounts to adding the information that it is snowing. 
-
-The basic operation of Bayesian update is a natural extension of the intersection operation to probability spaces. Formally, a probability space is a triple consisting of a set of worlds $W$, a domain of propositions $\Phi \subseteq \wp(W)$, and a normalized measure function $P$. For simplicity we deal only with finite $W$ here, which allows us to set $\Phi = \wp(W)$. (The extension to countable $W$ is straightforward.)
-
-\defin{Probability space}{A probability space is a triple \lar{W, \wp(W), P} where
-\bei
-\item [(a)] $P: \wp(W) \rightarrow [0,1]$
-\item [(b)] $P(W) = 1$
-\item [(c)] $A \cap B = \emptyset \rightarrow P(A \cup B) = P(A) + P(B)$
-\eni
-}
-Let $P$ (equivalently, $P(\cdot)$) be a probability measure representing Jermaine's beliefs about the world. Note that $P$ is a strictly richer representation of Jermaine's belief state than $B$: the probability measure contains not only information about which propositions might be true according to Jermaine (those $A \subseteq W$ s.t.\ $P(A) \neq 0$), but also about the relative likelihood of any two propositions. 
-
-Extending the intersective concept of update described above, we can define a simple Bayesian rule for taking in the information contained in a declarative sentence using a combination of \emph{intersection} and \emph{renormalization}. (The 0 subscript in this listener's name will be explained shortly.) 
-
-\defin{Na\"ive Bayesian listener}{Let $P_{L_0}$ be the prior probability distribution of a listener $L_0$. We say that $L_0$ is a \emph{na\"ive Bayesian update} if and only if $L_0$ always responds to an utterance $u$ by adopting a new probability distribution $P'$ which is generated by assuming that $u$ is true and making appropriate modifications to $P_{L_0}$: 
-\bei
-\item If $P_{L_0}$ is defined in a probability space \lar{W, \wp(W), P_{L_0}}, then $P'$ is defined in the reduced space \lar{W', \wp(W'), P'}, where $W' = \{W \cap \sv{u}^{\mathcal{M},g}\}$.
-\item $P'(W') = 1$. 
-\item For all $X, Y \subseteq W'$, the ratio of posterior probabilities  
-$P'(X)/P'(Y)$ is proportional to the ratio of prior probabilities $P_{L_0}(X \cap \sv{u}^{\mathcal{M},g})/P_L(Y \cap \sv{u}^{\mathcal{M},g})$.
-\eni
-}
-The first condition requires that no worlds remain after update which fail to make $u$ true. The second ensures that $P'$ is a well-defined probability measure. The third ensures that update with \sv{u}^{\mathcal{M},g} does not add any information except the information that $u$ is true. It turns out that there is a simple and unique way to ensure that these requirements are satisfied: we can define $P'$ as the conditional probability measure $P_L(\cdot \ |\ \sv{u}^{\mathcal{M},g})$.
-
-\defin{Conditional probability measure}{
-Let \lar{W, \wp(W), P} be a probability space. Then for any $X, Y \in \wp(W)$, the conditional probability measure $P(\cdot \ |\ X)$ is
-$$
-P(Y \ |\ X) =_{\mathit{df}} P(Y \cap X) / P_L(X)
-$$
-This gives us a very simple theory of probabilistic update: if Jermaine trusts Bret absolutely, then, he will respond to Bret's utterance ``It is snowing'' by assigning the following probability to any proposition $A \subseteq W'$: 
-$$
-P'(A) = P_{L_0}(A \ |\ \sv{\text{It's snowing}}^{\mathcal{M},g}) = \frac{P_{L_0}(A \cap \sv{\text{It's snowing}}^{\mathcal{M},g}}{P(\sv{\text{It's snowing}}^{\mathcal{M},g})}
-$$
-}
-
-This theory does not immediately tell us how to deal with cases in which a listener is unsure of the speaker's reliability or the intended meaning. Modeling sensitivity to a speaker's reliability is actually not too difficult: we can simply add a latent variable $R$, representing the probability that the speaker is reliable. Suppose Jermaine believes that Bret is probably reliable ($P_{L_0}(R=1) = .8$), but also considers it possible that Bret's utterance is independent of the weather ($P_{L_0}(R=0) = .2$). The utterance is definitely true if Bret is reliable --- 
-\bei
-\item $P_{L_0}(\cdot \ |\ u, R=1) = P_{L_0}(\cdot \ |\ \sv{u}^{\mathcal{M},g})$
-\eni
---- and we learn nothing if Bret is not reliable except that the utterance has been made. With this model in place, we can define a simple reliability-sensitive update rule:
-
-\defin{Reliability-sensitive Bayesian listener}{
-$L_R$ is a reliability-sensitive Bayesian listener if and only if $L_R$ always responds to an utterance $u$ by conditionalizing on the event that the speaker produced $u$, and then integrating prior information about the speaker's reliability $R$. That is, for any $A$, the posterior probability of $A$ will be $P_{L_R}(A\ |\ u)$, where
-$$
-P_{L_R}(A |\ u) = P_{L_R}(R=1) \times P_{L_R}(A \ |\ u, R=1) + P_{L_R}(R=0) \times P_{L_R}(A\ |\ u, R=0),
-$$
-a decomposition which follows straightforwardly from the definition of (conditional) probability. 
-}
-
-Bayesian update thus gives us a way of extending belief update to cases in which it is uncertain whether the speaker is reliable: we imagine what the posterior should be if the speaker is reliable or if he is not, and combine these quantities in a way that takes into account the listener's probabilistic beliefs about the speaker's reliability. Let $A$ be a proposition which is conditionally independent of $u$ given $R=0$ --- that is, any proposition whose probability is unaffected if we discover that Bret is unreliable. Since the utterance is definitely true if $R=1$, and $L$'s beliefs are unaffected if $R=0$, we have
-$$
-P_L(A\ |\ u) = .8 \times P_L(A \ |\ \sv{u}^{\mathcal{M},g}) + .2 \times P_L(A)
-$$
-%
-% use this as our linguistic example of screening off?
-%
-
-This line of investigation suggests several further enrichments. First, we may want to represent not only the probability that the speaker is reliable ($R$), but also the probability that the speaker is lying $L$, or speaking metaphorically ($M$), or being underinformative for the sake of politeness or personal gain ($U$), or making a joke ($J$), or any of the myriad reasons why an intelligent listener might not wish to respond to an utterance by simply conditioning on its literal truth. Knowing how to decide among these possibilities requires the listener to maintain a model of the speaker's beliefs and goals \citep[][etc.]{grice89,lewis69,clark96}. Rather than considering each variable separately, we combine them into a single interpretive rule:
-
-\defin{Level-1 pragmatic Bayesian listener}{$L_1$ is a level-1 pragmatic Bayesian listener if and only if $L_1$ always responds to an utterance $u$ by conditionalizing on the event that the speaker produced $u$, and then integrating this observation with a probabilistic model of the speaker's utterance planning process $P_{S}(\cdot)$. For any $A \subseteq W$, 
-$$
-P_{L_1}(A |\ u) \propto \frac{P_{S}(u \ |\ A) \times P_{L_1}(A)}{\sum_B\ P_{S}(u \ |\ B) \times P_{L_1}(B)},
-$$
-where the $B$'s form a partition of $W$ including $A$.
-
-That is, the probability that $A$ is true given that the speaker produced $u$ is proportional to the probability that the speaker would have produced $u$ if $A$ were true, multiplied by the prior probability that $A$ is true. The equation is a simple instantiation of Bayes' rule, along with the model assumption that $P_{L_1}(u \ |\ A) = P_{S}(u \ |\ A)$. Note that probabilities must be normalized by considering the $B$'s, representing all of the other events that might have caused the speaker to utter $u$.
-}
-
-This model allows us to wrap up all information about the speaker's reliability, willingness to lie, etc.\ into a single model of the speaker's behavior, given by $P_{S}(\cdot)$. If it is known that the speaker is fully reliable and maximally informative, for instance, then our speaker model will tell us that $P_{S}(\sv{u}^{\mathcal{M},g} \ |\ u) = 1$ and $P_{S}(u\ |\ \sv{u}^{\mathcal{M},g}) = 1$ --- $S$ speaks all and only true propositions. (Of course, no real speaker could or would behave in this way.)
-
-%
-% second enrichment is using a structured model (with Church)
-%
 
 %
 % Next: update on uncertain or inherently stochastic meanings -- Mishearing, ambiguity, vagueness(?)
@@ -454,10 +495,10 @@ This model allows us to wrap up all information about the speaker's reliability,
 
 
 \begin{itemize}  
-\item [dan] Bayesian belief update as the basic operation of literal meaning.
+\item  Bayesian belief update as the basic operation of literal meaning.
 \subitem     Conservative version uses standard deterministic semantics (world->truth) to update a prior distribution over worlds.
 \subitem     Generative world model has (at least) entities (objects, events, agents, ..) and properties. Recall tug-of-war world.
-\subitem[(ndg)]     Consequences:  Graded and non-monotonic effects: 
+\subitem     Consequences:  Graded and non-monotonic effects: 
 "in match1 bob played against jim. bob won match1." ... "jim is the weakest player." : initial graded inference about bob's strength. explaining away. initially think bob strong, then probably not. effect of prior knowledge on these inferences: number of other players and strength variance.
 
 
