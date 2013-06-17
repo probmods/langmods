@@ -345,7 +345,7 @@ Now, we have very little evidence about Bob's strength---the inferred mean stren
 \begin{center}
 \includegraphics[scale=.65]{explaining-away-example.pdf}
 \end{center}
-\caption{Explaining away: Bob's inferred strength after (a) no observations; (b) observing that Bob beat Jim, whose strength is unknown; (c) learning that Jim is very weak (strength -3).}
+\caption{An example of explaining away. Lines show the distribution on Bob's inferred strength after (a) no observations (solid); (b) observing that Bob beat Jim, whose strength is unknown (long dash); (c) learning that Jim is very weak, with strength -3 (short dash).}
 \end{figure}
 Notice that we have gone through a non-monotonic reasoning sequence: Our degree of belief that Bob is strong went up from the first piece of evidence, and then back down from the second. The explaining away pattern is extremely common in probabilistic inference over structure models. It is characterized by a priori independent variables (such as Bob and Jim's strengths) becoming coupled together by an observation (such as the outcome of match 1). Another way of saying this is that our knowledge of the world, the generative model, can have a significant amount of modularity; our inferences after making observations will generally not be modular in this way, instead complex patterns of influence can couple together disparate pieces of the model.
 
@@ -365,7 +365,7 @@ Other patterns include Occam's razor (complexity of hypotheses is automatically 
 %This view of the belief states and their dynamics has a natural extension to language understanding: we can treat interpretation as conditioning on the literal meaning of a sentence. 
 
 
-We view the basic function of language understanding as belief update: moving from a prior belief distribution over worlds (or situations) to a posterior belief distribution given the \emph{literal meaning} of a sentence. By analogy with the effects of observation on belief, we can formalize this idea naturally by defining the literal listener as:
+Following a productive tradition in semantics and pragmatics \citep[][etc.]{stalnaker78,lewis79}, we view the basic function of language understanding as belief update: moving from a prior belief distribution over worlds (or situations) to a posterior belief distribution given the \emph{literal meaning} of a sentence. By analogy with the effects of observation on belief, we can formalize this idea naturally by defining the literal listener as:
 \begin{lstlisting}
 (define (literal-listener utterance QUD)
   (query
@@ -373,7 +373,7 @@ We view the basic function of language understanding as belief update: moving fr
     (eval QUD)
     (eval (meaning utterance))))
 \end{lstlisting}
-This function specifies the posterior distribution over values of the \lstinline{QUD} given that the literal meaning of the utterance is true. \todo{make sure the use of eval is clear. or remove?} Notice that the prior distribution is specified by a conceptual lexicon---the \lstinline{...theory...}. The \lstinline{meaning} function is a map from strings to Church expressions (possibly calling functions from \lstinline{...theory...}); any appropriate syntactic theory could be used. For concreteness, consider the simple case where the constituency structure is known and where meanings are combined only by (left or right) application:
+This function specifies the posterior distribution over values of the Question Under Discussion (\lstinline{QUD}) given that the literal meaning of the utterance is true.\footnote{On QUD models, see \citealt{ginzburg95a,vankuppevelt95,roberts96,beaverclark08} among many others.} \todo{make sure the use of eval is clear. or remove?} Notice that the prior distribution is specified by a conceptual lexicon---the \lstinline{...theory...}. The \lstinline{meaning} function is a map from strings to Church expressions (possibly calling functions from \lstinline{...theory...}); any appropriate syntactic theory could be used. For concreteness, consider the simple case where the constituent structure is known and where meanings are combined only by (left or right) application:
 \begin{lstlisting}
 (define (meaning utterance)
   (if (lexical-item? utterance)
@@ -384,7 +384,7 @@ This function specifies the posterior distribution over values of the \lstinline
 \end{lstlisting}  
 Here the predicate \lstinline{lexical-item?} determines if the remaining utterance is a single lexical item (entry in the lexicon), the function \lstinline{left} returns the left subtree of the utterance, and \lstinline{right} returns the right subtree. By combining meanings with the \lstinline{pair} operator, we are implying that composition happens by function application: when the meaning is evaluated (as part of \lstinline{literal-listener}) the one subtree meaning will be applied to the other subtree meaning. We leave the direction of composition ambiguous, choosing between them with a random \lstinline{flip}: the \lstinline{meaning} function need not be deterministic, as we discuss further below\footnote{If type errors are interpreted as non-true values in the \lstinline{query} of the \lstinline{literal-listener} function, then ill-typed applications will be eliminated from the posterior interpretation.}.
 
-To understand what the \lstinline{iteral-listener} does, consider rejection sampling: we evaluate both the \lstinline{QUD} and meaning expressions, constructing whatever intermediate expressions are required; if the meaning expression has value \lstinline{true}, then we return the value of \lstinline{QUD}, otherwise we try again. More concretely, return to the tug-of-war example from the previous section, and now let us begin to build a lexicon for talking about this domain in natural language. 
+To understand what the \lstinline{literal-listener} does, consider rejection sampling: we evaluate both the \lstinline{QUD} and meaning expressions, constructing whatever intermediate expressions are required; if the meaning expression has value \lstinline{true}, then we return the value of \lstinline{QUD}, otherwise we try again. More concretely, return to the tug-of-war example from the previous section, and now let us begin to build a lexicon for talking about this domain in natural language. 
 
 \todo[inline]{From dan: To a first approximation, then, hearing the sentence ``Team 1 won match 2'' will cause the listener to update her belief state by adding to the (possibly context-dependent) translation of this sentence into SLC to her conditioning expression. This account of interpretation is in a straightforward extension of the proto-dynamic theory of \citet{stalnaker78}.
 Like Stalnaker's account, we must include some caveats: a listener should condition on the literal meaning only if the speaker is well-informed, reliable, etc. In addition, there will sometimes be uncertainty about what the literal meaning is }
