@@ -7,3 +7,5 @@
 *.toc
 *.synctex.gz
 .dropbox
+TSWLatexianTemp*
+
