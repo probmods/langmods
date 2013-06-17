@@ -363,20 +363,22 @@ To understand what the \lstinline{literal-listener} does, consider rejection sam
 \todo[inline]{From dan: To a first approximation, then, hearing the sentence ``Team 1 won match 2'' will cause the listener to update her belief state by adding to the (possibly context-dependent) translation of this sentence into SLC to her conditioning expression. This account of interpretation is in a straightforward extension of the proto-dynamic theory of \citet{stalnaker78}.
 Like Stalnaker's account, we must include some caveats: a listener should condition on the literal meaning only if the speaker is well-informed, reliable, etc. In addition, there will sometimes be uncertainty about what the literal meaning is }
 
-\subsection{Interpreting English in the Probabilistic Language of Thought}
+\subsection{Interpreting English in Church}
 English lexical items are interpreted as Church expressions, and sentence meanings are built up recursively from the denotations of lexical items along lines provided by the syntactic structure. The function mapping English expressions to their interpretation in Church is written \denot{\cdot}.\footnote{In a full Church implementation, each lexical specification ``\denot{English\ expression} = \lstinline{church-expression}'' would be incorporated into a single \lstinline{lexicon} function which is defined casewise.}   
 
-The stochastic $\lambda$-calculus (SLC) implemented by Church thus functions as our intermediate translation language, just as the simply-typed $\lambda$-calculus functions as an intermediate translation language in Montague's \citeyear{montague73} fragment of English. A key difference, however, is that the intermediate level is not merely a convenience as in Montague's approach. Conceptual representations and world knowledge are also represented as Church expressions, and use of a common language to represent linguistic and non-linguistic information makes it possible to model intricate interactions between these two types of knowledge.
+The stochastic $\lambda$-calculus (SLC) implemented by Church thus functions as our intermediate translation language, just as the simply-typed $\lambda$-calculus functions as an intermediate translation language in Montague's \citeyear{montague73} fragment of English. A key difference, however, is that the intermediate level is not merely a convenience as in Montague's approach. Conceptual representations and world knowledge are also represented as Church expressions, and use of a common language to represent linguistic and non-linguistic information makes it possible to model intricate interactions between these two types of knowledge. 
 
 For example, the interpretation of a name is a Church expression which is uniquely associated with some object or individual (the name-bearer). Interpreted in this way, names are directly referential since their reference does not depend on stochastic choices made in the interpretation process.
 \begin{itemize}
 \item \denot{Bob} = \lstinline{`Bob}
 \item \denot{Jim} = \lstinline{`Jim}
+\item \denot{Team 1} = \lstinline{`team1}
+\item \denot{Team 2} = \lstinline{`team2}
 \item \denot{Match 1} = \lstinline{`match1}
 \item \denot{Match 2} = \lstinline{`match2}
 \item ...
 \end{itemize}
-A one-place predicate such as \emph{player} or \emph{man} is interpreted as the characteristic function of a list ($\approx$ set) of individuals.\footnote{\lstinline{(element? x lst)} is defined as \lstinline{(not (null? (memq x lst)))}.}
+A one-place predicate such as \emph{player} or \emph{man} is interpreted as a function from individuals to truth-values. Intensionality is everywhere implicit, due to the fact that the denotations of English expressions can refer to stochastic functions such as \lstlinine{gender}.
 \begin{itemize}
 \item \sv{player} = \lstinline{($\lambda$ (x) (element? x player))}  
 \item \sv{team} = \lstinline{($\lambda$ (x) (element? x teams))}
@@ -384,10 +386,10 @@ A one-place predicate such as \emph{player} or \emph{man} is interpreted as the 
 \item \sv{man} = \lstinline{($\lambda$ (x) (equal? (gender x) `male))}
 \item \sv{woman} = \lstinline{($\lambda$ (x) (equal? (gender x) `female))}
 \end{itemize}
-\todo[inline]{We need to fix the lslinline environment so that \$$\backslash$lambda\$ and \$$\backslash$theta\$ display as $\lambda$ and $\theta$.}
-Predicates denote intensions of properties: they pick out sets of individuals in any world, but their extension in a world depends on the random choices (e.g., evaluations of \lstinline{flip}) that are made in the process of constructing the world. In these examples, \emph{player} is true of the same individuals in every world, since \lstinline{player} is defined deterministically in the intuitive theory in figure \ref{theory}. \emph{man}, on the other hand, denotes a predicate which will be true of a given individual (say, \lstinline{`Bob}) in 50\% of partial worlds constructed (assuming no relevant observations have been made). This is because the definition of \lstinline{man} requires that the \lstinline{gender} function return \lstinline{`male} when applied to the interpretation of its syntactic sister, and \lstinline{gender} is defined in figure \ref{theory} as a stochastic function which returns \lstinline{`male} and \lstinline{`female} with equal probability. 
+\todo[inline]{We need to fix the lstinline environment so that \$$\backslash$lambda\$ and \$$\backslash$theta\$ display as $\lambda$ and $\theta$.}
+Predicates denote intensions of properties: they pick out functions from individuals to truth-values in any world, but the specific function that they pick out in a world depends on the random choices (e.g., evaluations of \lstinline{flip}) that are made in the process of constructing the world. In these examples, \emph{player} is true of the same individuals in every world, since \lstinline{player} is defined deterministically in the intuitive theory in figure \ref{theory}. \emph{man}, on the other hand, denotes a predicate which will be true of a given individual (say, \lstinline{`Bob}) in 50\% of partial worlds constructed (assuming no relevant observations have been made). This is because the definition of \lstinline{man} requires that the \lstinline{gender} function return \lstinline{`male} when applied to the interpretation of its syntactic sister, and \lstinline{gender} is defined in figure \ref{theory} as a stochastic function which returns \lstinline{`male} and \lstinline{`female} with equal probability. 
 
-Similarly, transitive verbs such as \emph{won} and relational nouns such as \emph{captain} denote the (stochastic) intensions of two-place predicates. (We simplify by ignoring tense.)
+Similarly, transitive verbs such as \emph{won} and relational nouns such as \emph{captain} and \emph{team} denote the (stochastic) intensions of two-place predicates. (We simplify by ignoring tense.)
 \begin{itemize}
 \item \sv{won} = \lstinline{($\lambda$ (match) ($\lambda$ (x) (equal? x (winner match))))}
 \item \sv{captain} = \lstinline{($\lambda$ (team) ($\lambda$ (x) (equal? x (captain team))))}
@@ -406,14 +408,44 @@ Finally, we define a small amount of functional vocabulary---some quantification
 \item \lstinline{(define domain-of-individuals (union player team match))}
 \item \sv{all} = \lstinline{($\lambda$ (P) ($\lambda$ (Q) (all (map ($\lambda$ (x) (not (and (P x) (not Q x)))) domain-of-individuals))))}
 \item \sv{some} = \lstinline{($\lambda$ (P) ($\lambda$ (Q) (some (map ($\lambda$ (x) (and (P x) (Q x))) domain-of-individuals))))}
-\item \sv{the} = \lstinline{($\lambda$ (P) (lambda (x) (P x)))}
-\item \sv{\text{-}est} = \lstinline{($\lambda$ (N) ($\lambda$ (A) (lambda (x) (= (A x) (argmax N A)))))}
+\item \sv{\text{-}est} = \lstinline{($\lambda$ (N) ($\lambda$ (A) (lambda (x) (= (argmax A x) (argmax N A)))))}
+\item \sv{be\ on} =  \lstinline{($\lambda$ (team) ($\lambda$ (x) (element? x (players-on-team team))))} 
+\item \sv{the} = \lstinline{($\lambda$ (P) ($\lambda$ (x) (P x)))} 
 \end{itemize}
-The interpretations of \emph{all} and \emph{some} are standard. \emph{-est} is defined so that, for example, \emph{strongest player} is true of Bill if and only if Bill's degree of strength is equal to the maximal degree of strength of any player.
+The interpretations of \emph{all} and \emph{some} are standard. The superlative morpheme \emph{-est} is defined so that, for example, \emph{strongest player} will denote a property that is true of Bill if and only if the greatest degree of strength that Bill possesses is equal to the greatest degree of strength that any player possesses.
 \todo[inline]{Definition of ``the'' might better wait until introducing L1, since it's non-standard and only makes sense on our assumptions.} 
 
-\subsection{Probabilistic meanings}
+As an example of sequential interpretation by a na\"ive literal listener, consider the output of the \lstinline{literal-listener} function in a linguistic variant of our explaining-away example from the previous section. Assume that the literal listener's initial belief state is as given in figure \ref{theory}, and his mental lexicon conforms to the definitions in this section. Then as literal listener will respond to the utterances below exactly as he would if he were to make observations which are encoded using the Church expressions by which the utterances are interpreted.
+\begin{itemize}
+\item ``Bob is on Team 1.''
+\begin{itemize}
+\item [$\leadsto$] \sv{be\ on}(\sv{Team\ 1})(\sv{Bob})
+\item [$=$] \lstinline{((($\lambda$ (team) ($\lambda$ (x) (element? x (players-on-team team)))) `team1) `Bob)}
+\item [$\equiv$] \lstinline{(element? `Bob (players-on-team `team1))}
+\end{itemize}
+\item ``Jim is on Team 2.''
+\begin{itemize}
+\item [$\leadsto$] \sv{be\ on}(\sv{Team\ 2})(\sv{Jim})
+\item [$=$] \lstinline{((($\lambda$ (team) ($\lambda$ (x) (element? x (players-on-team team)))) `team2) `Jim)}
+\item [$\equiv$] \lstinline{(element? `Jim (players-on-team `team2))}
+\end{itemize}
+\item ``Team 1 and Team 2 were in Match 1.''
+\begin{itemize}
+\item ...
+\end{itemize}
+\item ``Team 1 won Match 1''.
+\begin{itemize}
+\item [$\leadsto$] \sv{won}(\sv{Match\ 1})(\sv{Team\ 1})
+\item [$=$] \lstinline{((($\lambda$ (match) ($\lambda$ (x) (equal? x (winner match)))) `match1) `team1)}
+\item [$\equiv$] \lstinline{(equal? `team1 (winner `match1))}
+\end{itemize}
+\end{itemize}
+The literal listener's posterior belief state after these utterances will thus be given by:
 
+
+
+\subsection{Probabilistic meanings}
+ 
 Note that any transition from distribution $P_{\text{before}}$ to distribution $P_{\text{after}}$ such that the support (i.e. region of non-zero probability) of $P_{\text{after}}$ is a subset of the support of $P_{\text{after}}$ can be written as multiplying by a real-valued function and then renormalizing. That is, any belief update of this type can be written as the result of conditioning on some proposition.
 
 
