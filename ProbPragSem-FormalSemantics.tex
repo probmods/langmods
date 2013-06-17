@@ -208,7 +208,7 @@ We are now already in a position to make useful inferences. We could, for instan
   
   (and (equal? (gender `Bob) `male) (= (strength `Bob) -1.1)
        (equal? (gender `Jane) `female) (= (strength `Jane) 0.5)
-       (equal? (gender `Jim) 'male) (= (strength `Jim) -0.3)))
+       (equal? (gender `Jim) `male) (= (strength `Jim) -0.3)))
 \end{lstlisting}
 
 \todo[inline]{We could already talk about explaining away and screening off here... should we?}
@@ -364,9 +364,9 @@ To understand what the \lstinline{literal-listener} does, consider rejection sam
 Like Stalnaker's account, we must include some caveats: a listener should condition on the literal meaning only if the speaker is well-informed, reliable, etc. In addition, there will sometimes be uncertainty about what the literal meaning is }
 
 \subsection{Interpreting English in Church}
-English lexical items are interpreted as Church expressions, and sentence meanings are built up recursively from the denotations of lexical items along lines provided by the syntactic structure. The function mapping English expressions to their interpretation in Church is written \denot{\cdot}.\footnote{In a full Church implementation, each lexical specification ``\denot{English\ expression} = \lstinline{church-expression}'' would be incorporated into a single \lstinline{lexicon} function which is defined casewise.}   
+English lexical items are interpreted as Church expressions, and sentence meanings are built up recursively from the denotations of lexical items along lines provided by the syntactic structure. The function mapping English expressions to their interpretation in Church is written \denot{\cdot}.\footnote{In a full Church implementation, each lexical specification ``\denot{English\text{-}expression} = \lstinline{church-expression}'' would be incorporated into a single \lstinline{lexicon} function which is defined casewise. We use the notation here because it is familiar to linguists, and it allows us to give a partial specification of the lexicon without excluding the possibility that this function is able to interpret additional items.}   
 
-The stochastic $\lambda$-calculus (SLC) implemented by Church thus functions as our intermediate translation language, just as the simply-typed $\lambda$-calculus functions as an intermediate translation language in Montague's \citeyear{montague73} fragment of English. A key difference, however, is that the intermediate level is not merely a convenience as in Montague's approach. Conceptual representations and world knowledge are also represented as Church expressions, and use of a common language to represent linguistic and non-linguistic information makes it possible to model intricate interactions between these two types of knowledge. 
+The stochastic $\lambda$-calculus implemented by Church thus functions as our intermediate translation language, just as the simply-typed $\lambda$-calculus functions as an intermediate translation language in Montague's \citeyear{montague73} fragment of English. A key difference, however, is that the intermediate level is not merely a convenience as in Montague's approach. Conceptual representations and world knowledge are also represented as Church expressions, and use of a common language to represent linguistic and non-linguistic information makes it possible to model intricate interactions between these two types of knowledge. 
 
 For example, the interpretation of a name is a Church expression which is uniquely associated with some object or individual (the name-bearer). Interpreted in this way, names are directly referential since their reference does not depend on stochastic choices made in the interpretation process.
 \begin{itemize}
@@ -378,70 +378,89 @@ For example, the interpretation of a name is a Church expression which is unique
 \item \denot{Match 2} = \lstinline{`match2}
 \item ...
 \end{itemize}
-A one-place predicate such as \emph{player} or \emph{man} is interpreted as a function from individuals to truth-values. Intensionality is everywhere implicit, due to the fact that the denotations of English expressions can refer to stochastic functions such as \lstlinine{gender}.
+A one-place predicate such as \emph{player} or \emph{man} is interpreted as a function from individuals to truth-values. Intensionality is implicit in these definitions, due to the fact that the denotations of English expressions can refer to stochastic functions in the intuitive theory, such as \lstinline{gender}.
 \begin{itemize}
-\item \sv{player} = \lstinline{($\lambda$ (x) (element? x player))}  
-\item \sv{team} = \lstinline{($\lambda$ (x) (element? x teams))}
-\item \sv{match} = \lstinline{($\lambda$ (x) (element? x matches))}
-\item \sv{man} = \lstinline{($\lambda$ (x) (equal? (gender x) `male))}
-\item \sv{woman} = \lstinline{($\lambda$ (x) (equal? (gender x) `female))}
+\item \sv{player} = \lstinline[mathescape]{($\lambda$ (x) (element? x player))}  
+\item \sv{team} = \lstinline[mathescape]{($\lambda$ (x) (element? x teams))}
+\item \sv{match} = \lstinline[mathescape]{($\lambda$ (x) (element? x matches))}
+\item \sv{man} = \lstinline[mathescape]{($\lambda$ (x) (equal? (gender x) `male))}
+\item \sv{woman} = \lstinline[mathescape]{($\lambda$ (x) (equal? (gender x) `female))}
 \end{itemize}
-\todo[inline]{We need to fix the lstinline environment so that \$$\backslash$lambda\$ and \$$\backslash$theta\$ display as $\lambda$ and $\theta$.}
-Predicates denote intensions of properties: they pick out functions from individuals to truth-values in any world, but the specific function that they pick out in a world depends on the random choices (e.g., evaluations of \lstinline{flip}) that are made in the process of constructing the world. In these examples, \emph{player} is true of the same individuals in every world, since \lstinline{player} is defined deterministically in the intuitive theory in figure \ref{theory}. \emph{man}, on the other hand, denotes a predicate which will be true of a given individual (say, \lstinline{`Bob}) in 50\% of partial worlds constructed (assuming no relevant observations have been made). This is because the definition of \lstinline{man} requires that the \lstinline{gender} function return \lstinline{`male} when applied to the interpretation of its syntactic sister, and \lstinline{gender} is defined in figure \ref{theory} as a stochastic function which returns \lstinline{`male} and \lstinline{`female} with equal probability. 
+Predicates denote intensions of properties: they pick out functions from individuals to truth-values in any world, but the specific function that they pick out in a world depends on the random choices (e.g., evaluations of \lstinline{flip}) that are made in the process of constructing the world. In these examples, \emph{player} is true of the same individuals in every world, since \lstinline{player} is defined deterministically in the intuitive theory in figure \ref{theory}. \emph{man}, on the other hand, denotes a predicate which will be true of a given individual (say, \lstinline{`Bob}) in 50\% of partial worlds constructed (assuming no relevant observations have been made). This is because the denotation of \emph{man} is a function which returns 1 if and only if its sister denotes an individual for which the \lstinline{gender} function returns \lstinline{`male}. \lstinline{gender}, in turn, is defined in figure \ref{theory} as a stochastic function which returns \lstinline{`male} and \lstinline{`female} with equal probability. 
 
-Similarly, transitive verbs such as \emph{won} and relational nouns such as \emph{captain} and \emph{team} denote the (stochastic) intensions of two-place predicates. (We simplify by ignoring tense.)
+Similarly, transitive verbs such as \emph{won} and relational nouns such as \emph{captain} denote the (stochastic) intensions of two-place predicates. (We simplify by ignoring tense.)
 \begin{itemize}
-\item \sv{won} = \lstinline{($\lambda$ (match) ($\lambda$ (x) (equal? x (winner match))))}
-\item \sv{captain} = \lstinline{($\lambda$ (team) ($\lambda$ (x) (equal? x (captain team))))}
+\item \sv{won} = \lstinline[mathescape]{($\lambda$ (match) ($\lambda$ (x) (equal? x (winner match))))}
+\item \sv{played\ in} =  \lstinline[mathescape]{($\lambda$ (match) ($\lambda$ (team-list) (all (map (lambda (x) (element? x (teams-in-match match)))) team-list)))} 
+\item \sv{captain} = \lstinline[mathescape]{($\lambda$ (team) ($\lambda$ (x) (equal? x (captain team))))}
 \end{itemize}
+Note that the denotation of \emph{played in} takes as its second argument a list, rather than an individual, and requires that each element of the list be among the players in the relevant match. However, the order of elements in the input list does not matter. (Compare the set-based account to plurals described in Scha \& Winter, this volume.)
 
 Gradable adjectives such as \emph{strong} and \emph{weak} denote relations between individuals and threshold values \citep[][etc.]{cresswell76,vonstechow84}. The weakness scale is simply the strength scale with the sign reversed. 
 \begin{itemize}
-\item \sv{strong} = \lstinline{($\lambda$ (x) ($\lambda$ ($\theta$) (> (strength x) d)))}
+\item \sv{strong} = \lstinline[mathescape]{($\lambda$ (x) ($\lambda$ ($\theta$) (> (strength x) $\theta$)))}
 \item \lstinline{(define (weakness x) (- 0 (strength x))))}
-\item \sv{weak} = \lstinline{($\lambda$ (x) ($\lambda$ ($\theta$) (> (weakness x) d)))}
+\item \sv{weak} = \lstinline[mathescape]{($\lambda$ (x) ($\lambda$ ($\theta$) (> (weakness x) $\theta$)))}
 \end{itemize}
 The interpretation of \emph{strong} and \emph{weak} as predicates requires pragmatic inference of the value of the vague threshold value: see section (\ref{vagueness}) below.
 
-Finally, we define a small amount of functional vocabulary---some quantificational determiners and the degree operator \emph{-est}---along with domains for their application.
+Finally, we define some functional vocabulary---a few quantificational determiners and the degree operator \emph{-est}---along with a domain of discourse relevant to the determiners.
 \begin{itemize}
 \item \lstinline{(define domain-of-individuals (union player team match))}
-\item \sv{all} = \lstinline{($\lambda$ (P) ($\lambda$ (Q) (all (map ($\lambda$ (x) (not (and (P x) (not Q x)))) domain-of-individuals))))}
-\item \sv{some} = \lstinline{($\lambda$ (P) ($\lambda$ (Q) (some (map ($\lambda$ (x) (and (P x) (Q x))) domain-of-individuals))))}
-\item \sv{\text{-}est} = \lstinline{($\lambda$ (N) ($\lambda$ (A) (lambda (x) (= (argmax A x) (argmax N A)))))}
-\item \sv{be\ on} =  \lstinline{($\lambda$ (team) ($\lambda$ (x) (element? x (players-on-team team))))} 
-\item \sv{the} = \lstinline{($\lambda$ (P) ($\lambda$ (x) (P x)))} 
+\item \sv{all} = \lstinline[mathescape]{($\lambda$ (P) ($\lambda$ (Q) (all (map ($\lambda$ (x) (not (and (P x) (not Q x)))) domain-of-individuals))))}
+\item \sv{some} = \lstinline[mathescape]{($\lambda$ (P) ($\lambda$ (Q) (some (map ($\lambda$ (x) (and (P x) (Q x))) domain-of-individuals))))}
+\item \sv{\text{-}est} = \lstinline[mathescape]{($\lambda$ (N) ($\lambda$ (A) ($\lambda$ (x) (= (max A x) (max ($\lambda$ ($\theta$) (some (map ($\lambda$ (x) (> (A x) $\theta$)) N))))))))}
+\item \sv{be\ on} =  \lstinline[mathescape]{($\lambda$ (team) ($\lambda$ (x) (element? x (players-on-team team))))} 
+\item \sv{the} = \lstinline[mathescape]{($\lambda$ (P) ($\lambda$ (x) (P x)))} 
 \end{itemize}
 The interpretations of \emph{all} and \emph{some} are standard. The superlative morpheme \emph{-est} is defined so that, for example, \emph{strongest player} will denote a property that is true of Bill if and only if the greatest degree of strength that Bill possesses is equal to the greatest degree of strength that any player possesses.
 \todo[inline]{Definition of ``the'' might better wait until introducing L1, since it's non-standard and only makes sense on our assumptions.} 
 
-As an example of sequential interpretation by a na\"ive literal listener, consider the output of the \lstinline{literal-listener} function in a linguistic variant of our explaining-away example from the previous section. Assume that the literal listener's initial belief state is as given in figure \ref{theory}, and his mental lexicon conforms to the definitions in this section. Then as literal listener will respond to the utterances below exactly as he would if he were to make observations which are encoded using the Church expressions by which the utterances are interpreted.
+As an example of sequential interpretation by a literal listener, consider the output of the \lstinline{literal-listener} function in a linguistic variant of our explaining-away example from the previous section. Assume that the literal listener's initial belief state is as given in figure \ref{theory}, and his mental lexicon conforms to the definitions in this section. Then as literal listener will respond to the utterances below exactly as he would if he were to make observations which are encoded using the Church expressions by which the utterances are interpreted.\footnote{We assume without discussion that the conjoined NP \emph{Team 1 and Team 2} denotes the list \lstinline{`(team1 team2)}.}
 \begin{itemize}
 \item ``Bob is on Team 1.''
 \begin{itemize}
 \item [$\leadsto$] \sv{be\ on}(\sv{Team\ 1})(\sv{Bob})
-\item [$=$] \lstinline{((($\lambda$ (team) ($\lambda$ (x) (element? x (players-on-team team)))) `team1) `Bob)}
+\item [$=$] \lstinline[mathescape]{((($\lambda$ (team) ($\lambda$ (x) (element? x (players-on-team team)))) `team1) `Bob)}
 \item [$\equiv$] \lstinline{(element? `Bob (players-on-team `team1))}
 \end{itemize}
 \item ``Jim is on Team 2.''
 \begin{itemize}
 \item [$\leadsto$] \sv{be\ on}(\sv{Team\ 2})(\sv{Jim})
-\item [$=$] \lstinline{((($\lambda$ (team) ($\lambda$ (x) (element? x (players-on-team team)))) `team2) `Jim)}
+\item [$=$] \lstinline[mathescape]{((($\lambda$ (team) ($\lambda$ (x) (element? x (players-on-team team)))) `team2) `Jim)}
 \item [$\equiv$] \lstinline{(element? `Jim (players-on-team `team2))}
 \end{itemize}
-\item ``Team 1 and Team 2 were in Match 1.''
+\item ``Team 1 and Team 2 played in Match 1.''
 \begin{itemize}
-\item ...
+\item [$\leadsto$] \sv{played\ in}(\sv{Match\ 1})(\sv{Team\ 1\ and\ Team\ 2})
+\item [$=$] \lstinline[mathescape]{($\lambda$ (match) ($\lambda$ (team-list) (all (map ($\lambda$ (x) (element? x (teams-in-match match)))) team-list) `match1) `(team1 team2))} 
+\item [$\equiv$] \lstinline[mathescape]{(all (map ($\lambda$ (x) (element? x (teams-in-match `match1)))) `(team1 team2))}   
+\item [$\equiv$] \lstinline[mathescape]{(and (element? `team1 (teams-in-match `match1)) (element? `team2 (teams-in-match `match1)))}  
 \end{itemize}
-\item ``Team 1 won Match 1''.
+\item ``Team 1 won Match 1.''
 \begin{itemize}
 \item [$\leadsto$] \sv{won}(\sv{Match\ 1})(\sv{Team\ 1})
-\item [$=$] \lstinline{((($\lambda$ (match) ($\lambda$ (x) (equal? x (winner match)))) `match1) `team1)}
+\item [$=$] \lstinline[mathescape]{((($\lambda$ (match) ($\lambda$ (x) (equal? x (winner match)))) `match1) `team1)}
 \item [$\equiv$] \lstinline{(equal? `team1 (winner `match1))}
 \end{itemize}
 \end{itemize}
-The literal listener's posterior belief state after these utterances will thus be given by:
 
+The literal listener's posterior belief state after these utterances will thus be given by sequentially conditioning on the truth of the literal interpretations of these utterances. In the absence of pragmatic reasoning of the type described below, this equivalent to conditioning on the simultaneous truth of the interpretations of all of the utterances. The literal listener's posterior belief state after hearing these sentences is the same that it would be if the listener were to directly observe that the statements are true. For the QUD \emph{How strong is Bob?}, then, the distribution on answers will be the same: Bob's inferred strength increases substantially relative to the uninformed prior. If, however, the speaker continues with the utterance
+\begin{itemize}
+\item ``Jim is the weakest player.''
+\begin{itemize}
+\item [$\leadsto$] \sv{\text{-}est}(\sv{player})(\sv{weak})(\sv{Jim})
+\item [$=$] \lstinline[mathescape]{(((($\lambda$ (N) ($\lambda$ (A) ($\lambda$ (x) (= (max A x) (max ($\lambda$ ($\theta$) (some (map ($\lambda$ (x) (> (A x) $\theta$)) N)))))))) ($\lambda$ (x) (element? x player))) ($\lambda$ (x) ($\lambda$ ($\theta$) (> (weakness x) $\theta$)))) `Jim)}
+\item [$\equiv$] \lstinline[mathescape]{(= (max ($\lambda$ ($\theta$) (> (weakness `Jim) $\theta$))) (max ($\lambda$ ($\theta$) (some (map ($\lambda$ (x) (> (weakness x) $\theta$)))))))    }
+\end{itemize}
+\end{itemize}
+This is a function which will return 1 if and only if Jim's degree of weakness is the greatest of any player, i.e., if his strength is less than that of any other player. Conditioning on the truth of this proposition about his opponent, we find that Bill's inferred strength decreases toward the prior, just as in the non-linguistic example above. 
+
+%
+% do simulation, plot
+%
+
+[However, when pragmatics intervenes ...]
 
 
 \subsection{Probabilistic meanings}
