@@ -364,7 +364,7 @@ To understand what the \lstinline{literal-listener} does, consider rejection sam
 Like Stalnaker's account, we must include some caveats: a listener should condition on the literal meaning only if the speaker is well-informed, reliable, etc. In addition, there will sometimes be uncertainty about what the literal meaning is }
 
 \subsection{Interpreting English in the Probabilistic Language of Thought}
-English lexical items are interpreted as Church expressions, and sentence meanings are built up recursively from the denotations of lexical items along lines provided by the syntactic structure. The function mapping English expressions to their interpretation in Church is written \denot{\cdot}. 
+English lexical items are interpreted as Church expressions, and sentence meanings are built up recursively from the denotations of lexical items along lines provided by the syntactic structure. The function mapping English expressions to their interpretation in Church is written \denot{\cdot}.\footnote{In a full Church implementation, each lexical specification ``\denot{English\ expression} = \lstinline{church-expression}'' would be incorporated into a single \lstinline{lexicon} function which is defined casewise.}   
 
 The stochastic $\lambda$-calculus (SLC) implemented by Church thus functions as our intermediate translation language, just as the simply-typed $\lambda$-calculus functions as an intermediate translation language in Montague's \citeyear{montague73} fragment of English. A key difference, however, is that the intermediate level is not merely a convenience as in Montague's approach. Conceptual representations and world knowledge are also represented as Church expressions, and use of a common language to represent linguistic and non-linguistic information makes it possible to model intricate interactions between these two types of knowledge.
 
@@ -376,16 +376,16 @@ For example, the interpretation of a name is a Church expression which is unique
 \item \denot{Match 2} = \lstinline{`match2}
 \item ...
 \end{itemize}
-A non-gradable, one-place predicate such as \emph{player} is interpreted as a list of individuals or as the characteristic function of a list of individuals. 
+A one-place predicate such as \emph{player} or \emph{man} is interpreted as the characteristic function of a list ($\approx$ set) of individuals.\footnote{\lstinline{(element? x lst)} is defined as \lstinline{(not (null? (memq x lst)))}.}
 \begin{itemize}
-\item \sv{player} = \lstinline{player} = \lstinline{`(Bob Jim Alice Sue)}
-\item \sv{team} = \lstinline{teams} = \lstinline{`(team1 team2 team3)}
-\item \sv{matches} = \lstinline{matches} = \lstinline{`(match1 match2)}
+\item \sv{player} = \lstinline{($\lambda$ (x) (element? x player))}  
+\item \sv{team} = \lstinline{($\lambda$ (x) (element? x teams))}
+\item \sv{match} = \lstinline{($\lambda$ (x) (element? x matches))}
 \item \sv{man} = \lstinline{($\lambda$ (x) (equal? (gender x) `male))}
 \item \sv{woman} = \lstinline{($\lambda$ (x) (equal? (gender x) `female))}
 \end{itemize}
-\todo[inline]{We need to fix the lslinline environment so that \$$\backslash$lambda\$ displays as $\lambda$.}
-Predicates denote stochastic intensions of properties: they denote sets of individuals in any world, but may do so non-deterministically, depending on the random choices that are made in the process of constructing a partial world. In these examples, \emph{player} denotes the same list of individuals in every world. \emph{man}, on the other hand, denotes a predicate which---in the prior---will be true of a given individual (say, \lstinline{`Bob}) in 50\% of partial worlds constructed; this is because it requires that the \lstinline{gender} function return \lstinline{`male} when applied to that individual, and \lstinline{gender} is defined so that this will occur half of the time in the initial distribution. 
+\todo[inline]{We need to fix the lslinline environment so that \$$\backslash$lambda\$ and \$$\backslash$theta\$ display as $\lambda$ and $\theta$.}
+Predicates denote intensions of properties: they pick out sets of individuals in any world, but their extension in a world depends on the random choices (e.g., evaluations of \lstinline{flip}) that are made in the process of constructing the world. In these examples, \emph{player} is true of the same individuals in every world, since \lstinline{player} is defined deterministically in the intuitive theory in figure \ref{theory}. \emph{man}, on the other hand, denotes a predicate which will be true of a given individual (say, \lstinline{`Bob}) in 50\% of partial worlds constructed (assuming no relevant observations have been made). This is because the definition of \lstinline{man} requires that the \lstinline{gender} function return \lstinline{`male} when applied to the interpretation of its syntactic sister, and \lstinline{gender} is defined in figure \ref{theory} as a stochastic function which returns \lstinline{`male} and \lstinline{`female} with equal probability. 
 
 Similarly, transitive verbs such as \emph{won} and relational nouns such as \emph{captain} denote the (stochastic) intensions of two-place predicates. (We simplify by ignoring tense.)
 \begin{itemize}
@@ -393,38 +393,24 @@ Similarly, transitive verbs such as \emph{won} and relational nouns such as \emp
 \item \sv{captain} = \lstinline{($\lambda$ (team) ($\lambda$ (x) (equal? x (captain team))))}
 \end{itemize}
 
-Gradable adjectives such as \emph{strong} and \emph{weak} denote relations between individuals and degrees \citep[][etc.]{cresswell76,vonstechow84}, differing only in the directionality of the comparison operator. 
+Gradable adjectives such as \emph{strong} and \emph{weak} denote relations between individuals and threshold values \citep[][etc.]{cresswell76,vonstechow84}. The weakness scale is simply the strength scale with the sign reversed. 
 \begin{itemize}
-\item \sv{strong} = \lstinline{($\lambda$ (x) ($\lambda$ (d) (> (strength x) d)))}
-\item \sv{weak} = \lstinline{($\lambda$ (x) ($\lambda$ (d) (< (strength x) d)))}
+\item \sv{strong} = \lstinline{($\lambda$ (x) ($\lambda$ ($\theta$) (> (strength x) d)))}
+\item \lstinline{(define (weakness x) (- 0 (strength x))))}
+\item \sv{weak} = \lstinline{($\lambda$ (x) ($\lambda$ ($\theta$) (> (weakness x) d)))}
 \end{itemize}
+The interpretation of \emph{strong} and \emph{weak} as predicates requires pragmatic inference of the value of the vague threshold value: see section (\ref{vagueness}) below.
 
-Finally, we define a small amount of functional vocabulary 
-
-
-(define players `(Bob Jim Alice Sue))
-(define teams `(team1 team2 team3))
-(define matches `(match1 match2))
-
-(define gender (mem ($\lambda$ (p) (if (flip) `male `female))))
-(define gender-mean-strength (mem ($\lambda$ (g) (gaussian 0 2))))
-(define strength (mem ($\lambda$ (p) (gaussian (gender-mean-strength (gender p)) 1))))
-
-(define team-size 1)
-(define players-on-team (mem ($\lambda$ (team) (draw-n team-size players))))
-(define captain (mem ($\lambda$ (team) (uniform-draw (players-on-team team)))))
-
-(define teams-in-match (mem ($\lambda$ (match) (draw-n 2 teams))))
-(define pulling (mem ($\lambda$ (player match) (+ (strength player) (gaussian 0 0.5)))))
-(define team-pulling (mem ($\lambda$ (team match) 
-                          (sum (map (lambda (x) (pulling x match)) (players-on-team team))))))
-(define (winner match) 
-  (let ([teamA (first (teams-in-match match))]
-        [teamB (second (teams-in-match match))])
-    (if (> (team-pulling teamA match) (team-pulling teamB match))
-        teamA
-        teamB)))
-
+Finally, we define a small amount of functional vocabulary---some quantificational determiners and the degree operator \emph{-est}---along with domains for their application.
+\begin{itemize}
+\item \lstinline{(define domain-of-individuals (union player team match))}
+\item \sv{all} = \lstinline{($\lambda$ (P) ($\lambda$ (Q) (all (map ($\lambda$ (x) (not (and (P x) (not Q x)))) domain-of-individuals))))}
+\item \sv{some} = \lstinline{($\lambda$ (P) ($\lambda$ (Q) (some (map ($\lambda$ (x) (and (P x) (Q x))) domain-of-individuals))))}
+\item \sv{the} = \lstinline{($\lambda$ (P) (lambda (x) (P x)))}
+\item \sv{\text{-}est} = \lstinline{($\lambda$ (N) ($\lambda$ (A) (lambda (x) (= (A x) (argmax N A)))))}
+\end{itemize}
+The interpretations of \emph{all} and \emph{some} are standard. \emph{-est} is defined so that, for example, \emph{strongest player} is true of Bill if and only if Bill's degree of strength is equal to the maximal degree of strength of any player.
+\todo[inline]{Definition of ``the'' might better wait until introducing L1, since it's non-standard and only makes sense on our assumptions.} 
 
 \subsection{Probabilistic meanings}
 
