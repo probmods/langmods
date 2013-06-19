@@ -89,4 +89,7 @@ lines(density(bob.str.prior), col='black', lty=1, lwd=3)
 lines(density(bob.str.given.jim.weakest), col='blue', lty=3, lwd=3)
 legend('topright', c("After utterances 1-3", 'After utterances 1-4', 'After utterances 1-5'), lty=c(1, 2, 3), lwd=3, cex=.9, col=c('black', 'red', 'blue'), text.col=c('black', 'red', 'blue'))
 
+# quantifier scope ambiguity
+
+
 
