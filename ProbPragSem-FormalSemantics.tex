@@ -172,7 +172,9 @@ This unassuming definition is the basis for much recent progress in modeling hum
 \begin{equation}
 P(H|o_1,\dots,o_N) = \frac{P(H)P(o_1,\dots,o_N|H)}{P(o_1,\dots,o_N)}.
 \end{equation}
-This useful equality is called \emph{Bayes' rule}; it follows immediately from the definition in equation \ref{conditionaldef}. If we additionally assume that the observations provide no information about each other, that is they are \emph{independent}, then $P(o_i|o_j)=P(o_i)$ for all $i\neq j$. It follows that:
+This useful equality is called \emph{Bayes' rule}; it follows immediately from the definition in equation \ref{conditionaldef}. If we additionally assume that the observations provide no information about each other, that is they are \emph{independent}, then $P(o_i|o_j)=P(o_i)$ for all $i\neq j$. 
+\todo{i think we want only independent conditioned on H...}
+It follows that:
 \begin{equation}
 P(H|o_1,\dots,o_N) = \frac{P(H)P(o_1|H)\cdots P(o_N|H)}{P(o_1|H)\cdots P(o_N|H)}.
 \end{equation}
@@ -347,18 +349,29 @@ Following a productive tradition in semantics and pragmatics \citep[][etc.]{stal
     (eval QUD)
     (eval (meaning utterance))))
 \end{lstlisting}
-This function specifies the posterior distribution over answers to the Question Under Discussion (\lstinline{QUD}) given that the literal meaning of the utterance is true.\footnote{On QUD models, see \citealt{ginzburg95a,vankuppevelt95,roberts96,beaverclark08} among many others.} \todo{make sure the use of eval is clear. or remove?} Notice that the prior distribution is specified by a conceptual lexicon---the \lstinline{...theory...}. The \lstinline{meaning} function is a map from strings to Church expressions (possibly calling functions from \lstinline{...theory...}); any appropriate syntactic theory could be used. For concreteness, consider the simple case where the constituent structure is known and where meanings are combined only by (left or right) application:
+This function specifies the posterior distribution over answers to the Question Under Discussion (\lstinline{QUD}) given that the literal meaning of the utterance is true.\footnote{On QUD models, see \citealt{ginzburg95a,vankuppevelt95,roberts96,beaverclark08} among many others.} \todo{make sure the use of eval is clear. or remove?} Notice that the prior distribution is specified by a conceptual lexicon---the \lstinline{...theory...}. 
+
+The \lstinline{meaning} function is a map from strings (surface form) to Church expressions (logical form, which include functions defined in \lstinline{...theory...}).
+Many theories of syntactic and semantic composition could be used to provide this mapping. 
+For concreteness, we consider a simple system in which a string is recursively split into left and right portions, and the meanings of these portions are combined with a random combinator:
 \begin{lstlisting}
 (define (meaning utterance)
   (if (lexical-item? utterance)
       (lexicon utterance)
-      (if (flip)
-          (pair (meaning (left utterance)) (meaning (right utterance)))
-          (pair (meaning (right utterance)) (meaning (left utterance))))))
-\end{lstlisting}  
-Here the predicate \lstinline{lexical-item?} determines if the remaining utterance is a single lexical item (entry in the lexicon), the function \lstinline{left} returns the left subtree of the utterance, and \lstinline{right} returns the right subtree. By combining meanings with the \lstinline{pair} operator, we are implying that composition happens by function application: when the meaning is evaluated (as part of \lstinline{literal-listener}) the one subtree meaning will be applied to the other subtree meaning. We leave the direction of composition ambiguous, choosing between them with a random \lstinline{flip}: the \lstinline{meaning} function need not be deterministic, as we discuss further below\footnote{If type errors are interpreted as non-true values in the \lstinline{query} of the \lstinline{literal-listener} function, then ill-typed applications will be eliminated from the posterior interpretation.}.
+      (let ([subs (random-split utterance)])
+         ((random-combinator) (meaning (first subs)) (meaning (second subs))))))
+\end{lstlisting}
+Here the predicate \lstinline{lexical-item?} determines if the remaining utterance is a single lexical item (entry in the lexicon), if so it is looked up with the \lstinline{lexicon} function.
+The function \lstinline{random-split} takes a string and returns the list of two substrings that result from splitting at a random position in the length of the string.
+The function \lstinline{random-combinator} chooses a random composition operator, such as left application or right composition. We assume that the set of possible compositions is sufficient to perform any syntactic operations needed\footnote{This is possible because...}.
+Critically, if type errors are interpreted as the non-true value \emph{bottom} (as described in section \ref{bottom-val}), then mis-typed compositions will not satisfy the condition of the \lstinline{query} in the \lstinline{literal-listener} function---though many ill-typed compositions can be generated by this procedure, they will be eliminated from the posterior, leaving only well-typed interpretations.
+Thus the \lstinline{meaning} function is a stochastic mapping from strings to Church expressions; the random choices made in this mapping will be reasoned about jointly with world states while interpreting the utterance, as discussed in section \ref{ambiguity} below.
+\todo{discuss errors and bottom in SLC section.}
 
-To understand what the \lstinline{literal-listener} does, consider rejection sampling: we evaluate both the \lstinline{QUD} and meaning expressions, constructing whatever intermediate expressions are required; if the meaning expression has value \lstinline{true}, then we return the value of \lstinline{QUD}, otherwise we try again. More concretely, return to the tug-of-war example from the previous section, and now let us begin to build a lexicon for talking about this domain in natural language. 
+To understand what the \lstinline{literal-listener} does, consider rejection sampling: we evaluate both the \lstinline{QUD} and meaning expressions, constructing whatever intermediate expressions are required; if the meaning expression has value \lstinline{true}, then we return the value of \lstinline{QUD}, otherwise we try again. 
+\todo{something about hyper intentionality? point out that the intention is a computation that can be run in a given intuitive theory environment. cite shalom..}
+It is apparent that the complexity of interpretation is an interaction between the domain theory, the meaning function, and the lexicon. 
+To make this more concrete, we return to the tug-of-war example from the previous section and begin to build a lexicon for talking about this domain in natural language. 
 
 \todo[inline]{From dan: To a first approximation, then, hearing the sentence ``Team 1 won match 2'' will cause the listener to update her belief state by adding to the (possibly context-dependent) translation of this sentence into SLC to her conditioning expression. This account of interpretation is in a straightforward extension of the proto-dynamic theory of \citet{stalnaker78}.
 Like Stalnaker's account, we must include some caveats: a listener should condition on the literal meaning only if the speaker is well-informed, reliable, etc. In addition, there will sometimes be uncertainty about what the literal meaning is }
@@ -367,7 +380,6 @@ Like Stalnaker's account, we must include some caveats: a listener should condit
 Natural language lexical items are interpreted as Church expressions, and sentence meanings are built up recursively from the denotations of lexical items along lines provided by the syntactic structure. The \lstinline{lexicon} function maps English expressions to their interpretation in Church, for simplicity we write the denotation \lstinline[mathescape]{(lexicon $\cdot$)} as  \denot{\cdot} \footnote{This notation is compact, familiar to linguists, and it allows us to give a partial specification of the lexicon without excluding the possibility that this function is able to interpret additional items.}.
 
 The stochastic $\lambda$-calculus (implemented in Church) thus functions as our intermediate translation language, just as the simply-typed $\lambda$-calculus functions as an intermediate translation language in Montague's \citeyear{montague73} fragment of English. A key difference, however, is that the intermediate level is not merely a convenience as in Montague's approach. Conceptual representations and world knowledge are also represented in this language (as Church function definitions)---use of a common language to represent linguistic and non-linguistic information makes it possible to model intricate interactions between these two types of knowledge. 
-\todo{here or somewhere need to discuss that compositionally in language and thought are similar but along different `directions'...}
 
 For example, the interpretation of a name is a Church symbol which is uniquely associated with some object or individual (the name-bearer). Interpreted in this way, names are directly referential since their reference is not altered by any inferences made during interpretation. %does not depend on stochastic choices made in the interpretation process.
 \begin{itemize}
@@ -463,14 +475,15 @@ This is a function which will return 1 if and only if Jim's degree of weakness i
 
 [However, when pragmatics intervenes ...]
 
+\subsection{Ambiguity}
 
 \subsection{Probabilistic meanings}
  
 Note that any transition from distribution $P_{\text{before}}$ to distribution $P_{\text{after}}$ such that the support (i.e. region of non-zero probability) of $P_{\text{after}}$ is a subset of the support of $P_{\text{after}}$ can be written as multiplying by a real-valued function and then renormalizing. That is, any belief update of this type can be written as the result of conditioning on some proposition.
 
 
-
-
+\subsection{Composition}
+\todo[inline]{discuss that compositionally in language and thought are similar but along different `directions'...}
 
 
 %\item  Sentence meanings: in formal semantics there are two views of meaning. the belief update view (roughly, dynamic semantics) and the intensions---functions from world to truth---view (the Montague, Lewis, etc view). Which is ``correct''? What's the relationship between belief and truth?
@@ -509,6 +522,12 @@ Note that any transition from distribution $P_{\text{before}}$ to distribution $
 
 
 \section{Pragmatic interpretation}
+
+The \lstinline{literal-listener} described above treats utterances as true information about the world, updating her beliefs accordingly. 
+In real language understanding, however, utterances are taken as speech acts that inform indirectly by conveying a speakers intention. In this section we describe a version of the \emph{rational speech acts} model \cite{Goodman2013, Frank2012}, in which a sophisticated listener reasons about the intention of an informative speaker.
+
+
+
 
 \begin{itemize}
 \item   The rational speech acts framework.
