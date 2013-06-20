@@ -102,6 +102,8 @@
 
 \todo[inline]{this intro (taken from the lexsem grant) needs to be edited into something short and to the point...}
 
+\todo[inline]{In this chapter we illustrate the use of probabilistic techniques in natural language pragmatics and semantics with a concrete formal model. This model is not meant to exhaust the space of possible probabilistic models, indeed dozens of extensions are immediately apparent, but rather to show that a probabilistic framework for natural language is possible and productive.}
+
 Words are potentially one of the clearest windows on human knowledge and conceptual structure. If we understood the connection between words and mental representation, we could gain critical insights into almost every aspect of psychology, construct vastly more useful thinking machines, and interface the two. But what do words mean? In this project we aim to {\bf construct and explore a formal model of lexical semantics grounded, via pragmatic inference, in core conceptual structures}. We will do so using a set of modeling tools---chiefly the probabilistic programming language Church \cite{goodman2008}---that we have previously developed and used to explain  aspects of high-level human cognition.
 
 Flexible human cognition is derived in large part from our ability to imagine possible worlds (or situations). A rich set of concepts, intuitive theories, and other mental representations support imagining and reasoning about possible worlds---together we call these the conceptual lexicon. 
@@ -518,23 +520,55 @@ Note that any transition from distribution $P_{\text{before}}$ to distribution $
 
 \end{itemize}
 
- **Language and reference variables? Where do we need to introduce reference variables? meaning of "a", "the", "he", etc? only where standard semantics has existentials? any NP (e.g. any specifier)? 
+ \todo{Language and reference variables? Where do we need to introduce reference variables? meaning of "a", "the", "he", etc? only where standard semantics has existentials? any NP (e.g. any specifier)? }
 
 
 \section{Pragmatic interpretation}
 
 The \lstinline{literal-listener} described above treats utterances as true information about the world, updating her beliefs accordingly. 
-In real language understanding, however, utterances are taken as speech acts that inform indirectly by conveying a speakers intention. In this section we describe a version of the \emph{rational speech acts} model \cite{Goodman2013, Frank2012}, in which a sophisticated listener reasons about the intention of an informative speaker.
+In real language understanding, however, utterances are taken as speech acts that inform the listener indirectly by conveying a speaker's intention. In this section we describe a version of the \emph{rational speech acts} model \cite{Goodman2013, Frank2012}, in which a sophisticated listener reasons about the intention of an informative speaker.
 
+First, imagine a speaker who wishes to convey that the question under discussion (\lstinline{QUD}) has a particular answer (or value). This can be viewed as an inference: what utterance is most likely to lead the (literal) listener to the correct interpretation?
+\begin{lstlisting}
+(define (speaker val QUD)
+  (query
+    (define utterance (language-prior))
+    utterance
+    (equal? val (literal-listener utterance QUD))))
+\end{lstlisting}
+The \lstinline{language-prior} forms the \emph{a priori} (non-contextual and non-semantic) distribution over linguistic forms, which may be modeled with a probabilistic context free grammar or similar model. 
+This prior inserts a \emph{cost} for each utterance: using a less likely utterance will be dispreferred \emph{a priori}.
+Overall, the \lstinline{speaker} function describes a speaker who uses a soft-max rule \cite{luce59,suttonbarto98} to choose utterances according to their utility---the sum of utterance cost and the informativity of the utterance about the \lstinline{QUD} (formalized as negative surprisal of the intended value)\footnote{here we give the derivation..?}.
 
+The pragmatic listener can now be modeled as a Bayesian agent inferring the value of the question under discussion, given that the speaker has bothered to make a particular speech act:
+\begin{lstlisting}
+;;The pragmatic listener: what value does the QUD have, given that a speaker chose this utterance to express it?    
+(define (listener utterance QUD)
+  (query
+    ...theory...
+    (define val (eval QUD))
+    val
+    (equal? utterance (speaker val QUD))))
+\end{lstlisting}
+Several observations about this model are worth making: 
+first, alternatives
+second, relevance to QUD
+
+We illustrate by considering quantity implicatures \cite{??}. 
+Take as an example the sentence "some of the women are stronger than jane".
+\todo{Fill in some not all example....}
+
+%\item "team A won some of the matches" : implicature that not all of them, unless speaker had not seen all matches.
+
+The force of this model comes from the ability to call the \lstinline{query} function within itself \cite{Stuhlmueller2013}---each query models the inference made by one (imagined) communicator and together they capture sophisticated pragmatic reasoning. 
 
 
 \begin{itemize}
-\item   The rational speech acts framework.
+%\item   The rational speech acts framework.
 \item  Example: reference via joint inference (effect of prior). FG'12 ref exprs. salience. (lewis "the cat"?)
 \item  Example: quantity implicatures, "captain" vs "player", "some" vs "all".
-\item  Speaker knowledge? (Not in detail...)
 \item  Relation to IBR and game-theoretic pragmatics.
+\item extensions: knowledge (GS12), inferring QUD, more general goals, etc.
 \end{itemize}
 
 
@@ -575,7 +609,7 @@ In real language understanding, however, utterances are taken as speech acts tha
 %\item  "teamA won match 3"
 \item : some noun with graded  prototype extent?
 \item "every player was in a match yesterday" : scope ambiguity treated either as stochastic meaning fn or underspecified semantics. manipulate priors...
-\item ("the match was aweful/awful for team A" : ambiguous homonym?)
+%\item ("the match was aweful/awful for team A" : ambiguous homonym?)
 \item "teamA has two players. one is the captain. that player on teamA is strong." : implicates not talking about the captain?  FG'12 style ad-hoc implicature.
 %\item "a player on team A is strong" : implicature that not talking about the team captain???
 %\item "the player" : salience and definite reference. (something about lewis and cats??)
