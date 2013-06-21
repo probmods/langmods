@@ -737,7 +737,7 @@ then do a version where there are two unnamed males, but only one of them was in
 \section{Semantic indices}
 
 In formal semantics \cite{montague} sentence meanings are often treated as intensions: functions from semantic indices to truth functions. The semantic theory has nothing to say about how to set these indices, only that they matter and (probably) depend on context. Yet we have already seen that a probabilistic theory of pragmatic interpretation can be used to describe the ways that context influences interpretation. Can we similarly use probabilistic tools to describe the ways that semantic indices are set based on context?
-We must first decide how semantic indices should enter into the probabilistic framework presented above (where we have so far treated meanings simply as truth functions). The simplest assumption would be that they are random variables that influence the meaning expression and are reasoned about by the literal listener:
+We must first decide how semantic indices should enter into the probabilistic framework presented above (where we have so far treated meanings simply as truth functions). The simplest assumption would be that they are random variables that occur (unbound) in the meaning expression and are reasoned about by the literal listener:
 \begin{lstlisting}
 (define (literal-listener utterance QUD)
   (query
@@ -745,9 +745,14 @@ We must first decide how semantic indices should enter into the probabilistic fr
     (define index (index-prior))
     (define val (eval QUD))
     val
-    (eval (meaning utterance index))))
-\end{lstlisting}\footnote{The simplest way to let indices enter the \lstinline{meaning} function is to treat \lstinline{index} as a lookup table from variables to index values, and extend \lstinline{lexical-item?} and \lstinline{lexicon} such that index variables are treated as `lexical' entries.}
-Because there is now a joint inference over \lstinline{val} and \lstinline{index}, the index will tend to be set such that the utterance is most likely to be true. To be concrete, consider the case of gradeable adjectives like \emph{strong}. In section \ref{lexicon} we have defined \sv{strong} = \lstinline[mathescape]{($\lambda$ (x) ($\lambda$ (d) (>= (strength x) d)))}, without specifying how \lstinline{d} is bound in sentences such as ``John is strong.'' We could instead define \sv{strong} = \lstinline[mathescape]{($\lambda$ (x) (>= (strength x) d))}, and posit that \lstinline{d} is a semantic index variable: it is free in the lexical entry, but bound by an index via the \lstinline{meaning} function. After applying the \lstinline{meaning} function (and simplifying composition) the utterance ``John is strong'' (with \lstinline{QUD} ``how string is John?'') would be interpreted via:
+    (eval (meaning utterance))))
+\end{lstlisting}
+Here we assume that a lexical item may contain an unbound occurrence of \lstinline{index} which is then bound during interpretation by  the \lstinline{(define index ...)} definition.
+Because there is now a joint inference over \lstinline{val} and \lstinline{index}, the index will tend to be set such that the utterance is most likely to be true. 
+To be concrete, consider the case of gradeable adjectives like \emph{strong}. In section \ref{lexicon} we have defined \sv{strong} = \lstinline[mathescape]{($\lambda$ (x) ($\lambda$ (d) (>= (strength x) d)))}, without specifying how \lstinline{d} is bound in sentences such as ``John is strong.'' 
+We could instead define \sv{strong} = \lstinline[mathescape]{($\lambda$ (x) (>= (strength x) d))}, allowing \lstinline{d} to be a free semantic index variable.\footnote{We would then have to make a corresponding change
+to the meaning of \emph{-est}: it would first bind the degree locally, then proceeded as above to saturate the threshold.}
+ After applying the \lstinline{meaning} function (and simplifying composition) the utterance ``John is strong'' (with \lstinline{QUD} ``how strong is John?'') would be interpreted via:
 \begin{lstlisting}
 (query
   ...theory...
@@ -762,7 +767,7 @@ The threshold variable has been influenced by context as expected: it changes fr
 
 Simply including the informative speaker and pragmatic listener models as defined above is not enough: without additional changes the index variables will still be inferred at the level of literal listener with no pragmatic pressures. \todo{verify that claim. put in simulation result if its interesting..} Instead, we lift the index variables to the pragmatic level. Imagine a pragmatic listener who believes that the index variables have values that she happens not to know, but which are otherwise common knowledge (i.e. known by the speaker, who assumes they are known by the listener):
 \begin{lstlisting}
-(define (listener utterance QUD index)
+(define (listener utterance QUD)
   (query
     ...theory...
     (define index (index prior))
@@ -788,7 +793,12 @@ In most ways this is a very small change to the model, but it has important cons
 We can motivate from this example a general treatment of semantic indices: lift them into the pragmatic inference, reasoning over then jointly with world states, but treating them as bound variables when the meaning is constructed. Another interpretation of this treatment (introduced in \cite{Bergen2012}) is as the result of \emph{lexical uncertainty}: each index represents a lingering uncertainty about word meaning (in context) which the listener must incorporate in the interpretation process. This interpretation is appealing in that it connects naturally to language acquisition and change \cite{SmithFrankGoodman}. For instance, upon hearing a new word a learner would initially treat it as underdetermined (essentially an index variables ranging over all expressions of the appropriate type), inferring its meaning on each usage from contextual cues. Over time the prior over this `index' would tighten until only the correct meaning remained, and no contextual flexibility was left. A difficulty with the lexical uncertainty interpretation is explaining why certain aspects of a word's meaning are so much more flexible than others. This is natural from the free-index interpretation since the dimensions of flexibility are explicitly represented as unbound variables in lexical entries. A more structured (e.g. hierarchical) notion of lexical uncertainty may be able to reconcile these interpretations, which are essential equivalent.
 
 
+\todo[inline]{When we don't know ahead of time which index variables we will have in the literal-listener utterance we need to generalize the above. One way is to treat \lstinline{index} as a memoized fn from variable names to values. Because it's created in pragmatic listener, the variables reside there, although they are made as needed in literal listener. Then either the lexical entires should change from free variables to lookups (e.g. \lstinline{d} to \lstinline{(index d)}) or the meaning function is responsible for detecting unbound variables and decorating them with \lstinline[mathescape]{(index ...)}.}
+
+
 \subsection{Other applications of index variables}
+
+
 
 \todo[inline]{Discuss Horn implicatures:  Marked meanings and marked utterances: why basic model fails. Then discuss the Bergen results. example in tug-of-war domain?}
 
@@ -801,6 +811,9 @@ We can motivate from this example a general treatment of semantic indices: lift 
 \end{itemize}
 
 \subsection{Vagueness}
+
+
+
 
 \todo[inline]{Discuss vagueness more generally. Sorites.}
 
