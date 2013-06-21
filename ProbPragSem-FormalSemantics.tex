@@ -268,11 +268,11 @@ or did you mean also to also say something about Pat's strength in the condition
 \end{lstlisting}
 
 \todo[inline]{We could already talk about explaining away and screening off here... should we?}
-\todo[inline]{I think it's more intuitive as you do it below,using results and inferring strengths.}
+\todo[inline]{I think it's more intuitive as you do it below, using results and inferring strengths.}
 In the game of tug-of-war players are on teams, which themselves have properties such as captains:
 \begin{lstlisting}[mathescape]
 (define players `(Bob Jim Mary Sue Bill Evan Sally Tim Joe Jane Terrence Kate))
-(define team-size 2)
+(define team-size (uniform-draw '(1 2 3 4 5 6)))
 (define players-on-team (mem ($\lambda$ (team) (draw-n team-size players))))
 (define captain (mem ($\lambda$ (team) (uniform-draw (players-on-team team)))))
 \end{lstlisting}
@@ -299,7 +299,7 @@ Notice that the team pulling is simply the sum of how hard each member is pullin
  \begin{figure}[tbh]
 \begin{center}
  \begin{lstlisting}[mathescape]
-(define players `(Bob Jim Alice Sue))
+(define players `(Bob Jim Mary Sue Bill Evan Sally Tim Joe Jane Terrence Kate))
 (define teams `(team1 team2 team3))
 (define matches `(match1 match2))
 
@@ -307,7 +307,7 @@ Notice that the team pulling is simply the sum of how hard each member is pullin
 (define gender-mean-strength (mem ($\lambda$ (g) (gaussian 0 2))))
 (define strength (mem ($\lambda$ (p) (gaussian (gender-mean-strength (gender p)) 1))))
 
-(define team-size 1)
+(define team-size (uniform-draw '(1 2 3 4 5 6)))
 (define players-on-team (mem ($\lambda$ (team) (draw-n team-size players))))
 (define captain (mem ($\lambda$ (team) (uniform-draw (players-on-team team)))))
 
@@ -326,7 +326,7 @@ Notice that the team pulling is simply the sum of how hard each member is pullin
 \label{theory}
 \end{center}
 \end{figure} 
-\todo[inline]{Wouldn't it be better to have team-size be stochastic as well? This wouldn't interfere with reasoning below, since the fact that team1 is `(Bob) and team2 is `(Jim) would mean that only size-1 teams would be considered by query anyway.}
+\todo[inline]{I've changed the definition of team-size to a stochastic one, in order to make the example of quantifier scope ambiguity work.}
  
 
 The conceptual lexicon of functions for the tug-of-war domain is given altogether in Figure \ref{theory}.
@@ -582,19 +582,53 @@ That is, because there is uncertainty about the strengths of all players, in pri
 However, the utterance is more likely to be true if Jim's strength falls into the lower tail of the prior distribution. 
 Conditioning via \lstinline{query} automatically integrates these two sources of uncertainty, concluding that utterance 5 favors low values of \lstinline{(strength `Jim)} and adjusting the inferred strength of his opponent Bob accordingly. 
 
-\subsection{Ambiguity and uncertain meaning}
-The \lstinline{meaning} function will frequently associate utterances with multiple interpretations. Ambiguities can arise due to any or all of the following:
+\subsection{Ambiguity}
+The \lstinline{meaning} function will frequently associate utterances with multiple interpretations. Ambiguities can arise due to any of the following:
 \begin{itemize}
-\item Syntactic: \lstinline{random-split} will generate possibly different syntactic structures for an utterance on different evaluations. If more than one of these structures is interpretable using the composition operators available, a syntactic ambiguity arises.
-\item Compositional: Holding the syntactic structure fixed, various choice of composition operators by the \lstinline{random-combinator} function may lead to well-typed outputs. Depending on the composition operators available, this may lead to (e.g.) ambiguities of quantifier scope and in whether a pronoun is bound or free.
+\item Syntactic: \lstinline{random-split} will generate possibly different syntactic structures for an utterance on each evaluation. 
+If more than one of these structures is interpretable using the composition operators available, the literal listener may entertain interpretations with different syntactic structures.
+\item Compositional: Holding the syntactic structure fixed, various choice of composition operators by the \lstinline{random-combinator} function may lead to well-typed outputs. 
+Depending on the composition operators available, this may lead to (e.g.) ambiguities of quantifier scope and in whether a pronoun is bound or free.
 \item Lexical: words may have intrinsically stochastic meanings. 
 \end{itemize}
-One of the crucial advantages of our architecture for language understanding is that these linguistic mechanisms automatically interact with the interpreter's beliefs about the world in an appropriate way. When a sentence is ambiguous in any of these ways, the listener will favor plausible interpretations over implausible ones, because the interpreter's model of the world is more likely to generate scenarios which make the sentence true under these interpretations. Implausible interpretations, on the other hand, lead to frequent rejection by \lstinline{query} due to their inconsistency with background information.
+One of the crucial advantages of our architecture for language understanding is that these linguistic mechanisms automatically interact with the interpreter's beliefs about the world in an appropriate way. 
+When a sentence is ambiguous in any of these ways, the listener will favor plausible interpretations over implausible ones, because the interpreter's model of the world is more likely to generate scenarios which make the sentence true under these interpretations. 
+Implausible interpretations, on the other hand, lead to frequent rejection by \lstinline{query} due to their inconsistency with background information.
 
-Syntactic ambiguities can be treated in a similar way. 
+For example, consider the utterance ``Every player played in some match''. 
+Depending on the composition operators which the \lstinline{meaning} function selects, two interpretations are possible:\footnote{See \citet{hendriks93,barker05} for discussion of the mechanics of generating this ambiguity from the given utterance without syntactic movement. 
+Note that in the approach described here the composition operations are all two-place. 
+This means that the set of available composition operators must include variants of forward and backward application and composition which apply one or more of Hendriks' unary type-shifting operators to their arguments.}
+\begin{itemize}
+\item ``For every player $x$, there was a match $y$ such that $x$ played in $y$.'' 
+\item ``For some match $y$, every player played in $y$.''
+\end{itemize}
+We can manipulate the plausibility of each of these interpretations by varying the number of players on each team, the number of matches, and the mechanism by which teams are selected to play in matches. 
+At one extreme, suppose that the listener has observed that each team has two individuals in it and  (as the theory in Figure \ref{theory} already implies) that only two matches was played:
+\begin{lstlisting}
+(query
+  ...ToW theory...
+  (eval QUD)
+  (and 
+    (= team-size 2)
+    (eval (meaning `(every player played in some match)))))
+\end{lstlisting}
 
-Lexical uncertainty will not be our focus here, but we should mention two prominent cases: lexical ambiguity and graded meanings. Lexical ambiguities of the ``bank''/``bank'' variety could be treated either by having the \lstinline{lexicon} function map ``bank'' to either of two discrete meanings, or by assuming that the latent mechanism which divides utterances into words recognizes two distinct words with this phonological realization. In principle, our computational architecture is Intrinsically graded (e.g., prototype) meanings are most naturally thought of as stochastically denoting regions of a non-discrete conceptual space. 
-\todo[inline]{Just a quick first pass --- Noah, you'll want to have a look at paragraph and put your own spin on it I suspect.}
+%
+% cont from here
+% 
+
+This model predicts that structural ambiguities should behave in a similar way. Suppose we were to enrich the ToW model and lexicon to accommodate utterances such as ``Bill hit the player with the ball''. 
+With no background information to constrain interpretation, either interpretation of this utterance might be appropriate, and a true ambiguity is felt. 
+However, one of the two possible interpretations is more likely to be true than the other, the literal listener will automatically prefer the parse which generates the more probable interpretation.
+In the limit, if one interpretation has zero prior probability, the syntactic ambiguity will not be felt because the interpretation that it generates will always be rejected by the \lstinline{query} function embedded in the definition of the literal listener.
+The model predicts that these preferences should display continuous variation between the extremes of assigning equal probability to both and assigning probability 1 to one parse.
+Psycholinguistic evidence supports the claim that background information affects the syntactic structures assigned to ambiguous sentences in this way \citep{crainsteedman85,altmannsteedman88,spiveyetal02}.
+
+Lexical uncertainty will not be our focus here, but we should mention two prominent cases: lexical ambiguity and graded meanings. 
+Lexical ambiguities of the ``bank''/``bank'' variety could be treated either by having the \lstinline{lexicon} function map ``bank'' to either of two discrete meanings, or by assuming that the latent mechanism which divides utterances into words recognizes two distinct words with this phonological realization.
+Intrinsically graded (e.g., prototype) meanings are most naturally thought of as stochastically denoting regions of a non-discrete conceptual space. 
+\todo[inline]{Just a quick first pass --- Noah, I suspect you'll want to have a look at this paragraph, and section, and put your own spin on it.}
 
 \subsection{Probabilistic meanings}
  
