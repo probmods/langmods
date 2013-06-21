@@ -719,8 +719,12 @@ We illustrate by considering quantity implicatures \cite{??}.
 Take as an example the sentence "some of the women are stronger than jane".
 \todo[inline]{Fill in some not all example.... also do "captain" vs "player"? (would need to make names unavailable for this to work...)}
 
-\todo[inline]{reference via joint inference (effect of prior). FG'12 ref exprs. salience. (lewis "the cat"?)\\
-maybe ``that guy is strong'' when there are two players, but only one has a name?}
+\todo[inline]{reference via joint inference (effect of prior). FG'12 ref exprs. salience. (lewis "the cat"?)
+
+how about a match between '(bob sue) and '(dude alice), where 'dude is male with unknown name, and the utterance is "he's strong!"... "he" should be interpreted as 'dude since otherwise could have used "Bob". this is just like the FG setup.
+
+then do a version where there are two unnamed males, but only one of them was in the match... salience should enter to set "he" to guy just in a match.
+}
 
 \subsection{Extensions and related models}
 
@@ -781,7 +785,7 @@ Simply including the informative speaker and pragmatic listener models as define
 \end{lstlisting}\footnote{For simplicity we are assuming that it is clear from the argument structure whether the version of each function with or without indices is intended.}
 In most ways this is a very small change to the model, but it has important consequences. At a high level, the effect is that index variables will now be set in such a way that they both make the utterance likely to be true \emph{and} likely to be pragmatically useful (informative, relevant, etc); the tradeoff between these two factors results in significant contextual flexibility of the interpreted meaning. In the case of the adjective \emph{strong} we see \todo{put in model figure} that the threshold is now interpreted as roughly one standard deviation from the prior mean strength---hence \emph{strong} means significantly stronger than average, but does not require maximal strength (most informative) or permit any strength (most often true). This model of gradeable adjective interpretation (which was introduced in \cite{Lassiter2013}) has a number of appealing properties: for instance, it explains how background knowledge affects qualitative and quantitative aspects of adjective interpretation (see \cite{Lassiter2013}), and it explains why adjectives result in vaguest interpretation (see below).
 
-From this example, we can thus motivate a general treatment of semantic indices: lift them into the pragmatic inference, reasoning over then jointly with world states, but treating them as bound variables when the meaning is constructed. Another interpretation of this treatment (introduced in \cite{Bergen2012}) is as the result of \emph{lexical uncertainty}: each index represents a lingering uncertainty about word meaning (in context) which the listener must incorporate in the interpretation process. This interpretation is appealing in that it connects naturally to language acquisition and change \cite{SmithFrankGoodman}. For instance, upon hearing a new word a learner would initially treat it as underdetermined (essentially an index variables ranging over all expressions of the appropriate type), inferring its meaning on each usage from contextual cues. Over time the prior over this `index' would tighten until only the correct meaning remained, and no contextual flexibility was left. A difficulty with the lexical uncertainty interpretation is explaining why certain aspects of a word's meaning are so much more flexible than others. This is natural from the free-index interpretation since the dimensions of flexibility are explicitly represented as unbound variables in lexical entries. A more structured (e.g. hierarchical) notion of lexical uncertainty may be able to reconcile these interpretations, which are essential equivalent.
+We can motivate from this example a general treatment of semantic indices: lift them into the pragmatic inference, reasoning over then jointly with world states, but treating them as bound variables when the meaning is constructed. Another interpretation of this treatment (introduced in \cite{Bergen2012}) is as the result of \emph{lexical uncertainty}: each index represents a lingering uncertainty about word meaning (in context) which the listener must incorporate in the interpretation process. This interpretation is appealing in that it connects naturally to language acquisition and change \cite{SmithFrankGoodman}. For instance, upon hearing a new word a learner would initially treat it as underdetermined (essentially an index variables ranging over all expressions of the appropriate type), inferring its meaning on each usage from contextual cues. Over time the prior over this `index' would tighten until only the correct meaning remained, and no contextual flexibility was left. A difficulty with the lexical uncertainty interpretation is explaining why certain aspects of a word's meaning are so much more flexible than others. This is natural from the free-index interpretation since the dimensions of flexibility are explicitly represented as unbound variables in lexical entries. A more structured (e.g. hierarchical) notion of lexical uncertainty may be able to reconcile these interpretations, which are essential equivalent.
 
 
 \subsection{Other applications of index variables}
@@ -815,6 +819,10 @@ From this example, we can thus motivate a general treatment of semantic indices:
 
 
 
+
+
+
+\appendix
 
 
 \section{Example sentences}
@@ -898,7 +906,7 @@ From this example, we can thus motivate a general treatment of semantic indices:
 
 
 
-\appendix
+
 
 \section{Old stuff we may want to draw on...}
 
