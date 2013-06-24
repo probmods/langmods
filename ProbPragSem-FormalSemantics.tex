@@ -194,6 +194,8 @@ The probability\footnote{Everything we say here applies equally well to probabil
 More generally, a \emph{random variable} $A$ is an assignment of a probability $P(A{=}a)$ to each of a set of exhaustive and mutually exclusive outcomes $a$, such that $\sum_a P(A{=}a)=1$. 
 The joint probability $P(A{=}a,B{=}b)$, of two random variable values) is the degree of belief we assign to the proposition that both $A{=}a$ and $B{=}b$. 
 
+\todo[inline]{We should define ``distribution''  and ``marginal'' somewhere.} 
+
 The fundamental operation for incorporating new information or assumptions $B$ into prior beliefs is \emph{probabilistic conditioning}. 
 This operation takes us from the \emph{prior} probability of $A$, $P(A)$, to the \emph{posterior} probability of $A$ given $B$, written $P(A|B)$. 
 Conditional probability is standardly defined, following \citet{kolmogorov33}, by:
@@ -237,7 +239,7 @@ Further details and examples of Church can be found at \url{church web}.
 In what follows we will assume passing familiarity with the Polish notation used in LISP-family languages, and will occasionally build on ideas from programming languages---\cite{SICP} is an excellent background on these ideas. 
 
 A set of stochastic function definitions in Church can be interpreted as a distribution over possible worlds: A world consists of a value for each well-formed expression that can be made from the defined functions (in each calling position). 
-\todo{We should define ``distribution''  and ``marginal'' somewhere. Probably above in background on probability.} To evaluate any particular expression or query requires evaluating only a small subset of this infinitude of expressions. 
+To evaluate any particular expression or query requires evaluating only a small subset of this infinitude of expressions. 
 That is, an particular query only depends on the partial world of expressions actually constructed during the evaluation process. 
 The relationship between the idealized complete possible worlds and these partial worlds is coherent because taking the marginal sum over any expressions that are evaluated but that don't impact the value of the query (condition or query expressions) results in the same distribution as if we didn't evaluate them. 
 \todo{Noah: need to state this theorem more formally.} 
@@ -1233,141 +1235,141 @@ Another interpretation of this modeling approach (indeed, the original interpret
 %
 %
 
-%%%%%%%%%%%%
-
-The language architecture described above predicts the interpretation of an utterance given its semantic content and context; fixing the semantic content of particular (classes of) words makes this abstract architecture concrete by grounding language use into the concepts of core cognition. In this section we describe our proposal to study several classes of words as representative case studies in which concepts, uncertainty, and inference interact in important ways. We place particular emphasis on the cases in which free semantic variables are needed to allow contextual flexibility in semantic interpretation.
-
-\subsection{Indexicals and referring expressions}
-\label{indexicals}
-
-Perhaps the simplest case where semantic free variables are needed is in the meanings of referring expressions. 
-For instance, the meaning of \emph{He is drinking a martini} can be taken to be (approximately): $\text{male}(x)\wedge \text{drinking}(x,y) \wedge \text{martini}(y)$, where $x$ and $y$ are free semantic variables that range over individual entities. The semantic contribution of \emph{he} to this meaning is two-fold: it introduces a free variable, and it constrains that free variable to be a male. However, in order to compose properly with the surrounding sentence, the return value of \emph{he} must be only the variable $x$. We can add the constraint, without affecting the return value, by using a Church factor statement: \\
-\indent \sv{\mathit{he}}$=$\lstinline[keepspaces]{(begin (factor (if (male x) 1.0 0.1)) x)}. \\
-This definition adds the constraint as a side-effect, then goes on to return the value of the free variable \lstinline{x}.
-Notice that the constraint that \emph{he} be male is a soft constraint: in a situation where no male referent for $x$ is plausible, it can be interpreted as a non-male. (For instance, in a situation in which we are discussing the best way to cook a burger the sentence \emph{Wait until he's just brown, then flip him} can be interpreted as referring to the burger.) Interpretation of the pronoun is guided by the semantics, but driven by probabilistic inference of the sentence meaning (similar to the conclusion of \citet{kehler08}).
-
-The constraints in this approach are determined by the conceptual content, but so are the potential referents: the possible values of $x$ are not entities in the world, but entities in the possible world represented by the listener \lstinline{L1-sv}. This is particularly striking in the case of
-indexicals such as \emph{I/here/now/that}. The free variable for \emph{now} ranges over times, that for \emph{I} over people, and each must have meta-access to the speech act itself. For instance, \\
-\indent \sv{I}$=$\lstinline[keepspaces]{(begin (factor (if (eq? x (speaker-of utterance)) 1.0 0.1)) x)}; \\
-where we have made use of the fact that the utterance is bound in the environment in which \sv{I} is evaluated (being an argument to \lstinline{L0}), and assumed that the \lstinline{speaker-of} function returns the individual who performed a speech act.
-
-
-Horn's \emph{division of pragmatic labor} \cite{Horn1984} presents a more subtle case for the pragmatic fixing of reference. This principle dictates that, in the absence of distinguishing semantic content, simple utterances should be interpreted as un-marked (i.e.~simple/probable/good) meanings and complex utterances as marked (i.e.~deviant/unlikely/bad) meanings. For instance \emph{I got the car started} is interpreted as doing something unusual to start the car, since the simpler phrase \emph{I started the car} is available to be interpreted as simply turning the ignition.
-To formalize this, imagine cheap/costly utterances \emph{u1}/\emph{u2} and \emph{a priori} likely/unlikely interpretations of the QUD \lstinline{val1}/\lstinline[mathescape]{val2}.
-We would like the less costly expression to be interpreted as the more likely interpretation: 
-\sv{u1}${=}$\lstinline{val1}, \sv{u2}${=}$\lstinline{val2}. 
-This is a simple signaling game \cite{Franke2009}, and this solution is a Nash equilibrium; however, there are many equally good Nash equilibria for this game. A number of attempts have been made to explain why this particular equilibrium should be chosen, but all require ad-hoc stipulations on the equilibrium concept.
-Indeed, the simple model \lstinline{L1}, with no semantic free variables, is unable to arrive at the correct interpretations.
-We have shown in \cite{bergen12} that the \lstinline{L1-sv} model does arrive at the correct interpretations in this case.
-Many questions and difficulties remain to integrate this result with lexical semantics more generally. In particular, how does the division of labor play out in situations with similar but not equivalent semantic meaning, and what semantic work can we rely on this  effect to do?
-
-We propose to use the \lstinline{L1-sv} framework with constrained entity variables to study the details of how referring expressions can be flexibly interpreted. 
-As illustrated above, complex interpretation patterns can be expected as context, concepts, and inference interact.
-We will explore the ways that context allows semantic constraints to be violated, the conceptual grounding of indexicals, the effect of alternative referring expressions, and the use of division of pragmatic labor in simplifying semantic denotations.
-
-
-\subsection{Scalar Adjectives}
-  \label{sec:GA}
-  
-Many words resist simple truth-functions that could be used to tell with certainty when they hold. For instance, exactly how tall must a person be to be a \emph{tall person}?
-Vagueness of meanings has been the subject of much discussion in philosophy and linguistics, and is of critical importance in the psychological literature on graded concepts \cite{rosch78,oshersonsmith81,armstrong83,kamppartee95,fodorlepore96,hampton07}. 
-Vagueness is particularly clear in the meanings of gradable adjectives, such as \emph{tall/short}, \emph{wide/narrow}, \emph{happy/sad}, \emph{wet/dry}, and \emph{full/empty}. 
-These adjectives serve to express measurement along a scale (\emph{Sam is six feet tall}); they are grammatically gradable (\emph{Sam is very tall}), are typically vague, and are highly context-sensitive \cite[e.g.~][]{kamp75,fine75,cresswell76,vonstechow84,williamson94,kennedymcnally05,kennedy07}. 
-%For example:
+%%%%%%%%%%%%%
+%
+%The language architecture described above predicts the interpretation of an utterance given its semantic content and context; fixing the semantic content of particular (classes of) words makes this abstract architecture concrete by grounding language use into the concepts of core cognition. In this section we describe our proposal to study several classes of words as representative case studies in which concepts, uncertainty, and inference interact in important ways. We place particular emphasis on the cases in which free semantic variables are needed to allow contextual flexibility in semantic interpretation.
+%
+%\subsection{Indexicals and referring expressions}
+%\label{indexicals}
+%
+%Perhaps the simplest case where semantic free variables are needed is in the meanings of referring expressions. 
+%For instance, the meaning of \emph{He is drinking a martini} can be taken to be (approximately): $\text{male}(x)\wedge \text{drinking}(x,y) \wedge \text{martini}(y)$, where $x$ and $y$ are free semantic variables that range over individual entities. The semantic contribution of \emph{he} to this meaning is two-fold: it introduces a free variable, and it constrains that free variable to be a male. However, in order to compose properly with the surrounding sentence, the return value of \emph{he} must be only the variable $x$. We can add the constraint, without affecting the return value, by using a Church factor statement: \\
+%\indent \sv{\mathit{he}}$=$\lstinline[keepspaces]{(begin (factor (if (male x) 1.0 0.1)) x)}. \\
+%This definition adds the constraint as a side-effect, then goes on to return the value of the free variable \lstinline{x}.
+%Notice that the constraint that \emph{he} be male is a soft constraint: in a situation where no male referent for $x$ is plausible, it can be interpreted as a non-male. (For instance, in a situation in which we are discussing the best way to cook a burger the sentence \emph{Wait until he's just brown, then flip him} can be interpreted as referring to the burger.) Interpretation of the pronoun is guided by the semantics, but driven by probabilistic inference of the sentence meaning (similar to the conclusion of \citet{kehler08}).
+%
+%The constraints in this approach are determined by the conceptual content, but so are the potential referents: the possible values of $x$ are not entities in the world, but entities in the possible world represented by the listener \lstinline{L1-sv}. This is particularly striking in the case of
+%indexicals such as \emph{I/here/now/that}. The free variable for \emph{now} ranges over times, that for \emph{I} over people, and each must have meta-access to the speech act itself. For instance, \\
+%\indent \sv{I}$=$\lstinline[keepspaces]{(begin (factor (if (eq? x (speaker-of utterance)) 1.0 0.1)) x)}; \\
+%where we have made use of the fact that the utterance is bound in the environment in which \sv{I} is evaluated (being an argument to \lstinline{L0}), and assumed that the \lstinline{speaker-of} function returns the individual who performed a speech act.
+%
+%
+%Horn's \emph{division of pragmatic labor} \cite{Horn1984} presents a more subtle case for the pragmatic fixing of reference. This principle dictates that, in the absence of distinguishing semantic content, simple utterances should be interpreted as un-marked (i.e.~simple/probable/good) meanings and complex utterances as marked (i.e.~deviant/unlikely/bad) meanings. For instance \emph{I got the car started} is interpreted as doing something unusual to start the car, since the simpler phrase \emph{I started the car} is available to be interpreted as simply turning the ignition.
+%To formalize this, imagine cheap/costly utterances \emph{u1}/\emph{u2} and \emph{a priori} likely/unlikely interpretations of the QUD \lstinline{val1}/\lstinline[mathescape]{val2}.
+%We would like the less costly expression to be interpreted as the more likely interpretation: 
+%\sv{u1}${=}$\lstinline{val1}, \sv{u2}${=}$\lstinline{val2}. 
+%This is a simple signaling game \cite{Franke2009}, and this solution is a Nash equilibrium; however, there are many equally good Nash equilibria for this game. A number of attempts have been made to explain why this particular equilibrium should be chosen, but all require ad-hoc stipulations on the equilibrium concept.
+%Indeed, the simple model \lstinline{L1}, with no semantic free variables, is unable to arrive at the correct interpretations.
+%We have shown in \cite{bergen12} that the \lstinline{L1-sv} model does arrive at the correct interpretations in this case.
+%Many questions and difficulties remain to integrate this result with lexical semantics more generally. In particular, how does the division of labor play out in situations with similar but not equivalent semantic meaning, and what semantic work can we rely on this  effect to do?
+%
+%We propose to use the \lstinline{L1-sv} framework with constrained entity variables to study the details of how referring expressions can be flexibly interpreted. 
+%As illustrated above, complex interpretation patterns can be expected as context, concepts, and inference interact.
+%We will explore the ways that context allows semantic constraints to be violated, the conceptual grounding of indexicals, the effect of alternative referring expressions, and the use of division of pragmatic labor in simplifying semantic denotations.
+%
+%
+%\subsection{Scalar Adjectives}
+%  \label{sec:GA}
+%  
+%Many words resist simple truth-functions that could be used to tell with certainty when they hold. For instance, exactly how tall must a person be to be a \emph{tall person}?
+%Vagueness of meanings has been the subject of much discussion in philosophy and linguistics, and is of critical importance in the psychological literature on graded concepts \cite{rosch78,oshersonsmith81,armstrong83,kamppartee95,fodorlepore96,hampton07}. 
+%Vagueness is particularly clear in the meanings of gradable adjectives, such as \emph{tall/short}, \emph{wide/narrow}, \emph{happy/sad}, \emph{wet/dry}, and \emph{full/empty}. 
+%These adjectives serve to express measurement along a scale (\emph{Sam is six feet tall}); they are grammatically gradable (\emph{Sam is very tall}), are typically vague, and are highly context-sensitive \cite[e.g.~][]{kamp75,fine75,cresswell76,vonstechow84,williamson94,kennedymcnally05,kennedy07}. 
+%%For example:
+%%\begin{exe}
+%%\ex{\label{e1} 	 Measurement and gradation:		}
+%%\begin{xlist}
+%%\ex{\label{e1a} 	.	}
+%%\ex{\label{e1b} 	This glass is 50\%/completely full.	}
+%%\end{xlist}
+%%\end{exe}
+%
+%Vagueness can be seen from the existence of \emph{borderline cases}: individuals for whom it is unclear whether an adjective applies. A seven-foot-tall man is obviously tall, and a five-foot-tall man is obviously not; but does a man who is $6'2''$ count as ``tall''? When asked a question of this type, speakers typically express uncertainty, and show disagreement in responses to a forced-choice \citep{bonini99,schmidtetal09,verheyen10,alxatib11}. 
+%The vagueness of adjectives appears to be related to statistical properties of a \emph{comparison class} \citep{bierwisch89,schmidtetal09,solt11}, which can be implicit in the context or provided explicitly as in: 
+%\emph{Sam is rich for a janitor/politician} or \emph{Michael Jordan is tall for a man/basketball player}.
+%
+%Our approach to gradable adjectives starts with a scalar theory of their lexical semantics. 
+%%We assume that the lexical entry of a gradable adjective contains only a specification of the relevant scale---a triple \lar{D, \leq, \delta}, as in [K07]. 
+%We adopt a degree semantics in which adjectives relate individuals to a threshold value\footnote{Or rather: \sv{A}${=}$ \texttt{($\lambda$ (x) (> ($\mu_A$ x) $\theta$)}, but we have used the more familiar mathematical notation where it is clearer.}: \sv{A} $= \lambda x [ \mu_A(x) > \theta{A}]$, where $\theta{A}$ is a free threshold variable on $A$'s scale and $\mu_A(x)$ is the degree of $x$ on this scale. We will further assume that the function $\mu_A(x)$ is a concept defined in core cognition. For example, if \lstinline{height} is a persistent property of an individual (here drawn from a fixed gaussian for simplicity), the basic meaning of \emph{tall} is:
+%\begin{lstlisting}[mathescape]
+%;;core concept definitions:
+%(define height (mem ($\lambda$ (x) (gaussian 6.0 1.0))))
+%...
+%
+%;;lexicon:
+%$\sv{tall} =$ ($\lambda$ (x) (> (height x) $\theta$))
+%\end{lstlisting}
+%%
+%%\begin{exe}
+%%\ex{\label{etall} $\sv{\mathit{tall}} = \lambda x [\mathit{height}(x) > \theta ]$	\\
+%%``\emph{tall} is true of an individual $x$ if and only if $x$'s height is greater than $\theta$''
+%%	}
+%%\end{exe}
+%Crucially, $\theta$ is left as a free variable in the semantic representation. The meaning of \emph{Sam is tall}, then, is simply that Sam's height is at least $\theta$; the task of inferring $\theta$ in order to derive a meaning for this sentence will be preformed by the full interpretation model, \lstinline{L1-sv}. This approach to the interpretation of vague adjectives captures the insights of previous probabilistic accounts \citep{edgington97,schmidtetal09,frazeebeaver10,lassiter11}, but improves on them in several ways, notably in providing a clear lexical semantics from which the probabilities follow.
+%
+%
+%To illustrate, imagine a situation in which a speaker is attempting to communicate Sam's height to a listener who does not know how tall Sam is, but knows that Sam is an adult male. The \lstinline{QUD} is \lstinline{(height `sam)}. We assume that listener and speaker share the common prior knowledge that heights of people are approximately normally distributed. The meaning of the sentence \emph{Sam is tall}, as constructed by the \lstinline{meaning} function, will be simply \lstinline[mathescape,keepspaces]{(> (height `sam) theta)}.
+%The listener \lstinline{L1-sv} will then do a joint inference of Sam's height and the threshold variable \lstinline{theta}.
+%
+%\begin{figure}[tbp]
+%\begin{center}
+%\includegraphics[scale=0.24]{GA-figs/heights-onr}
+%\includegraphics[scale=0.24]{GA-figs/fullness-onr}
+%\caption{Predictions of the \lstinline{L1-sv} model for a threshold semantics for adjectives, with prior distribution over degrees appropriate to \emph{tall/short} and \emph{full/empty}. These simulations used Markov Chain Monte Carlo to draw 30,000 samples from the joint posterior on 
+%degree and $\theta$, with $\alpha = 4$, the utterance prior of $u \propto \text{length}(u)$, a burn-in of 5000 samples, and a lag of 100. Plots show the kernel density of the relevant variables. 
+%The alternative utterances considered are to say nothing or to use the positive (e.g.~\emph{tall}) or negative (e.g.~\emph{short}) adjective.
+%}
+%\label{GA}
+%\end{center}
+%\end{figure}
+%
+%%We assume that speakers and listeners share a uniform prior on $\theta$. Let $h$ represent Sam's height. A listener who does not know how tall Sam is, but knows that Sam is an adult male, will have some prior distribution over $h$ (e.g., a Gaussian). The probability that a speaker will utter $u$ under this parameterization is sensitive to this statistical knowledge, because the speaker's utility function refers to the statement's informativity to the literal listener $L_0$.
+%%\eq{\label{5}
+%%p_{S_{1}}(h\ |\ w, \theta) & \propto & \text{exp}(\alpha \times \text{log}(\mathbb{EU}_{S_1}(u; h, \theta)))\\
+%%& \propto & \text{exp}(\alpha \times \text{log}(1/p_{L_0}(h\ |\ u, \theta) - C(u)))
+%%}
+%%
+%If the value of \lstinline{theta} is very low (e.g., one foot), the utterance \emph{Sam is tall}  is extremely uninformative: the listener already has a strong belief that Sam is more than one foot tall. On the other hand, if \lstinline{theta} is extremely high, the utterance will be extremely informative since the prior probability that Sam's height is greater than \lstinline{theta} is very low. 
+%This means that \emph{Sam is tall} was much more likely to be uttered by \lstinline{S1} if the value of \lstinline{theta} is high.
+%But this pressure to infer high \lstinline{theta}, and hence large heights, is balanced by the low prior probability of very large heights. The posterior distribution on heights given the utterance (shown in Figure \ref{GA}) reflects this balancing process. In effect, interpretations are preferred which make Sam significantly taller than average, but not implausibly tall. 
+%%This does indeed seem to be the inferred meaning of \emph{Sam is tall} in context. 
+%Our model thus gives precise form to an intuition about the meaning of scalar adjectives which has been stated repeatedly in the linguistic and philosophical literature \cite[e.g.][]{bierwisch89,fara00,kennedy07}.
+%
+%
+%There is an immediate explanation in this approach of the context-dependence of scalar adjectives: different comparison classes have different prior distributions, which affects the joint inference carried out by \lstinline{L1-sv}. This can explain not only quantitative shifting of the threshold depending on context (e.g.~tall man vs.~tall basketball player), it can also explain qualitative differences between different types of adjectives. For instance, absolute adjectives, like \emph{full/closed}, also refer to a degree along some scale, but behave differently than relative adjectives (like \emph{tall}): absolute adjectives compare a degree to a (fairly) fixed extreme point \cite{rotsteinwinter04,kennedymcnally05,kennedy07}\footnote{There are also differences in modification patterns between relative and absolute adjectives. For example, we can modify \emph{full} as \emph{completely full} but we cannot usually say not \emph{completely tall}.}. 
+%For instance, a closed door is not one that's more closed than average, it's \emph{closed}.
+%%
+%% [DL] On the last sentence: You convinced me at some point that this isn't a categorical distinction, plus it's not clear here what its significance is. You could say more about degree modification, but I suspect it's not really necessary here; instead you could just cite e.g. \cite{rotsteinwinter04,kennedymcnally05,kennedy07} for the intuition that there's a distinction in the postive-form meaning in that the absolute adjectives are closer to an endpoint. Probably worth using and definig the term ``absolute adjective'' explicitly here as well, since it's used below.
+%%
+%Prior distributions which have significant probability mass near the edges of a scale result in very different interpretation than those with thin tails (Figure \ref{GA} left vs right): the interpreted meaning is strongly peaked near the extreme point of the degree. The difference between relative and absolute adjectives can thus be explained by qualitative differences in the prior distributions which they invoke. These differences in prior distribution are a consequence of non-linguistic knowledge represented in concepts of the domain.
+%
+%
+%\paragraph{Sorites paradox} The much-discussed \emph{sorites paradox} is a key puzzle of gradable adjectives, for example:
 %\begin{exe}
-%\ex{\label{e1} 	 Measurement and gradation:		}
+%\ex{\label{e2} 	 Sorites paradox:	}
 %\begin{xlist}
-%\ex{\label{e1a} 	.	}
-%\ex{\label{e1b} 	This glass is 50\%/completely full.	}
+%\ex{\label{e2a} 	A man who is 7 feet tall is tall.	}
+%\ex{\label{e2b} 	A man who is 0.01 inches less tall than someone who is tall is also tall.	}
+%\ex{\label{e2c} 	Therefore, a man who is 4 feet tall is tall.	}
 %\end{xlist}
 %\end{exe}
-
-Vagueness can be seen from the existence of \emph{borderline cases}: individuals for whom it is unclear whether an adjective applies. A seven-foot-tall man is obviously tall, and a five-foot-tall man is obviously not; but does a man who is $6'2''$ count as ``tall''? When asked a question of this type, speakers typically express uncertainty, and show disagreement in responses to a forced-choice \citep{bonini99,schmidtetal09,verheyen10,alxatib11}. 
-The vagueness of adjectives appears to be related to statistical properties of a \emph{comparison class} \citep{bierwisch89,schmidtetal09,solt11}, which can be implicit in the context or provided explicitly as in: 
-\emph{Sam is rich for a janitor/politician} or \emph{Michael Jordan is tall for a man/basketball player}.
-
-Our approach to gradable adjectives starts with a scalar theory of their lexical semantics. 
-%We assume that the lexical entry of a gradable adjective contains only a specification of the relevant scale---a triple \lar{D, \leq, \delta}, as in [K07]. 
-We adopt a degree semantics in which adjectives relate individuals to a threshold value\footnote{Or rather: \sv{A}${=}$ \texttt{($\lambda$ (x) (> ($\mu_A$ x) $\theta$)}, but we have used the more familiar mathematical notation where it is clearer.}: \sv{A} $= \lambda x [ \mu_A(x) > \theta{A}]$, where $\theta{A}$ is a free threshold variable on $A$'s scale and $\mu_A(x)$ is the degree of $x$ on this scale. We will further assume that the function $\mu_A(x)$ is a concept defined in core cognition. For example, if \lstinline{height} is a persistent property of an individual (here drawn from a fixed gaussian for simplicity), the basic meaning of \emph{tall} is:
-\begin{lstlisting}[mathescape]
-;;core concept definitions:
-(define height (mem ($\lambda$ (x) (gaussian 6.0 1.0))))
-...
-
-;;lexicon:
-$\sv{tall} =$ ($\lambda$ (x) (> (height x) $\theta$))
-\end{lstlisting}
+%This argument is logically valid, and the premises \ref{e2a} and \ref{e2b} appear to be reasonable; but the conclusion \ref{e2c} is clearly false. An account of vagueness should explain both the logical puzzle (which premise is incorrect?) and the psychological problem (why do people find the premises so compelling, while also maintaining that the conclusion is completely implausible? \cite[Cf.][]{fara00}).
 %
-%\begin{exe}
-%\ex{\label{etall} $\sv{\mathit{tall}} = \lambda x [\mathit{height}(x) > \theta ]$	\\
-%``\emph{tall} is true of an individual $x$ if and only if $x$'s height is greater than $\theta$''
-%	}
-%\end{exe}
-Crucially, $\theta$ is left as a free variable in the semantic representation. The meaning of \emph{Sam is tall}, then, is simply that Sam's height is at least $\theta$; the task of inferring $\theta$ in order to derive a meaning for this sentence will be preformed by the full interpretation model, \lstinline{L1-sv}. This approach to the interpretation of vague adjectives captures the insights of previous probabilistic accounts \citep{edgington97,schmidtetal09,frazeebeaver10,lassiter11}, but improves on them in several ways, notably in providing a clear lexical semantics from which the probabilities follow.
-
-
-To illustrate, imagine a situation in which a speaker is attempting to communicate Sam's height to a listener who does not know how tall Sam is, but knows that Sam is an adult male. The \lstinline{QUD} is \lstinline{(height `sam)}. We assume that listener and speaker share the common prior knowledge that heights of people are approximately normally distributed. The meaning of the sentence \emph{Sam is tall}, as constructed by the \lstinline{meaning} function, will be simply \lstinline[mathescape,keepspaces]{(> (height `sam) theta)}.
-The listener \lstinline{L1-sv} will then do a joint inference of Sam's height and the threshold variable \lstinline{theta}.
-
-\begin{figure}[tbp]
-\begin{center}
-\includegraphics[scale=0.24]{GA-figs/heights-onr}
-\includegraphics[scale=0.24]{GA-figs/fullness-onr}
-\caption{Predictions of the \lstinline{L1-sv} model for a threshold semantics for adjectives, with prior distribution over degrees appropriate to \emph{tall/short} and \emph{full/empty}. These simulations used Markov Chain Monte Carlo to draw 30,000 samples from the joint posterior on 
-degree and $\theta$, with $\alpha = 4$, the utterance prior of $u \propto \text{length}(u)$, a burn-in of 5000 samples, and a lag of 100. Plots show the kernel density of the relevant variables. 
-The alternative utterances considered are to say nothing or to use the positive (e.g.~\emph{tall}) or negative (e.g.~\emph{short}) adjective.
-}
-\label{GA}
-\end{center}
-\end{figure}
-
-%We assume that speakers and listeners share a uniform prior on $\theta$. Let $h$ represent Sam's height. A listener who does not know how tall Sam is, but knows that Sam is an adult male, will have some prior distribution over $h$ (e.g., a Gaussian). The probability that a speaker will utter $u$ under this parameterization is sensitive to this statistical knowledge, because the speaker's utility function refers to the statement's informativity to the literal listener $L_0$.
-%\eq{\label{5}
-%p_{S_{1}}(h\ |\ w, \theta) & \propto & \text{exp}(\alpha \times \text{log}(\mathbb{EU}_{S_1}(u; h, \theta)))\\
-%& \propto & \text{exp}(\alpha \times \text{log}(1/p_{L_0}(h\ |\ u, \theta) - C(u)))
-%}
+%Our approach to adjective interpretation offers a new account of the sorites paradox. The argument is logically unsound because the second premise \ref{e2b} is not \emph{strictly true}: if $x$'s height is very close to the cutoff, $\theta$, then $x$ may count as ``tall'' while someone just slightly shorter does not. However, the second premise is  \emph{highly plausible} because the probability that $\theta$ and $x$'s height will be so close is small. 
+%%In other words, the posterior distribution on $\theta$ describes the inferred meaning of ``tall'' in a particular context; the distribution on $w$ described the height of someone known to be ``tall'' given this distribution on meanings. 
+%Indeed, if we choose the height $h$ of $x$ and the threshold $\theta$ from the joint posterior distribution that \lstinline{L1-sv} defines given the utterance \emph{$x$ is tall},
+%%$p_{L_1}(h, \theta \ |\ u)$ defined by our model, 
+%the probability that $h - \theta > 0.01$ (i.e.~premise \ref{e2b} holds) is approximately 95\%.
+%%This high probability makes the inductive premise intuitively compelling; but since its probability is less than 1, repeated use as a premise does not preserve high probability: the conclusion of the sorites paradox need not hold.
+%This explains the psychological puzzle described above: why is the second premise so compelling, if it is not strictly true? The answer is that this premise has high probability (a fact which does not justify its repeated use as a premise in logical arguments \cite{kyburg61}).
 %
-If the value of \lstinline{theta} is very low (e.g., one foot), the utterance \emph{Sam is tall}  is extremely uninformative: the listener already has a strong belief that Sam is more than one foot tall. On the other hand, if \lstinline{theta} is extremely high, the utterance will be extremely informative since the prior probability that Sam's height is greater than \lstinline{theta} is very low. 
-This means that \emph{Sam is tall} was much more likely to be uttered by \lstinline{S1} if the value of \lstinline{theta} is high.
-But this pressure to infer high \lstinline{theta}, and hence large heights, is balanced by the low prior probability of very large heights. The posterior distribution on heights given the utterance (shown in Figure \ref{GA}) reflects this balancing process. In effect, interpretations are preferred which make Sam significantly taller than average, but not implausibly tall. 
-%This does indeed seem to be the inferred meaning of \emph{Sam is tall} in context. 
-Our model thus gives precise form to an intuition about the meaning of scalar adjectives which has been stated repeatedly in the linguistic and philosophical literature \cite[e.g.][]{bierwisch89,fara00,kennedy07}.
-
-
-There is an immediate explanation in this approach of the context-dependence of scalar adjectives: different comparison classes have different prior distributions, which affects the joint inference carried out by \lstinline{L1-sv}. This can explain not only quantitative shifting of the threshold depending on context (e.g.~tall man vs.~tall basketball player), it can also explain qualitative differences between different types of adjectives. For instance, absolute adjectives, like \emph{full/closed}, also refer to a degree along some scale, but behave differently than relative adjectives (like \emph{tall}): absolute adjectives compare a degree to a (fairly) fixed extreme point \cite{rotsteinwinter04,kennedymcnally05,kennedy07}\footnote{There are also differences in modification patterns between relative and absolute adjectives. For example, we can modify \emph{full} as \emph{completely full} but we cannot usually say not \emph{completely tall}.}. 
-For instance, a closed door is not one that's more closed than average, it's \emph{closed}.
+%Absolute adjectives are different: the second premise is less intuitively plausible for an adjective like \emph{closed} (``A door that is 0.1 inches less closed than a closed door is also closed'') \cite{kennedy07}.
+%We suggest that this is essentially because the posterior variance of the threshold is lower for absolute adjectives. In simulations using a prior peaked slightly near the boundary (as in Figure \ref{GA} right), the second premise has much lower probability (65\%).
+%%
+%% the next sentence seems kind of out of place ... also, maybe we should say something about the world-model connection, why it makes the assumption of different priors reasonable, and how we plan to test the model assumptions that drive this empirical result?
+%%
+% Our model thus suggests that the difference in sorites susceptibility between relative and absolute adjectives may be a difference in the degree of uncertainty after hearing the adjective statement, rather than a qualitative difference between kinds of uncertainty.
 %
-% [DL] On the last sentence: You convinced me at some point that this isn't a categorical distinction, plus it's not clear here what its significance is. You could say more about degree modification, but I suspect it's not really necessary here; instead you could just cite e.g. \cite{rotsteinwinter04,kennedymcnally05,kennedy07} for the intuition that there's a distinction in the postive-form meaning in that the absolute adjectives are closer to an endpoint. Probably worth using and definig the term ``absolute adjective'' explicitly here as well, since it's used below.
-%
-Prior distributions which have significant probability mass near the edges of a scale result in very different interpretation than those with thin tails (Figure \ref{GA} left vs right): the interpreted meaning is strongly peaked near the extreme point of the degree. The difference between relative and absolute adjectives can thus be explained by qualitative differences in the prior distributions which they invoke. These differences in prior distribution are a consequence of non-linguistic knowledge represented in concepts of the domain.
-
-
-\paragraph{Sorites paradox} The much-discussed \emph{sorites paradox} is a key puzzle of gradable adjectives, for example:
-\begin{exe}
-\ex{\label{e2} 	 Sorites paradox:	}
-\begin{xlist}
-\ex{\label{e2a} 	A man who is 7 feet tall is tall.	}
-\ex{\label{e2b} 	A man who is 0.01 inches less tall than someone who is tall is also tall.	}
-\ex{\label{e2c} 	Therefore, a man who is 4 feet tall is tall.	}
-\end{xlist}
-\end{exe}
-This argument is logically valid, and the premises \ref{e2a} and \ref{e2b} appear to be reasonable; but the conclusion \ref{e2c} is clearly false. An account of vagueness should explain both the logical puzzle (which premise is incorrect?) and the psychological problem (why do people find the premises so compelling, while also maintaining that the conclusion is completely implausible? \cite[Cf.][]{fara00}).
-
-Our approach to adjective interpretation offers a new account of the sorites paradox. The argument is logically unsound because the second premise \ref{e2b} is not \emph{strictly true}: if $x$'s height is very close to the cutoff, $\theta$, then $x$ may count as ``tall'' while someone just slightly shorter does not. However, the second premise is  \emph{highly plausible} because the probability that $\theta$ and $x$'s height will be so close is small. 
-%In other words, the posterior distribution on $\theta$ describes the inferred meaning of ``tall'' in a particular context; the distribution on $w$ described the height of someone known to be ``tall'' given this distribution on meanings. 
-Indeed, if we choose the height $h$ of $x$ and the threshold $\theta$ from the joint posterior distribution that \lstinline{L1-sv} defines given the utterance \emph{$x$ is tall},
-%$p_{L_1}(h, \theta \ |\ u)$ defined by our model, 
-the probability that $h - \theta > 0.01$ (i.e.~premise \ref{e2b} holds) is approximately 95\%.
-%This high probability makes the inductive premise intuitively compelling; but since its probability is less than 1, repeated use as a premise does not preserve high probability: the conclusion of the sorites paradox need not hold.
-This explains the psychological puzzle described above: why is the second premise so compelling, if it is not strictly true? The answer is that this premise has high probability (a fact which does not justify its repeated use as a premise in logical arguments \cite{kyburg61}).
-
-Absolute adjectives are different: the second premise is less intuitively plausible for an adjective like \emph{closed} (``A door that is 0.1 inches less closed than a closed door is also closed'') \cite{kennedy07}.
-We suggest that this is essentially because the posterior variance of the threshold is lower for absolute adjectives. In simulations using a prior peaked slightly near the boundary (as in Figure \ref{GA} right), the second premise has much lower probability (65\%).
-%
-% the next sentence seems kind of out of place ... also, maybe we should say something about the world-model connection, why it makes the assumption of different priors reasonable, and how we plan to test the model assumptions that drive this empirical result?
-%
- Our model thus suggests that the difference in sorites susceptibility between relative and absolute adjectives may be a difference in the degree of uncertainty after hearing the adjective statement, rather than a qualitative difference between kinds of uncertainty.
-
 
 %\paragraph{Plural comparison}
 %\todo{add something on plural comparison?}
