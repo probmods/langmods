@@ -219,7 +219,7 @@ From this it is a simple calculation to verify that we can perform the condition
 Probability as described so far provides a notation for indicating degrees of belief and conditional information, but requires that the actual degrees of belief (the numbers) be specified separately; this quickly becomes unmanageable when we wish to describe complex knowledge---relations among many beliefs. 
 The stochastic lambda calculus (SLC) provides a formal, compositional language for describing probabilities over complex sets of interrelated beliefs. 
 We assume some familiarity with the (deterministic) lambda calculus \cite{lambda}. 
-At its core SLC simply extends the lambda calculus with a primitive operator for random choice between two expressions and an additional reduction rule that reduces such a choice expression to it's left or right sub-expression with equal probability. 
+At its core SLC simply extends the lambda calculus with a primitive operator for random choice between two expressions and an additional reduction rule that reduces such a choice expression to its left or right sub-expression with equal probability. 
 While this reduction process results in a single expression after any sequence of reductions, it can be viewed as a distribution over such reduction sequences, and hence a distribution over the final expression: SLC expressions denote (sub-)distributions over normal form SLC expressions. 
 It can be shown that this system can represent any computable distribution in an appropriate sense \cite[see for example][]{PfefferRamsey,FreeRoy}.
 
@@ -754,14 +754,14 @@ Because there is now a joint inference over \lstinline{val} and \lstinline{index
 \end{lstlisting}
 To understand this distribution, we can look at the prior (marginal) distributions over \lstinline{d} and John's strength, and the corresponding posteriors.
 \todo{Run this simulation. Put in figure. (Note, we want this for SALT paper too!)}
-The threshold variable has been influenced by context as expected: it changes from it's prior to a posterior that makes the utterance likely to be true. However, this gives us the wrong interpretation of ``John is strong''! What is missing is the pressure to adjust \lstinline{d} so that the sentence is not only true, but also \emph{informative}. 
+The threshold variable has been influenced by context as expected: it changes from its prior to a posterior that makes the utterance likely to be true. However, this gives us the wrong interpretation of ``John is strong''! What is missing is the pressure to adjust \lstinline{d} so that the sentence is not only true, but also \emph{informative}. 
 
 Simply including the informative speaker and pragmatic listener models as defined above is not enough: without additional changes the index variables will still be inferred at the level of literal listener with no pragmatic pressures. \todo{verify that claim. put in simulation result if its interesting..} Instead, we lift the index variables to the pragmatic level. Imagine a pragmatic listener who believes that the index variables have values that she happens not to know, but which are otherwise common knowledge (i.e. known by the speaker, who assumes they are known by the listener):
 \begin{lstlisting}
 (define (listener utterance QUD index)
   (query
     ...theory...
-    (define index (index prior))
+    (define index (index-prior))
     (define val (eval QUD))
     val
     (equal? utterance (speaker val QUD index))))
