@@ -100,23 +100,27 @@
 \pagebreak
 
 
-\todo[inline]{Noah: This intro (taken from the lexsem grant) needs to be edited into something short and to the point...}
 
-Words are potentially one of the clearest windows on human knowledge and conceptual structure. 
-If we understood the connection between words and mental representation, we could gain critical insights into almost every aspect of psychology, construct vastly more useful thinking machines, and interface the two. 
-But what do words mean? In this project we aim to {\bf construct and explore a formal model of lexical semantics grounded, via pragmatic inference, in core conceptual structures}. 
-We will do so using a set of modeling tools---chiefly the probabilistic programming language Church \cite{goodman2008}---that we have previously developed and used to explain  aspects of high-level human cognition.
+Words are used to communicate ideas. Ideas are mental tools for coping with a complex and uncertain world. This implies that human conceptual structures should be key to word meaning, and that probability, the mathematics of uncertainty, should be indispensable for describing both language and thought. Indeed, probabilistic models have proven enormously useful in modeling human cognition \cite{Tenenbaum, etc}, and aspects of natural language \cite{ChaterManning}. Natural language semantics and pragmatics have only recently been attacked with probabilistic tools. In this chapter we synthesize several of these modeling advances, exploring a formal model of semantics grounded, via pragmatic inference, in core conceptual structures.
+
+
+
+%\todo[inline]{Noah: This intro (taken from the lexsem grant) needs to be edited into something short and to the point...}
+%
+%Words are potentially one of the clearest windows on human knowledge and conceptual structure. 
+%If we understood the connection between words and mental representation, we could gain critical insights into almost every aspect of psychology, construct vastly more useful thinking machines, and interface the two. 
+%But what do words mean? In this project we aim to {\bf construct and explore a formal model of lexical semantics grounded, via pragmatic inference, in core conceptual structures}. 
+%We will do so using a set of modeling tools---chiefly the probabilistic programming language Church \cite{goodman2008}---that we have previously developed and used to explain  aspects of high-level human cognition.
 
 Flexible human cognition is derived in large part from our ability to imagine possible worlds (or situations). 
 A rich set of concepts, intuitive theories, and other mental representations support imagining and reasoning about possible worlds---together we call these the conceptual lexicon. 
-
-
+%
 We can formalize the conceptual lexicon using probabilistic programming tools, viewing commonsense knowledge as a set of interrelated definitions (or concepts) in a probabilistic programming language. 
-Probabilistic programs specify sampling procedures over possible program executions, each execution fixes (some of) the variables in that describe the world, hence each collection of concepts describes how to sample from a rich space of possible worlds. 
+Probabilistic programs specify sampling procedures over possible program executions, each execution fixes (some of) the variables that describe the world, hence each collection of concepts describes how to sample from a rich space of possible worlds. 
 The inference (or conditioning, or query) operator describes how to use these distributions on worlds for reasoning. 
-
+%
 We have been able to explain many inferences that humans draw from sparse evidence using these tools. 
-Here we posit that this collection of concepts also forms the set of primitive elements available for {\bf lexical semantics}: word meanings can be built from the pieces of core cognition.
+Here we posit that this collection of concepts also forms the set of primitive elements available for lexical semantics: word meanings can be built from the pieces of conceptual structure.
 
 However, the connection between core concepts and lexical semantics is not direct: 
 first, because language must flexibly adapt to the context of communication, the connection between lexical representation and interpreted meaning is mediated by pragmatic inference;
@@ -130,24 +134,24 @@ In particular, we view semantic representation as indivisible from core cognitio
 
 Our approach is similar in spirit to cognitive semantics, in that we attempt to ground semantics in mental representation, but we draw on the highly successful tools of Bayesian cognitive science to formalize these ideas. 
 Similarly, our approach draws heavily on the progress made in formal model-theoretic semantics \cite{montague1973,heimkratzer1998}, borrowing insights about how syntax drives semantic composition, but we compose elements of stochastic logics rather than deterministic ones.
-Finally, our approach is related to recent progress in robotics (and indeed our project will benefit from ongoing collaboration with roboticist Stefanie Tellex of Brown University), but is more systematic and systematically connected to cognitive and linguistic theory. 
+%Finally, our approach is related to recent progress in robotics (and indeed our project will benefit from ongoing collaboration with roboticist Stefanie Tellex of Brown University), but is more systematic and systematically connected to cognitive and linguistic theory. 
 
-We propose to study lexical semantics in the setting of an architecture for language understanding that is described in section \ref{langaugemodels}. 
-We first provide, in section \ref{background}, background on the probabilistic programming language Church and on using Church to describe core cognition. 
-In section \ref{lex} we describe the case studies of lexical semantics that we propose to explore in this project. 
-We will rely heavily on computational infrastructure for inference in the Church language; the models we propose push the envelope of what is currently possible and will require new inference techniques. 
-In section \ref{infrastr} we describe proposed work on Church inference algorithms and implementations.
+%We propose to study lexical semantics in the setting of an architecture for language understanding that is described in section \ref{langaugemodels}. 
+%We first provide, in section \ref{background}, background on the probabilistic programming language Church and on using Church to describe core cognition. 
+%In section \ref{lex} we describe the case studies of lexical semantics that we propose to explore in this project. 
+%We will rely heavily on computational infrastructure for inference in the Church language; the models we propose push the envelope of what is currently possible and will require new inference techniques. 
+%In section \ref{infrastr} we describe proposed work on Church inference algorithms and implementations.
+%
+%Probabilities describe degrees of belief, and probabilistic inference describes rational reasoning under uncertainty. 
+%It is no wonder, then, that probabilistic models have exploded onto the scene of modern artificial intelligence, cognitive science, and applied statistics: these are all sciences of inference under uncertainty. 
+%But as probabilistic models have become more sophisticated, the tools to formally describe them and to perform probabilistic inference have wrestled with new complexity. 
+%Just as programming more than the simplest algorithms requires tools for abstraction and composition, complex probabilistic modeling requires new progress in model representation---\emph{probabilistic} programming languages. 
+%These languages provide compositional means for describing complex probability distributions; implementations of these languages provide \emph{generic} inference engines: tools for performing efficient probabilistic inference over an arbitrary program. 
 
-Probabilities describe degrees of belief, and probabilistic inference describes rational reasoning under uncertainty. 
-It is no wonder, then, that probabilistic models have exploded onto the scene of modern artificial intelligence, cognitive science, and applied statistics: these are all sciences of inference under uncertainty. 
-But as probabilistic models have become more sophisticated, the tools to formally describe them and to perform probabilistic inference have wrestled with new complexity. 
-Just as programming more than the simplest algorithms requires tools for abstraction and composition, complex probabilistic modeling requires new progress in model representation---\emph{probabilistic} programming languages. 
-These languages provide compositional means for describing complex probability distributions; implementations of these languages provide \emph{generic} inference engines: tools for performing efficient probabilistic inference over an arbitrary program. 
-
-By providing a uniform and universal representation for probabilistic models, probabilistic programming provides a framework for unifying disparate Bayesian models of human cognition. 
-Indeed, while Bayesian models have been extremely influential in cognitive science \cite[e.g.][]{tenenbaum2011}, 
-it is only recently that we have the tools to view the Bayesian approach as a general framework for mental representation.
-We next give a brief introduction to probabilistic programming, then an indication of how these tools can be used for modeling human cognition.
+%By providing a uniform and universal representation for probabilistic models, probabilistic programming provides a framework for unifying disparate Bayesian models of human cognition. 
+%Indeed, while Bayesian models have been extremely influential in cognitive science \cite[e.g.][]{tenenbaum2011}, 
+%it is only recently that we have the tools to view the Bayesian approach as a general framework for mental representation.
+%We next give a brief introduction to probabilistic programming, then an indication of how these tools can be used for modeling human cognition.
 
 %make sure to have something like this:
 In this chapter we illustrate the use of probabilistic techniques in natural language pragmatics and semantics with a concrete formal model. This model is not meant to exhaust the space of possible probabilistic models, indeed dozens of extensions are immediately apparent, but rather to show that a probabilistic framework for natural language is possible and productive.
@@ -232,7 +236,7 @@ This simple calculus is universal but cumbersome to work with.
 Further details and examples of Church can be found at \url{church web}.
 In what follows we will assume passing familiarity with the Polish notation used in LISP-family languages, and will occasionally build on ideas from programming languages---\cite{SICP} is an excellent background on these ideas. 
 
-An important observation is that a set of stochastic function definitions in Church can be interpreted as a distribution over possible worlds: A world consists of a value for each well-formed expression that can be made from the defined functions (in each calling position). 
+A set of stochastic function definitions in Church can be interpreted as a distribution over possible worlds: A world consists of a value for each well-formed expression that can be made from the defined functions (in each calling position). 
 \todo{We should define ``distribution''  and ``marginal'' somewhere. Probably above in background on probability.} To evaluate any particular expression or query requires evaluating only a small subset of this infinitude of expressions. 
 That is, an particular query only depends on the partial world of expressions actually constructed during the evaluation process. 
 The relationship between the idealized complete possible worlds and these partial worlds is coherent because taking the marginal sum over any expressions that are evaluated but that don't impact the value of the query (condition or query expressions) results in the same distribution as if we didn't evaluate them. 
@@ -790,10 +794,12 @@ Simply including the informative speaker and pragmatic listener models as define
 \end{lstlisting}\footnote{For simplicity we are assuming that it is clear from the argument structure whether the version of each function with or without indices is intended.}
 In most ways this is a very small change to the model, but it has important consequences. At a high level, the effect is that index variables will now be set in such a way that they both make the utterance likely to be true \emph{and} likely to be pragmatically useful (informative, relevant, etc); the tradeoff between these two factors results in significant contextual flexibility of the interpreted meaning. In the case of the adjective \emph{strong} we see \todo{put in model figure} that the threshold is now interpreted as roughly one standard deviation from the prior mean strength---hence \emph{strong} means significantly stronger than average, but does not require maximal strength (most informative) or permit any strength (most often true). This model of gradeable adjective interpretation (which was introduced in \cite{Lassiter2013}) has a number of appealing properties: for instance, it explains how background knowledge affects qualitative and quantitative aspects of adjective interpretation (see \cite{Lassiter2013}), and it explains why adjectives result in vaguest interpretation (see below).
 
-We can motivate from this example a general treatment of semantic indices: lift them into the pragmatic inference, reasoning over then jointly with world states, but treating them as bound variables when the meaning is constructed. Another interpretation of this treatment (introduced in \cite{Bergen2012}) is as the result of \emph{lexical uncertainty}: each index represents a lingering uncertainty about word meaning (in context) which the listener must incorporate in the interpretation process. This interpretation is appealing in that it connects naturally to language acquisition and change \cite{SmithFrankGoodman}. For instance, upon hearing a new word a learner would initially treat it as underdetermined (essentially an index variables ranging over all expressions of the appropriate type), inferring its meaning on each usage from contextual cues. Over time the prior over this `index' would tighten until only the correct meaning remained, and no contextual flexibility was left. A difficulty with the lexical uncertainty interpretation is explaining why certain aspects of a word's meaning are so much more flexible than others. This is natural from the free-index interpretation since the dimensions of flexibility are explicitly represented as unbound variables in lexical entries. A more structured (e.g. hierarchical) notion of lexical uncertainty may be able to reconcile these interpretations, which are essential equivalent.
+We can motivate from this example a general treatment of semantic indices: lift each index into the pragmatic inference, allowing them to bind free variables in the literal meaning, and reasoning over them jointly with world states. 
+When we don't know ahead of time which index variables will occur in the literal-listener utterance we need to generalize the above. 
+One way is to treat \lstinline{index} as a memoized function mapping variable names to (random) values appropriate for their types.\footnote{The semantics of a memoized function is such that its value on all inputs is formally (if not actually) fixed when the function is created. Thus a memoized \lstinline{index} function would result in index variables that are reasoned about at the pragmatic listener level, although they are made only as needed in the literal listener.} 
+Then either the lexical entires should change from free variables to lookups (e.g. \lstinline{d} to \lstinline{(index d)}) or the meaning function is responsible for detecting unbound variables and decorating them with \lstinline[mathescape]{(index ...)}.
 
-
-\todo[inline]{When we don't know ahead of time which index variables we will have in the literal-listener utterance we need to generalize the above. One way is to treat \lstinline{index} as a memoized fn from variable names to values. Because it's created in pragmatic listener, the variables reside there, although they are made as needed in literal listener. Then either the lexical entires should change from free variables to lookups (e.g. \lstinline{d} to \lstinline{(index d)}) or the meaning function is responsible for detecting unbound variables and decorating them with \lstinline[mathescape]{(index ...)}.}
+Another interpretation of this modeling approach (indeed, the original interpretation, introduced in \cite{Bergen2012}) is as the result of \emph{lexical uncertainty}: each index represents a lingering uncertainty about word meaning (in context) which the listener must incorporate in the interpretation process. This interpretation is appealing in that it connects naturally to language acquisition and change \cite{SmithFrankGoodman}. For instance, upon hearing a new word a learner would initially treat it as underdetermined (essentially an index variables ranging over all expressions of the appropriate type), inferring its meaning on each usage from contextual cues. Over time the prior over this `index' would tighten until only the correct meaning remained, and no contextual flexibility was left. A difficulty with the lexical uncertainty interpretation is explaining why certain aspects of a word's meaning are so much more flexible than others. This is natural from the free-index interpretation since the dimensions of flexibility are explicitly represented as unbound variables in lexical entries. A more structured (e.g. hierarchical) notion of lexical uncertainty may be able to reconcile these interpretations, which are essential equivalent.
 
 
 \subsection{Other applications of index variables}
@@ -805,9 +811,11 @@ We can motivate from this example a general treatment of semantic indices: lift 
 % Lifting assignment fn to pragmatic listener. Semantic "existence" or "skolem" operator.  (Why do this and what should lift? Conventional vs coordinated indices? Lexical uncertainty?)
 
 \begin{itemize}
+\item horn implicature
 \item  "the" vs "a": same basic meaning, but the variable from "the" is lifted to L1, hence is influenced by salience. (competition between "a" and "the"?)
 \subitem \sv{the} = \lstinline{($\lambda$ (P) ($\lambda (x) (P x)))}, with the variable $x$ lifted up to the pragmatic listener. 
 \item  presupposition accommodation: "the strong player" == the strongest.
+\item quantifier scope??
 \end{itemize}
 
 \subsection{Vagueness}
