@@ -230,31 +230,50 @@ While this reduction process results in a single expression after any sequence o
 It can be shown that this system can represent any computable distribution in an appropriate sense \cite[see for example][]{PfefferRamsey,FreeRoy}.
 
 This simple calculus is universal but cumbersome to work with. 
-\cite{Goodman} introduce Church, an enriched SLC that can be realized as a \emph{probabilistic programming language}, just as the programming language LISP is an enriched lambda calculus. Church starts with the pure subset of Scheme (which is itself essentially lambda calculus enriched with primitive data types, operators, and useful syntax) and extends it with elementary random primitives (ERPs), the inference function \lstinline{query}, and the memoization function \emph{mem}. 
+\citet{Goodman2008} introduce Church, an enriched SLC that can be realized as a \emph{probabilistic programming language}, just as the programming language LISP is an enriched lambda calculus. 
+Church starts with the pure subset of Scheme (which is itself essentially lambda calculus enriched with primitive data types, operators, and useful syntax) and extends it with elementary random primitives (ERPs), the inference function \lstinline{query}, and the memoization function \emph{mem}. 
 We next describe key pieces of the language semantics; further details and examples of using Church for cognitive modeling can be found at \url{http://bit.ly/ProbMods}.
 In what follows we will assume passing familiarity with the Polish notation used in LISP-family languages (fully parenthesized and operator initial), and will occasionally build on ideas from programming languages---\cite{SICP} is an excellent background on these ideas. 
 
-Rather than restricting to the $\oplus$ uniform random choice between two options (which is sufficient, but results in extremely cumbersome programs), Church include an interface for adding elementary random primitives (ERPs). These are procedures that return random values; a sequence of evaluations of such and ERP procedure is assumed to result in independent identically distributed (i.i.d.) values. Common ERPs include Bernoulli (\lstinline{flip}), uniform, gaussian, etc. While the ERPs themselves are i.i.d., it is straightforward to construct Church procedures out of the ERPS that are not i.i.d. For instance:
+Rather than restricting to the $\oplus$ uniform random choice between two options (which is sufficient, but results in extremely cumbersome representations), Church includes an interface for adding elementary random primitives (ERPs). 
+These are procedures that return random values; a sequence of evaluations of such and ERP procedure is assumed to result in independent identically distributed (i.i.d.) values. 
+Common ERPs include Bernoulli (\lstinline{flip}), \lstinline{uniform}, \lstinline{gaussian}, etc. 
+While the ERPs themselves are i.i.d., it is straightforward to construct Church procedures sing ERPs that are not i.i.d. 
+For instance \lstinline[mathescape]{(($\lambda$ (bias) ($\lambda$ () (flip bias))) (uniform 0 1))} creates a function that ``flips a coin'' of a specified but unknown \lstinline{bias}.
+%\begin{lstlisting}[mathescape]
+%(define bias (uniform 0 1))
+%(define coin )
+%\end{lstlisting}
+Multiple calls to the function will result in a sequence of values which are not i.i.d., because the jointly depend on the unknown \lstinline{bias} (though they are exchangeable \cite{defintetti}).
+
+To represent conditional probabilities in SLC and Church we introduce the \lstinline{query} function. Unlike simpler representations (such as Bayes nets) where conditioning is an operation that happens to a mold from the outside, \lstinline{query} can be defined within the SLC itself as an ordinary function. One way to do this is via \emph{rejection sampling}. Imagine we have a distribution represented by the function with no arguments \lstinline{thunk}, and a predicate on return values \lstinline{condition}. We can represent the conditional distribution of return values from \lstinline{thunk} that satisfy \lstinline{condition} by:
 \begin{lstlisting}[mathescape]
-(define bias (uniform 0 1))
-(define coin ($\lambda$ () (flip bias)))
+(define conditional ($\lambda$ () (($\lambda$ (val) (if (predicate val) val (conditional))) (thunk))))
 \end{lstlisting}
-Multiple calls to the function \lstinline{coin} will result in a sequence of values which are not i.i.d., because the jointly depend on the unknown \lstinline{bias} (though they are exchangeable \cite{defintetti}).
-
-Memoization is a higher-order function that upgrades a stochastic function to have persistent randomness. 
-
-mem
-
-eval
+where we have used a stochastic recursion (conveniently specified by the named define) to build a conditional. For clarity, we introduce special syntax to specify such conditionals: 
+\todo{finish query spec}
 
 
+Memoization is a higher-order function that upgrades a stochastic function to have persistent randomness---a memoized function is evaluated as usual the first time is is called with given arguments, but thereafter returns this ``stored'' value. For instance \lstinline{(equal? (flip) (flip))} will be \lstinline{true} with probability $0.5$, but if we define a memoized flip, \lstinline{(define memflip (mem flip))}, then \lstinline{(equal? (memflip) (memflip))} will always be \lstinline{true}. This property is convenient for representing probabilistic dependencies between beliefs that rely on common properties, for instance the strengths and genders of people in a game (as illustrated below).
+%
+A technical, but important, subtlety concerns the ``location'' where a memoized random choice is created: should it be at the first use or the second? 
+In order to avoid an artificial symmetry breaking (and for technical reasons), the semantics of memoization should be defined so that all random values that may be returned by a memoized function are created when the memoized function is \emph{created}, not where it is called. 
 
 
-\todo[inline]{Noah: give definitional interpreter (eval) for ESLC. need: define, xrps, query, mem.}
+\label{eval}
+In Church, as in most LISP-like languages, source code is a first-class data type: it is represented by lists. The quote operator tells the evaluation process to treat a list as a literal list of symbols, rather than evaluating it: \lstinline{(flip)} results in a random value \lstinline{true} or \lstinline{false}, while \lstinline{`(flip)} results in the list \lstinline{(flip)} as a \emph{value}.
+ For us this will be important because we can ``reverse'' the process by calling the \lstinline{eval} function on a piece of reified code. For instance, \lstinline{(eval `(flip))} results in true or false. Usefully for us, evaluation triggered by \lstinline{eval} happens in the local context with any bound variables in scope. For instance:
+\begin{lstlisting}[mathescape]
+(define expression `(flip bias))
+(define foo (($\lambda$ (bias) ($\lambda$ (e) (eval e))) (uniform)))
+(foo expression)
+\end{lstlisting}
+In this snippet the variable \lstinline{bias} is not in scope at the top level where \lstinline{expression} is defined, but it is in scope where \lstinline{expression} is evaluated, inside the function bound to \lstinline{foo}. For the natural language architecture described below this allows utterances to be evaluated in the local context of comprehension. For powerful applications of these ideas in natural language semantics see \cite{kenshan}.
 
+%Do we want to give a definitional interpreter (eval) for ESLC in an appendix???
 
 \label{bottom-val}
-Church is a dynamically typed language: values have types, but expressions don't have fixed types that can be determined \emph{a priori}. For simplicity (and utility below) we assume that when an operator is applied to values outside of its domain, for instance \lstinline{(+ 1 'a)}, they return a special value \emph{error} which is itself outside the domain of all operators, except the equality operator \lstinline{eq?}. By allowing \lstinline{eq?} to test for error we permit very simple error handling.
+Church is a dynamically typed language: values have types, but expressions don't have fixed types that can be determined \emph{a priori}. For simplicity (and utility below) we assume that when an operator is applied to values outside of its domain, for instance \lstinline{(+ 1 `a)}, they return a special value \emph{error} which is itself outside the domain of all operators, except the equality operator \lstinline{eq?}. By allowing \lstinline{eq?} to test for error we permit very simple error handling.
 
 
 
@@ -449,7 +468,7 @@ By analogy with the effects of observation on belief, we can formalize this idea
     (eval QUD)
     (eval (meaning utterance))))
 \end{lstlisting}
-This function specifies the posterior distribution over answers to the Question Under Discussion (\lstinline{QUD}) given that the literal meaning of the utterance is true.\footnote{On QUD models, see \citealt{ginzburg95a,vankuppevelt95,roberts96,beaverclark08} among many others.} \todo{Noah: make sure the use of eval is clear.} Notice that the prior distribution is specified by a conceptual lexicon---the \lstinline{...theory...}. 
+This function specifies the posterior distribution over answers to the Question Under Discussion (\lstinline{QUD}) given that the literal meaning of the utterance is true.\footnote{On QUD models, see \citealt{ginzburg95a,vankuppevelt95,roberts96,beaverclark08} among many others.} Notice that the prior distribution is specified by a conceptual lexicon---the \lstinline{...theory...}---and the \lstinline{QUD} will be evaluated in the local environment where all functions defined by this theory are in scope. That is, the question of interest is determined by the \emph{expression} \lstinline{QUD} while its answer is determined by the \emph{value} of this expression in the local context of reasoning by the literal listener: the value of \lstinline{(eval QUD)}. (For a description of the \lstinline{eval} operator see section \ref{eval} above.)
 
 The \lstinline{meaning} function is a map from strings (surface forms) to Church expressions (logical forms, which include functions defined in \lstinline{...theory...}).
 Many theories of syntactic and semantic composition could be used to provide this mapping. 
