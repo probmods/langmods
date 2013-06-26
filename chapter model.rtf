@@ -21,39 +21,47 @@
 \
 (define (approx-equal x y) (< (abs (- x y)) .01))\
 \
+(define (select n lst) \
+	(if (= n 1) (list (first lst))\
+		(pair (first lst) (select (- n 1) lst))))\
+\
 (mh-query 100 100\
 \
-\cf0 (\cf2 define\cf3  \cf2 players\cf3  \cf0 '(\cf2 Bob\cf3  \cf2 Jim\cf3  \cf2 Alice\cf3  \cf2 Sue\cf0 ))\cf3 \
-\cf0 (\cf2 define\cf3  \cf2 teams\cf3  \cf0 '(\cf2 team1\cf3  \cf2 team2\cf3  \cf2 team3\cf0 ))\cf3 \
-\cf0 (\cf2 define\cf3  \cf2 matches\cf3  \cf0 '(\cf2 match1\cf3  \cf2 match2\cf0 ))\cf3 \
+\cf0 	(define players `(Bob Jim Mary Sue Bill Evan Sally Tim Joe Jane Terrence Kate))\
+	(define teams `(team1 team2 team3))\
+	(define matches `(match1 match2 match3 match4 match5 match6))\
+	(define num-matches (uniform-draw '(1 2 3 4 5 6)))\cf3 \
 \'a0 \'a0 \'a0 \'a0 \'a0\'a0\
-\cf0 (\cf2 define\cf3  \cf2 gender\cf3  \cf0 (\cf2 mem\cf3  \cf0 (\cf2 lambda\cf3 \'a0\cf0 (\cf2 p\cf0 )\cf3 \'a0\cf0 (\cf2 if\cf3  \cf0 (\cf2 flip\cf0 )\cf3  \cf0 '\cf2 male\cf3  \cf0 '\cf2 female\cf0 ))))\cf3 \
-\cf0 (\cf2 define\cf3  \cf2 gender-mean-strength\cf3  \cf0 (\cf2 mem\cf3  \cf0 (\cf2 lambda\cf3  \cf0 (\cf2 g\cf0 )\cf3  \cf0 (\cf2 gaussian\cf3  \cf4 0\cf3  \cf4 2\cf0 ))))\cf3 \
-\cf0 (\cf2 define\cf3  \cf2 strength\cf3  \cf0 (\cf2 mem\cf3  \cf0 (\cf2 lambda\cf3  \cf0 (\cf2 p\cf0 )\cf3  \cf0 (\cf2 gaussian\cf3  \cf0 (\cf2 gender-mean-strength\cf3  \cf0 (\cf2 gender\cf3  \cf2 p\cf0 ))\cf3  \cf4 1\cf0 ))))\cf3 \
+\cf0 	(\cf2 define\cf3  \cf2 gender\cf3  \cf0 (\cf2 mem\cf3  \cf0 (\cf2 lambda\cf3 \'a0\cf0 (\cf2 p\cf0 )\cf3 \'a0\cf0 (\cf2 if\cf3  \cf0 (\cf2 flip\cf0 )\cf3  \cf0 '\cf2 male\cf3  \cf0 '\cf2 female\cf0 ))))\cf3 \
+\cf0 	(\cf2 define\cf3  \cf2 gender-mean-strength\cf3  \cf0 (\cf2 mem\cf3  \cf0 (\cf2 lambda\cf3  \cf0 (\cf2 g\cf0 )\cf3  \cf0 (\cf2 gaussian\cf3  \cf4 0\cf3  \cf4 2\cf0 ))))\cf3 \
+\cf0 	(\cf2 define\cf3  \cf2 strength\cf3  \cf0 (\cf2 mem\cf3  \cf0 (\cf2 lambda\cf3  \cf0 (\cf2 p\cf0 )\cf3  \cf0 (\cf2 gaussian\cf3  \cf0 (\cf2 gender-mean-strength\cf3  \cf0 (\cf2 gender\cf3  \cf2 p\cf0 ))\cf3  \cf4 1\cf0 ))))\cf3 \
 \'a0 \'a0 \'a0 \'a0 \'a0\'a0\
-\cf0 (\cf2 define\cf3  \cf2 team-size\cf3  \cf4 1\cf0 )\cf3 \
-\cf0 (\cf2 define\cf3  \cf2 players-on-team\cf3  \cf0 (\cf2 mem\cf3  \cf0 (\cf2 lambda\cf3  \cf0 (\cf2 team\cf0 )\cf3  \cf0 (\cf2 draw-n\cf3  \cf2 team-size\cf3  \cf2 players\cf0 ))))\cf3 \
-\cf0 (\cf2 define\cf3  \cf2 captain\cf3  \cf0 (\cf2 mem\cf3  \cf0 (\cf2 lambda\cf3  \cf0 (\cf2 team\cf0 )\cf3  \cf0 (\cf2 uniform-draw\cf3  \cf0 (\cf2 players-on-team\cf3  \cf2 team\cf0 )))))\cf3 \
+\cf0 	(define team-size (uniform-draw '(1 2 3 4 5 6)))\cf3 \
+\cf0 	(\cf2 define\cf3  \cf2 players-on-team\cf3  \cf0 (\cf2 mem\cf3  \cf0 (\cf2 lambda\cf3  \cf0 (\cf2 team\cf0 )\cf3  \cf0 (\cf2 draw-n\cf3  \cf2 team-size\cf3  \cf2 players\cf0 ))))\cf3 \
+\cf0 	(\cf2 define\cf3  \cf2 captain\cf3  \cf0 (\cf2 mem\cf3  \cf0 (\cf2 lambda\cf3  \cf0 (\cf2 team\cf0 )\cf3  \cf0 (\cf2 uniform-draw\cf3  \cf0 (\cf2 players-on-team\cf3  \cf2 team\cf0 )))))\cf3 \
 \'a0 \'a0 \'a0 \'a0 \'a0\'a0\
-\cf0 (\cf2 define\cf3  \cf2 teams-in-match\cf3  \cf0 (\cf2 mem\cf3  \cf0 (\cf2 lambda\cf3  \cf0 (\cf2 match\cf0 )\cf3  \cf0 (\cf2 draw-n\cf3  \cf4 2\cf3  \cf2 teams\cf0 ))))\cf3 \
-\cf0 (\cf2 define\cf3  \cf2 pulling\cf3  \cf0 (\cf2 mem\cf3  \cf0 (\cf2 lambda\cf3  \cf0 (\cf2 player\cf3  \cf2 match\cf0 )\cf3  \cf0 (\cf2 +\cf3  \cf0 (\cf2 strength\cf3  \cf2 player\cf0 )\cf3  \cf0 (\cf2 gaussian\cf3  \cf4 0\cf3  \cf4 0.5\cf0 )))))\cf3 \
-\cf0 (\cf2 define\cf3  \cf2 team-pulling\cf3  \cf0 (\cf2 mem\cf3  \cf0 (\cf2 lambda\cf3  \cf0 (\cf2 team\cf3  \cf2 match\cf0 )\cf3  \
+\cf0 	(\cf2 define\cf3  \cf2 teams-in-match\cf3  \cf0 (\cf2 mem\cf3  \cf0 (\cf2 lambda\cf3  \cf0 (\cf2 match\cf0 )\cf3  \cf0 (\cf2 draw-n\cf3  \cf4 2\cf3  \cf2 teams\cf0 ))))\cf3 \
+\cf0 	(\cf2 define\cf3  \cf2 pulling\cf3  \cf0 (\cf2 mem\cf3  \cf0 (\cf2 lambda\cf3  \cf0 (\cf2 player\cf3  \cf2 match\cf0 )\cf3  \cf0 (\cf2 +\cf3  \cf0 (\cf2 strength\cf3  \cf2 player\cf0 )\cf3  \cf0 (\cf2 gaussian\cf3  \cf4 0\cf3  \cf4 0.5\cf0 )))))\cf3 \
+\cf0 	(\cf2 define\cf3  \cf2 team-pulling\cf3  \cf0 (\cf2 mem\cf3  \cf0 (\cf2 lambda\cf3  \cf0 (\cf2 team\cf3  \cf2 match\cf0 )\cf3  \
 \'a0 \'a0 \'a0 \'a0 \'a0 \'a0 \'a0 \'a0 \'a0 \'a0 \'a0 \'a0 \'a0 \'a0 \'a0 \'a0 \'a0 \cf0 (\cf2 sum\cf3  \cf0 (\cf2 map\cf3 \'a0\cf0 (\cf2 lambda\cf3 \'a0\cf0 (\cf2 x\cf0 )\cf3 \'a0\cf0 (\cf2 pulling\cf3 \'a0\cf2 x\cf3 \'a0\cf2 match\cf0 ))\cf3 \'a0\cf0 (\cf2 players-on-team\cf3  \cf2 team\cf0 ))))))\cf3 \
-\'a0 \'a0 \'a0 \'a0 \'a0\'a0\
-(\cf2 define\cf3  \cf0 (\cf2 winner\cf3  \cf2 match\cf0 )\cf3  \
+\'a0 \'a0 \'a0\
+	(define (in-match? player) (some (map (lambda (x) ()) (select num-matches matches)))))\
+\
+	(define interp (if (flip) 'sw 'ow))\
+	(define sw-interp (\
+\
+	(\cf2 define\cf3  \cf0 (\cf2 winner\cf3  \cf2 match\cf0 )\cf3  \
 \'a0 \'a0 \'a0 \'a0    \cf0 (\cf2 let\cf3  \cf0 ([\cf2 teamA\cf3  \cf0 (\cf2 first\cf3  \cf0 (\cf2 teams-in-match\cf3  \cf2 match\cf0 ))]\cf3 \
 \'a0 \'a0 \'a0 \'a0 \'a0 \'a0 \'a0 \'a0 \'a0\cf0 [\cf2 teamB\cf3  \cf0 (\cf2 second\cf3  \cf0 (\cf2 teams-in-match\cf3  \cf2 match\cf0 ))])\cf3 \
 \'a0 \'a0 \'a0 \'a0 \'a0 \'a0 \'a0\'a0\cf0 (\cf2 if\cf3  \cf0 (\cf2 >\cf3  \cf0 (\cf2 team-pulling\cf3  \cf2 teamA\cf3 \'a0\cf2 match\cf0 )\cf3  \cf0 (\cf2 team-pulling\cf3  \cf2 teamB\cf3 \'a0\cf2 match\cf0 ))\cf3 \
 \'a0 \'a0 \'a0 \'a0 \'a0 \'a0 \'a0 \'a0 \'a0\'a0\cf2 teamA\cf3 \
 \'a0 \'a0 \'a0 \'a0 \'a0 \'a0 \'a0 \'a0 \'a0\'a0\cf2 teamB\cf0 )))\
 \
-(strength 'bob)\
+	interp\
 \
-(and\
-    (equal? (players-on-team 'team1) '(Bob))\
-    (equal? (players-on-team 'team2) '(Jim))\
-    (equal? (teams-in-match 'match1) '(team1 team2))\
-    (equal? (winner 'match1) 'team1))\
+	(if (equal? interp 'sw)\
+		(equal? sw-interp #t)\
+		(equal? ow-interp #t)\
 )\cf3 \
 \'a0 \'a0 \'a0 \'a0 \'a0\'a0\
 \'a0}
