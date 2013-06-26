@@ -353,7 +353,7 @@ Notice that the team pulling is simply the sum of how hard each member is pullin
  \begin{lstlisting}[mathescape]
 (define players `(Bob Jim Mary Sue Bill Evan Sally Tim Joe Jane Terrence Kate))
 (define teams `(team1 team2 team3))
-(define matches `(match1 match2))
+(define matches `(match1 match2 match3 match4 match5 match6))
 
 (define gender (mem ($\lambda$ (p) (if (flip) `male `female))))
 (define gender-mean-strength (mem ($\lambda$ (g) (gaussian 0 2))))
@@ -484,14 +484,14 @@ Here the predicate \lstinline{lexical-item?} determines if the (remaining) utter
 %\todo[inline]{``remaining'' suggests we're already within the recursion---maybe we should ease the poor linguists into it a bit?}
 The function \lstinline{random-split} takes a string and returns the list of two substrings that result from splitting at a random position in the length of the string.
 The function \lstinline{random-combinator} chooses a random composition operator, such as left application or right composition. 
-We assume that the set of possible compositions is sufficient to perform any syntactic operations needed.\footnote{The set of composition operators includes at least forward and backward application and composition:
+We assume that the set of possible compositions is sufficient to perform any syntactic operations needed.\footnote{\label{composition}The set of composition operators includes at least forward and backward application and composition:
 \begin{itemize}
 \item \textbf{FA}: \lstinline{(lambda (A) (lambda (B) (A B)))}
 \item \textbf{BA}: \lstinline{(lambda (A) (lambda (B) (B A)))}
 \item \textbf{FC}: \lstinline{(lambda (A) (lambda (B) (lambda (x) (A (B x)))))}
 \item \textbf{BC}: \lstinline{(lambda (A) (lambda (B) (lambda (x) (B (A x)))))}
 \end{itemize}
-We generate quantifier scope ambiguities by including among the set of composition operators all possible combinations of \textbf{FA}, \textbf{BA}, \textbf{FC}, and \textbf{BC} with the type-shifting mechanisms of \citet{hendriks93}. 
+As discussed in section \ref{quantifiers}, we can generate quantifier scope ambiguities by including among the set of composition operators all possible combinations of \textbf{FA}, \textbf{BA}, \textbf{FC}, and \textbf{BC} with the type-shifting mechanisms of \citet{hendriks93}. 
 This treatment of quantifier scope is convenient, but others (e.g., quantifier raising or Skolem functions \cite{steedman12} ) could be implemented by complicating the syntactic or semantic mechanisms in various ways. 
 
 Our simple implementation of \lstinline{random-split} does not insert silent elements such as indices and PRO. 
@@ -566,10 +566,11 @@ Finally, we define some functional vocabulary---a few quantificational determine
 \item \lstinline{(define domain-of-individuals (union player team match))}
 \item \sv{every} = \lstinline[mathescape]{($\lambda$ (P) ($\lambda$ (Q) (all (map ($\lambda$ (x) (not (and (P x) (not Q x)))) domain-of-individuals))))}
 \item \sv{some} = \lstinline[mathescape]{($\lambda$ (P) ($\lambda$ (Q) (some (map ($\lambda$ (x) (and (P x) (Q x))) domain-of-individuals))))}
+\item \sv{most} = \lstinline[mathescape]{($\lambda$ (P) ($\lambda$ (Q) (> (proportion-true (map ($\lambda$ (x) (and (P x) (Q x))) domain-of-individuals)) .5)))}
 \item \sv{\text{-}est} = \lstinline[mathescape]{($\lambda$ (A) ($\lambda$ (N) ($\lambda$ (x) (= (argmax A x) (argmax ($\lambda$ (d) (some (map ($\lambda$ (x) (>= (A x) d)) N))))))))}
 %\item \sv{the} = \lstinline[mathescape]{($\lambda$ (P) ($\lambda$ (x) (P x)))} 
 \end{itemize}
-The interpretations of \emph{every} and \emph{some} are standard. 
+%The interpretations of \emph{every}, \emph{most}, and \emph{some} are standard. 
 The superlative morpheme \emph{-est} is defined so that, for example, \emph{strongest player} will denote a property that is true of Bill if and only if the greatest degree of strength that Bill possesses is equal to the greatest degree of strength that any player possesses.
 
 As an example of sequential interpretation by a literal listener, consider the output of the \lstinline{literal-listener} function in a variant of our explaining-away example from the previous section. 
@@ -600,7 +601,7 @@ Then the literal listener will respond to the utterances below exactly as he wou
 \end{itemize}
 \item Utterance 4: ``Team 1 won Match 1.''
 \begin{itemize}
-\item Possible interpretation: \textbf{BA}(\sv{Jim})(\textbf{FA}(\sv{be\ on})(\sv{Team\ 2}))
+\item Possible interpretation: \textbf{BA}(\sv{Team\ 1})(\textbf{FA}(\sv{won})(\sv{Match\ 1}))
 \item [$\equiv$] \sv{won}(\sv{Match\ 1})(\sv{Team\ 1})
 \item [$=$] \lstinline[mathescape]{((($\lambda$ (match) ($\lambda$ (x) (equal? x (winner match)))) `match1) `team1)}
 \item [$\equiv$] \lstinline{(equal? `team1 (winner `match1))}
@@ -636,7 +637,7 @@ That is, because there is uncertainty about the strengths of all players, in pri
 However, the utterance is more likely to be true if Jim's strength falls into the lower tail of the prior distribution. 
 Conditioning via \lstinline{query} automatically integrates these two sources of uncertainty, concluding that utterance 5 favors low values of \lstinline{(strength `Jim)} and adjusting the inferred strength of his opponent Bob accordingly. 
 
-\subsection{Ambiguity}
+\subsection{\label{quantifiers}Ambiguity}
 The \lstinline{meaning} function will frequently associate utterances with multiple interpretations. Ambiguities can arise due to any of the following:
 \begin{itemize}
 \item Syntactic: \lstinline{random-split} will generate possibly different syntactic structures for an utterance on each evaluation. 
@@ -649,44 +650,72 @@ One of the crucial advantages of our architecture for language understanding is 
 When a sentence is ambiguous in any of these ways, the listener will favor plausible interpretations over implausible ones, because the interpreter's model of the world is more likely to generate scenarios which make the sentence true under these interpretations. 
 Implausible interpretations, on the other hand, lead to frequent rejection by \lstinline{query} due to their inconsistency with background information.
 
-For example, consider the utterance ``Every player played in some match''. 
-Depending on the composition operators used by the \lstinline{meaning} function in a given application, two interpretations are possible:\footnote{As mentioned above, we use the type-shifting mechanisms described in \citet{hendriks93,barker05} to generate this ambiguity from the given utterance.
-Note that in the approach described here the composition operations always combine the meanings of two syntactic sisters. 
-This means that the set of composition operators must include variants of forward and backward application and composition which apply one or more of Hendriks' unary type-shifting operators to their arguments.
-%
-% give an example - AR 
-%
+For example, consider the utterance ``Most players played in some match''. 
+Depending on the composition operators used by the \lstinline{meaning} function in a given application, two interpretations are possible:
+\footnote{
+We generate this ambiguity by including among the composition operations which may be selected by the \lstinline{random-combinator} function all combinations of application and composition with the type-shifting mechanisms described in \citet{hendriks93,barker05}.
+Formally, this means that \lstinline{random-combinator} is defined as a a function which selects a composition operator $\mathit{Op}$ and then performs a stochastic recursion: depending on the outcome of a coin flip, \lstinline{random-combinator} will either output $\mathit{Op}$ or select a type-shifter $\mathcal{T}$, apply $\mathcal{T}$ to one of the arguments of $\mathit{Op}$ at random, and flip another coin to determine whether to output the result or select another type-shifter and repeat.
+%\begin{lstlisting}[mathescape]
+%(define (random-combinator)}
+%  (let ([Op (uniform-draw `(FA BA FC BC ...))])
+%    (if (flip) Op
+%      (random-shift Op (random-type-shifter)))))
+%(define (random-type-shifter) (uniform-draw `(AR1 AR2 VR ...)))
+%(define (random-shift Op type-shifter)
+%  (let ([shifted (if (flip)
+%    ($\lambda$ (arg1 arg2) (Op (type-shifter arg1) arg2))
+%    ($\lambda$ (arg1 arg2) (Op arg1 (type-shifter arg2))))])
+%      (if (flip) shifted
+%        (random-shift shifted (random-type-shifter)))))
+%\end{lstlisting}
+
+For example, the object wide scope reading of ``Most players played in some match'' obtains when the meaning function proceeds as follows: 
+$$
+\mathbf{BA}(\mathbf{FA}(\sv{most})(\sv{players})
+(\mathbf{FA}(\mathbf{AR}_1(\mathbf{AR}_2(\sv{played\ in})))
+(\mathbf{FA}(\sv{some})(\sv{match})))),
+$$  
+where $\mathbf{AR}_1 = \lambda f \lambda x \lambda y [x(\lambda z . [f(z)] (y))]$, $\mathbf{AR}_2 = \lambda f \lambda x \lambda y [y(\lambda z . [f(x)] (z))]$ \cite[cf.][pp.453ff.]{barker05}, and $\mathbf{BA}$ and $\mathbf{FA}$ are defined as in footnote \ref{composition}.
 }
+\todo[inline]{Noah: can't get the Church code in the footnote to typeset correctly --- needed to implement type-shifting treatment of quantifier scope. Or do you think we should just describe it in prose as I did?}
 \begin{itemize}
-\item ``For every player $x$, there was a match $y$ such that $x$ played in $y$.'' 
-\item ``For some match $y$, every player played in $y$.''
+\item ``For most players $x$, there was a match $y$ such that $x$ played in $y$.'' 
+\item ``For some match $y$, most players played in $y$.''
 \end{itemize}
-We can manipulate the plausibility of each of these interpretations by varying the number of players on each team, the number of matches, and the mechanism by which teams are selected to play in matches. 
-At one extreme, suppose that the listener has observed that each team has two individuals in it and  (as the theory in Figure \ref{theory} already implies) that only two matches was played:
+We can manipulate the plausibility of each of these interpretations by varying the number of players on each team, the number of matches, or the mechanism by which teams are selected to play in matches. 
+For example, suppose that the listener has observed that each team has two individuals in it:
 \begin{lstlisting}
 (query
   ...ToW theory...
   (eval QUD)
   (and 
     (= team-size 2)
-    (eval (meaning `(every player played in some match)))))
+    (eval (meaning `(most players played in some match)))))
 \end{lstlisting}
+Given that there are twelve players and six matches in the ToW theory (fig.\ \ref{theory}), the reading with the object \emph{some match} taking wide scope is clearly false: only four players could be in any given match, and this reading requires more than half of the twelve to be involved. 
+However, the reading with \emph{most players} taking wide scope could be true in this scenario if no one played twice. 
+Because 
 
-%
-% cont from here
-% 
+On the other extreme, if the listener were to observe that the \lstinline{team-size} is 4 or greater, both readings would be compatible with this observation. The object wide scope reading increases in plausibility as \lstinline{team-size} increases to its maximum possible value of 6. Figure \ref{quantifier-scope-ambiguity} displays the results of a simulation showing the relationship between \lstinline{team-size} and the probability of the two readings of this utterance.
+
+%\begin{figure}[tbh]
+%\begin{center}
+%\includegraphics[scale=.65]{quantifiers.pdf}
+%\end{center}
+%\label{quantifier-scope-ambiguity}
+%\caption{}
+%\end{figure} 
 
 This model predicts that structural ambiguities should behave in a similar way. Suppose we were to enrich the ToW model and lexicon to accommodate utterances such as ``Bill hit the player with the ball''. 
 With no background information to constrain interpretation, either interpretation of this utterance might be appropriate, and a true ambiguity is felt. 
 However, one of the two possible interpretations is more likely to be true than the other, the literal listener will automatically prefer the parse which generates the more probable interpretation.
 In the limit, if one interpretation has zero prior probability, the syntactic ambiguity will not be felt because the interpretation that it generates will always be rejected by the \lstinline{query} function embedded in the definition of the literal listener.
 The model predicts that these preferences should display continuous variation between the extremes of assigning equal probability to both and assigning probability 1 to one parse.
-Psycholinguistic evidence supports the claim that background information affects the syntactic structures assigned to ambiguous sentences in this way \citep{crainsteedman85,altmannsteedman88,spiveyetal02}.
+Psycholinguistic research has demonstrated that background information affects the syntactic structures assigned to ambiguous sentences in this way \citep{crainsteedman85,altmannsteedman88,spiveyetal02}.
 
 Lexical uncertainty will not be our focus here, but we should mention two prominent cases: lexical ambiguity and graded meanings. 
 Lexical ambiguities of the ``bank''/``bank'' variety could be treated either by having the \lstinline{lexicon} function map ``bank'' to either of two discrete meanings, or by assuming that the latent mechanism which divides utterances into words recognizes two distinct words with this phonological realization.
 Intrinsically graded (e.g., prototype) meanings are most naturally thought of as stochastically denoting regions of a non-discrete conceptual space. 
-\todo[inline]{Just a quick first pass --- Noah, I suspect you'll want to have a look at this paragraph, and section, and put your own spin on it.}
 
 \subsection{Probabilistic meanings}
  \todo[inline]{This section may be vestigial. it would be nice to somewhere mention that rescaling beliefs is a general mechanism, and that this is equivalent to query. Maybe put this wherever we discuss sequential conditioning as way to update on several sentences...} 
@@ -814,13 +843,8 @@ to the meaning of \emph{-est}: it would first bind the degree locally, then proc
   (>= (strength 'John) d))
 \end{lstlisting}
 To understand this distribution, we can look at the prior (marginal) distributions over \lstinline{d} and John's strength, and the corresponding posteriors.
-<<<<<<< HEAD
 \todo{Run this simulation. Put in figure. (Note, we want this for SALT paper too!)}
 The threshold variable has been influenced by context as expected: it changes from its prior to a posterior that makes the utterance likely to be true. However, this gives us the wrong interpretation of ``John is strong''! What is missing is the pressure to adjust \lstinline{d} so that the sentence is not only true, but also \emph{informative}. 
-=======
-\todo{Dan: Run this simulation. Put in figure. (Note, we want this for SALT paper too!)}
-The threshold variable has been influenced by context as expected: it changes from its prior to a posterior that makes the utterance likely to be true. However, this gives us the wrong interpretation of ``John is strong''! What is missing is the pressure to adjust \lstinline{d} so that the sentence is not only true, but also \emph{informative}. 
->>>>>>> dfa862309b1f1d964af3df7da14821df8b538c1e
 
 Simply including the informative speaker and pragmatic listener models as defined above is not enough: without additional changes the index variables will still be inferred at the level of literal listener with no pragmatic pressures. \todo{Dan: verify that claim. put in simulation result if its interesting..} Instead, we lift the index variables to the pragmatic level. Imagine a pragmatic listener who believes that the index variables have values that she happens not to know, but which are otherwise common knowledge (i.e. known by the speaker, who assumes they are known by the listener):
 \begin{lstlisting}
