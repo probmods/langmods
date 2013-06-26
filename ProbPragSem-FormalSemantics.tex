@@ -608,7 +608,8 @@ Implausible interpretations, on the other hand, lead to frequent rejection by \l
 
 For example, consider the utterance ``Every player played in some match''. 
 Depending on the composition operators used by the \lstinline{meaning} function in a given application, two interpretations are possible:
-\footnote{We generate this ambiguity by including among the composition operations which may be selected by the \lstinline{random-combinator} function all combinations of application and composition with the type-shifting mechanisms described in \citet{hendriks93,barker05}.
+\footnote{
+We generate this ambiguity by including among the composition operations which may be selected by the \lstinline{random-combinator} function all combinations of application and composition with the type-shifting mechanisms described in \citet{hendriks93,barker05}.
 Formally, this means that \lstinline{random-combinator} is defined as a a function which selects a composition operator $\mathit{Op}$ and then performs a stochastic recursion: depending on the outcome of a coin flip, \lstinline{random-combinator} will either output $\mathit{Op}$ or select a type-shifter $\mathcal{T}$, apply $\mathcal{T}$ to one of the arguments of $\mathit{Op}$ at random, and flip another coin to determine whether to output the result or select another type-shifter and repeat.
 %\begin{lstlisting}[mathescape]
 %(define (random-combinator)}
@@ -623,13 +624,15 @@ Formally, this means that \lstinline{random-combinator} is defined as a a functi
 %      (if (flip) shifted
 %        (random-shift shifted (random-type-shifter)))))
 %\end{lstlisting}
+
 For example, the object wide scope reading of ``Every player played in some match'' obtains when the meaning function proceeds as follows: 
 $$
 \mathbf{BA}(\mathbf{FA}(\sv{Every})(\sv{player})
 (\mathbf{FA}(\mathbf{AR}_1(\mathbf{AR}_2(\sv{played\ in})))
 (\mathbf{FA}(\sv{some})(\sv{match})))),
 $$  
-where $\mathbf{AR}_1 = \lambda f \lambda x \lambda y [x(\lambda z . [f(z)] (y))]$, $\mathbf{AR}_2 = \lambda f \lambda x \lambda y [y(\lambda z . [f(x)] (z))]$ \cite[cf.][pp.453ff.]{barker05}, and $\mathbf{BA}$ and $\mathbf{FA}$ are defined as in footnote \ref{composition}.}
+where $\mathbf{AR}_1 = \lambda f \lambda x \lambda y [x(\lambda z . [f(z)] (y))]$, $\mathbf{AR}_2 = \lambda f \lambda x \lambda y [y(\lambda z . [f(x)] (z))]$ \cite[cf.][pp.453ff.]{barker05}, and $\mathbf{BA}$ and $\mathbf{FA}$ are defined as in footnote \ref{composition}.
+}
 \todo[inline]{I can't get the Church code in the footnote to typeset correctly --- needed to implement type-shifting treatment of quantifier scope.}
 \begin{itemize}
 \item ``For every player $x$, there was a match $y$ such that $x$ played in $y$.'' 
