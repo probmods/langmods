@@ -93,7 +93,7 @@
 \abstract{}
 
 
-\pagebreak
+
 
 \tableofcontents
 
@@ -220,21 +220,21 @@ From this it is a simple calculation to verify that we can perform the condition
 %Dan: Also, worth mentioning that the independence assumption isn't required to justify sequential conditioning as opposed to all-at-once.
 %Noah: well independent given H is required...
 
-\subsection{Stochastic Lambda Calculus}
+\subsection{Stochastic Lambda Calculus and Church}
 
 Probability as described so far provides a notation for indicating degrees of belief and conditional information, but requires that the actual probability distributions be specified separately (for example by writing down the numbers in a table); this quickly becomes unmanageable when we wish to describe complex knowledge---relations among many beliefs. 
 The stochastic lambda calculus (SLC) provides a formal, compositional language for describing probabilities over complex sets of interrelated beliefs. 
 We assume some familiarity with the (deterministic) lambda calculus \cite{lambda}. 
-At its core SLC simply extends the lambda calculus with a primitive operator for random choice between two expressions and an additional reduction rule that reduces such a choice expression to its left or right sub-expression with equal probability. 
-While this reduction process results in a single expression after any sequence of reductions, it can be viewed as a distribution over such reduction sequences, and hence a distribution over the final expression: SLC expressions denote (sub-)distributions over normal form SLC expressions. 
+At its core SLC simply extends the lambda calculus with an expression type $(L \oplus R)$, indicating random choice between the sub-expressions $L$ and $R$, and an additional reduction rule that reduces such a choice expression to its left or right sub-expression with equal probability. 
+While this reduction process results in a single expression after any sequence of reductions, it can be viewed as a distribution over such reduction sequences, and hence a distribution over the final expression: SLC expressions denote (sub-)distributions over completely reduced SLC expressions. 
 It can be shown that this system can represent any computable distribution in an appropriate sense \cite[see for example][]{PfefferRamsey,FreeRoy}.
 
 This simple calculus is universal but cumbersome to work with. 
-\cite{Goodman} introduce Church, an enriched SLC that can be realized as a \emph{probabilistic programming language}, just as the programming language LISP is an enriched lambda calculus. Church starts with the pure subset of Scheme (which is itself essentially lambda calculus enriched with primitive data types and operators, and useful syntax) and extends it with elementary random primitives (ERPs), the inference function \lstinline{query}, and the memoization function \emph{mem}. 
-We next describe key pieces of the language semantics; further details and examples of Church can be found at \url{church web}.
-In what follows we will assume passing familiarity with the Polish notation used in LISP-family languages, and will occasionally build on ideas from programming languages---\cite{SICP} is an excellent background on these ideas. 
+\cite{Goodman} introduce Church, an enriched SLC that can be realized as a \emph{probabilistic programming language}, just as the programming language LISP is an enriched lambda calculus. Church starts with the pure subset of Scheme (which is itself essentially lambda calculus enriched with primitive data types, operators, and useful syntax) and extends it with elementary random primitives (ERPs), the inference function \lstinline{query}, and the memoization function \emph{mem}. 
+We next describe key pieces of the language semantics; further details and examples of using Church for cognitive modeling can be found at \url{http://bit.ly/ProbMods}.
+In what follows we will assume passing familiarity with the Polish notation used in LISP-family languages (fully parenthesized and operator initial), and will occasionally build on ideas from programming languages---\cite{SICP} is an excellent background on these ideas. 
 
-Rather than restricting to uniform random choice between two options (which is sufficient, but results in extremely cumbersome programs), Church include an interface for adding elementary random primitives (ERPs). These are procedures that return random values; a sequence of evaluations of such and ERP procedure is assumed to result in independent identically distributed (i.i.d.) values. Common ERPs include Bernoulli (\lstinline{flip}), uniform, gaussian, etc. While the ERPs themselves are i.i.d., it is straightforward to construct Church procedures out of the ERPS that are not i.i.d. For instance:
+Rather than restricting to the $\oplus$ uniform random choice between two options (which is sufficient, but results in extremely cumbersome programs), Church include an interface for adding elementary random primitives (ERPs). These are procedures that return random values; a sequence of evaluations of such and ERP procedure is assumed to result in independent identically distributed (i.i.d.) values. Common ERPs include Bernoulli (\lstinline{flip}), uniform, gaussian, etc. While the ERPs themselves are i.i.d., it is straightforward to construct Church procedures out of the ERPS that are not i.i.d. For instance:
 \begin{lstlisting}[mathescape]
 (define bias (uniform 0 1))
 (define coin ($\lambda$ () (flip bias)))
