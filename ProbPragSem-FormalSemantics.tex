@@ -225,7 +225,7 @@ From this it is a simple calculation to verify that we can perform the condition
 Probability as described so far provides a notation for indicating degrees of belief and conditional information, but requires that the actual probability distributions be specified separately (for example by writing down the numbers in a table); this quickly becomes unmanageable when we wish to describe complex knowledge---relations among many beliefs. 
 The stochastic lambda calculus (SLC) provides a formal, compositional language for describing probabilities over complex sets of interrelated beliefs. 
 We assume some familiarity with the (deterministic) lambda calculus \cite{lambda}. 
-At its core SLC simply extends the lambda calculus with a primitive operator for random choice between two expressions and an additional reduction rule that reduces such a choice expression to it's left or right sub-expression with equal probability. 
+At its core SLC simply extends the lambda calculus with a primitive operator for random choice between two expressions and an additional reduction rule that reduces such a choice expression to its left or right sub-expression with equal probability. 
 While this reduction process results in a single expression after any sequence of reductions, it can be viewed as a distribution over such reduction sequences, and hence a distribution over the final expression: SLC expressions denote (sub-)distributions over normal form SLC expressions. 
 It can be shown that this system can represent any computable distribution in an appropriate sense \cite[see for example][]{PfefferRamsey,FreeRoy}.
 
@@ -631,9 +631,13 @@ When a sentence is ambiguous in any of these ways, the listener will favor plaus
 Implausible interpretations, on the other hand, lead to frequent rejection by \lstinline{query} due to their inconsistency with background information.
 
 For example, consider the utterance ``Every player played in some match''. 
-Depending on the composition operators which the \lstinline{meaning} function selects, two interpretations are possible:\footnote{See \citet{hendriks93,barker05} for discussion of the mechanics of generating this ambiguity from the given utterance without syntactic movement. 
-Note that in the approach described here the composition operations are all two-place. 
-This means that the set of available composition operators must include variants of forward and backward application and composition which apply one or more of Hendriks' unary type-shifting operators to their arguments.}
+Depending on the composition operators used by the \lstinline{meaning} function in a given application, two interpretations are possible:\footnote{As mentioned above, we use the type-shifting mechanisms described in \citet{hendriks93,barker05} to generate this ambiguity from the given utterance.
+Note that in the approach described here the composition operations always combine the meanings of two syntactic sisters. 
+This means that the set of composition operators must include variants of forward and backward application and composition which apply one or more of Hendriks' unary type-shifting operators to their arguments.
+%
+% give an example - AR 
+%
+}
 \begin{itemize}
 \item ``For every player $x$, there was a match $y$ such that $x$ played in $y$.'' 
 \item ``For some match $y$, every player played in $y$.''
@@ -791,15 +795,20 @@ to the meaning of \emph{-est}: it would first bind the degree locally, then proc
   (>= (strength 'John) d))
 \end{lstlisting}
 To understand this distribution, we can look at the prior (marginal) distributions over \lstinline{d} and John's strength, and the corresponding posteriors.
+<<<<<<< HEAD
+\todo{Run this simulation. Put in figure. (Note, we want this for SALT paper too!)}
+The threshold variable has been influenced by context as expected: it changes from its prior to a posterior that makes the utterance likely to be true. However, this gives us the wrong interpretation of ``John is strong''! What is missing is the pressure to adjust \lstinline{d} so that the sentence is not only true, but also \emph{informative}. 
+=======
 \todo{Dan: Run this simulation. Put in figure. (Note, we want this for SALT paper too!)}
-The threshold variable has been influenced by context as expected: it changes from it's prior to a posterior that makes the utterance likely to be true. However, this gives us the wrong interpretation of ``John is strong''! What is missing is the pressure to adjust \lstinline{d} so that the sentence is not only true, but also \emph{informative}. 
+The threshold variable has been influenced by context as expected: it changes from its prior to a posterior that makes the utterance likely to be true. However, this gives us the wrong interpretation of ``John is strong''! What is missing is the pressure to adjust \lstinline{d} so that the sentence is not only true, but also \emph{informative}. 
+>>>>>>> dfa862309b1f1d964af3df7da14821df8b538c1e
 
 Simply including the informative speaker and pragmatic listener models as defined above is not enough: without additional changes the index variables will still be inferred at the level of literal listener with no pragmatic pressures. \todo{Dan: verify that claim. put in simulation result if its interesting..} Instead, we lift the index variables to the pragmatic level. Imagine a pragmatic listener who believes that the index variables have values that she happens not to know, but which are otherwise common knowledge (i.e. known by the speaker, who assumes they are known by the listener):
 \begin{lstlisting}
 (define (listener utterance QUD)
   (query
     ...theory...
-    (define index (index prior))
+    (define index (index-prior))
     (define val (eval QUD))
     val
     (equal? utterance (speaker val QUD index))))
@@ -941,7 +950,7 @@ Another interpretation of this modeling approach (indeed, the original interpret
 \item strong: $\lambda x . \mathit{strength}(x) > \theta_{\mathit{strong}}$
 \item score1, score2: auxiliary functions with apply to a match and return the score of the team listed first/second 
 \item close: $\lambda x . \mathit{match}(x): \mathit{score1}(x) - \mathit{score2}(x)| < \theta_{\mathit{close}}$ [presupposes argument is a match, asserts it was theta-close]
-\item the: a choice function, i.e., a function from a property to some individual who satisfies the property; the prior distribution is uniform over all individuals who have the property. (The graded salience effects should kick in at L1, in reasoning about who it's more likely that the speaker would be talking about.)
+\item the: a choice function, i.e., a function from a property to some individual who satisfies the property; the prior distribution is uniform over all individuals who have the property. (The graded salience effects should kick in at L1, in reasoning about who its more likely that the speaker would be talking about.)
 \item less: a function from an adjective (\emph{close, strong}) and a degree $d$ to properties of individuals $x$, returning true iff the adjective holds of $x$ to a degree less than $d - \epsilon$. By default, $r = 0$. 
 \item A little: a modifier of \emph{less} s.t.\ , where epsilon is a free parameter which we can vary to make the point about how the sorites works.
 \item -est: function from domains and adjectives to adjectives, where the latter is true only of individuals with argmax degree of the property in the domain
