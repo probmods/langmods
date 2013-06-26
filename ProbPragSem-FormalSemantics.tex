@@ -334,7 +334,7 @@ Notice that the team pulling is simply the sum of how hard each member is pullin
  \begin{lstlisting}[mathescape]
 (define players `(Bob Jim Mary Sue Bill Evan Sally Tim Joe Jane Terrence Kate))
 (define teams `(team1 team2 team3))
-(define matches `(match1 match2))
+(define matches `(match1 match2 match3 match4 match5 match6))
 
 (define gender (mem ($\lambda$ (p) (if (flip) `male `female))))
 (define gender-mean-strength (mem ($\lambda$ (g) (gaussian 0 2))))
@@ -663,7 +663,7 @@ where $\mathbf{AR}_1 = \lambda f \lambda x \lambda y [x(\lambda z . [f(z)] (y))]
 \item ``For some match $y$, every player played in $y$.''
 \end{itemize}
 We can manipulate the plausibility of each of these interpretations by varying the number of players on each team, the number of matches, and the mechanism by which teams are selected to play in matches. 
-At one extreme, suppose that the listener has observed that each team has two individuals in it and  (as the theory in Figure \ref{theory} already implies) that only two matches was played:
+At one extreme, suppose that the listener has observed that each team has two individuals in it and  (as the model in figure \ref{theory} already implies) that six matches were played:
 \begin{lstlisting}
 (query
   ...ToW theory...
@@ -672,7 +672,7 @@ At one extreme, suppose that the listener has observed that each team has two in
     (= team-size 2)
     (eval (meaning `(every player played in some match)))))
 \end{lstlisting}
-
+Given that there are twelve players, the reading with \emph{some match} taking wide scope is clearly false in this scenario: only four players could be in any given match. However, the reading with \emph{every player} taking wide scope could be true in this scenario if no one played twice. 
 %
 % cont from here
 % 
