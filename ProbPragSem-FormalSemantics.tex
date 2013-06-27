@@ -354,7 +354,7 @@ Notice that the team pulling is simply the sum of how hard each member is pullin
  \begin{lstlisting}[mathescape]
 (define players `(Bob Jim Mary Sue Bill Evan Sally Tim Joe Jane Terrence Kate))
 (define teams `(team1 team2 team3))
-(define matches `(match1 match2 match3 match4 match5 match6))
+(define matches `(match1 match2 match3 match4))
 
 (define gender (mem ($\lambda$ (p) (if (flip) `male `female))))
 (define gender-mean-strength (mem ($\lambda$ (g) (gaussian 0 2))))
@@ -639,7 +639,8 @@ However, the utterance is more likely to be true if Jim's strength falls into th
 Conditioning via \lstinline{query} automatically integrates these two sources of uncertainty, concluding that utterance 5 favors low values of \lstinline{(strength `Jim)} and adjusting the inferred strength of his opponent Bob accordingly. 
 
 \subsection{\label{quantifiers}Ambiguity}
-The \lstinline{meaning} function will frequently associate utterances with multiple interpretations. Ambiguities can arise due to any of the following:
+The \lstinline{meaning} function will frequently associate utterances with different interpretations on different evaluations. 
+Ambiguities can arise due to any of the following:
 \begin{itemize}
 \item Syntactic: \lstinline{random-split} will generate possibly different syntactic structures for an utterance on each evaluation. 
 If more than one of these structures is interpretable using the composition operators available, the literal listener may entertain interpretations with different syntactic structures.
