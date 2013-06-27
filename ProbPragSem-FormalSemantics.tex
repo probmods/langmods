@@ -101,66 +101,35 @@
 
 \todo[inline]{bibliography! we have a lot of reference chasing to do..}
 
-\todo[inline]{noah: clean up intro.}
-
-Words are used to communicate ideas. Ideas are mental tools for coping with a complex and uncertain world. This implies that human conceptual structures should be key to word meaning, and that probability, the mathematics of uncertainty, should be indispensable for describing both language and thought. Indeed, probabilistic models have proven enormously useful in modeling human cognition \cite{Tenenbaum, etc}, and aspects of natural language \cite{ChaterManning}. Natural language semantics and pragmatics have only recently been attacked with probabilistic tools. In this chapter we synthesize several of these modeling advances, exploring a formal model of semantics grounded, via pragmatic inference, in core conceptual structures.
-
-
-
-%\todo[inline]{Noah: This intro (taken from the lexsem grant) needs to be edited into something short and to the point...}
-%
-%Words are potentially one of the clearest windows on human knowledge and conceptual structure. 
-%If we understood the connection between words and mental representation, we could gain critical insights into almost every aspect of psychology, construct vastly more useful thinking machines, and interface the two. 
-%But what do words mean? In this project we aim to {\bf construct and explore a formal model of lexical semantics grounded, via pragmatic inference, in core conceptual structures}. 
-%We will do so using a set of modeling tools---chiefly the probabilistic programming language Church \cite{goodman2008}---that we have previously developed and used to explain  aspects of high-level human cognition.
+Language is used to communicate ideas. Ideas are mental tools for coping with a complex and uncertain world. This implies that human conceptual structures should be key to language meaning, and that probability, the mathematics of uncertainty, should be indispensable for describing both language and thought. Indeed, probabilistic models are enormously useful in modeling human cognition \cite{Tenenbaum, etc}, and aspects of natural language \cite{ChaterManning}. Probabilistic tools have only recently been used for natural language semantics and pragmatics. In this chapter we synthesize several of these modeling advances, exploring a formal model of semantics grounded, via pragmatic inference, in core conceptual structures.
 
 Flexible human cognition is derived in large part from our ability to imagine possible worlds (or situations). 
-A rich set of concepts, intuitive theories, and other mental representations support imagining and reasoning about possible worlds---together we call these the conceptual lexicon. 
-%
-We can formalize the conceptual lexicon using probabilistic programming tools, viewing commonsense knowledge as a set of interrelated definitions (or concepts) in a probabilistic programming language. 
-Probabilistic programs specify sampling procedures over possible program executions, each execution fixes (some of) the variables that describe the world, hence each collection of concepts describes how to sample from a rich space of possible worlds. 
-The inference (or conditioning, or query) operator describes how to use these distributions on worlds for reasoning. 
-%
-We have been able to explain many inferences that humans draw from sparse evidence using these tools. 
-Here we posit that this collection of concepts also forms the set of primitive elements available for lexical semantics: word meanings can be built from the pieces of conceptual structure.
-
-However, the connection between core concepts and lexical semantics is not direct: 
+A rich set of concepts, intuitive theories, and other mental representations support imagining and reasoning about possible worlds---together we will call these the conceptual lexicon. 
+Here we posit that this collection of concepts also forms the set of primitive elements available for lexical semantics: word meanings can be built from the pieces of conceptual structure. Larger semantic structures are then built from word meanings by composition, ultimately resulting in a sentence meaning as a phrase in the ``language of thought'' provided by the conceptual lexicon.
+However, the connection between core concepts and semantics is not direct: 
 first, because language must flexibly adapt to the context of communication, the connection between lexical representation and interpreted meaning is mediated by pragmatic inference;
 second, sentence meanings act as constraints on possible worlds, via their truth-value, whereas core concepts describe generation of possible worlds.
-We propose to explore a model of language that formalizes and explains these differences, again using tools of probabilistic programming. 
 
-In recent work we have made preliminary progress at combining underspecified semantic representations with a general purpose pragmatic inference mechanism.
-This potentially allows us to account for subtle aspects of language use with relatively simple semantic denotations.
-%: aspects of conveyed meaning emerge from an interaction of semantic denotation with context and core conceptual structures.
-In particular, we view semantic representation as indivisible from core cognition, and the effective meaning of words as emerging from a pragmatic inference process. 
+There are thus a number of challenges to formalizing this view of language: how can we formalize the conceptual lexicon such that is described generation of possible worlds? How can we appropriately connect lexical meaning to this conceptual lexicon? How, within this system, do sentence meanings act as constraints on possible worlds and correspondingly how does composition within language relate to composition within world knowledge?  How can pragmatic inference be included in this process? How can we account for various forms of context flexibility that arise in natural language?
 
+
+%We can formalize the conceptual lexicon using probabilistic programming tools, viewing commonsense knowledge as a set of interrelated definitions (or concepts) in a probabilistic programming language. 
+%Probabilistic programs specify sampling procedures over possible program executions, each execution fixes (some of) the variables that describe the world, hence each collection of concepts describes how to sample from a rich space of possible worlds. 
+%The inference (or conditioning, or query) operator describes how to use these distributions on worlds for reasoning. 
+
+
+In this chapter we illustrate the use of probabilistic techniques in natural language pragmatics and semantics with a concrete formal model. This model is not meant to exhaust the space of possible probabilistic models, indeed dozens of extensions are immediately apparent, but rather to show that a probabilistic framework for natural language is possible and productive.
 Our approach is similar in spirit to cognitive semantics, in that we attempt to ground semantics in mental representation, but we draw on the highly successful tools of Bayesian cognitive science to formalize these ideas. 
 Similarly, our approach draws heavily on the progress made in formal model-theoretic semantics \cite{montague1973,heimkratzer1998}, borrowing insights about how syntax drives semantic composition, but we compose elements of stochastic logics rather than deterministic ones.
-%Finally, our approach is related to recent progress in robotics (and indeed our project will benefit from ongoing collaboration with roboticist Stefanie Tellex of Brown University), but is more systematic and systematically connected to cognitive and linguistic theory. 
+Finally, like game-theoretic approaches, we place an emphasis on the the refinement of meaning through interactional, pragmatic reasoning.
 
-%We propose to study lexical semantics in the setting of an architecture for language understanding that is described in section \ref{langaugemodels}. 
-%We first provide, in section \ref{background}, background on the probabilistic programming language Church and on using Church to describe core cognition. 
-%In section \ref{lex} we describe the case studies of lexical semantics that we propose to explore in this project. 
-%We will rely heavily on computational infrastructure for inference in the Church language; the models we propose push the envelope of what is currently possible and will require new inference techniques. 
-%In section \ref{infrastr} we describe proposed work on Church inference algorithms and implementations.
-%
-%Probabilities describe degrees of belief, and probabilistic inference describes rational reasoning under uncertainty. 
-%It is no wonder, then, that probabilistic models have exploded onto the scene of modern artificial intelligence, cognitive science, and applied statistics: these are all sciences of inference under uncertainty. 
-%But as probabilistic models have become more sophisticated, the tools to formally describe them and to perform probabilistic inference have wrestled with new complexity. 
-%Just as programming more than the simplest algorithms requires tools for abstraction and composition, complex probabilistic modeling requires new progress in model representation---\emph{probabilistic} programming languages. 
-%These languages provide compositional means for describing complex probability distributions; implementations of these languages provide \emph{generic} inference engines: tools for performing efficient probabilistic inference over an arbitrary program. 
-
-%By providing a uniform and universal representation for probabilistic models, probabilistic programming provides a framework for unifying disparate Bayesian models of human cognition. 
-%Indeed, while Bayesian models have been extremely influential in cognitive science \cite[e.g.][]{tenenbaum2011}, 
-%it is only recently that we have the tools to view the Bayesian approach as a general framework for mental representation.
-%We next give a brief introduction to probabilistic programming, then an indication of how these tools can be used for modeling human cognition.
-
-%make sure to have something like this:
-In this chapter we illustrate the use of probabilistic techniques in natural language pragmatics and semantics with a concrete formal model. This model is not meant to exhaust the space of possible probabilistic models, indeed dozens of extensions are immediately apparent, but rather to show that a probabilistic framework for natural language is possible and productive.
+In section \ref{commonsense} we provide background on probabilistic modeling and stochastic lambda calculus, and introduce the running example scenario: game of tug-of-war. In section \ref{literal} we provide a model of literal interpretation of natural language utterances and describe a formal fragment of english suitable for our running scenario. Using this fragment we illustrate the emergence of non-monotonic effects in interpretation and the interaction of ambiguity with background knowledge. In section \ref{pragmatics} we describe pragmatic interpretation of meaning as an inference that depends on an informative speaker, who depends on the literal interpretation listener. This extended notion of interpretation predicts a variety of quantity implicatures and connects to recent quantitative experimental results. In section \ref{indices} we discuss the role of semantic indices in this framework and show that binding these indices at the pragmatic level allows us to deal with several issues in context-sensitivity of meaning, such as the interpretation of scalar adjectives. We conclude with general comments about the role of uncertainty in pragmatics and semantics.
 
 
 
-\section{Bayesian models of commonsense reasoning}
+\section{Probabilistic models of commonsense reasoning}
+\label{commonsense}
+
 %\begin{itemize}
 
 %\item  Knowledge as generative model, 
@@ -435,6 +404,8 @@ These will be less important in what follows, but we note that they are potentia
 
  
 \section{Meaning as condition}
+\label{literal}
+
 \todo[inline]{Noah:
 What if any general motivation do we give here?
 
@@ -749,6 +720,7 @@ Intrinsically graded (e.g., prototype) meanings are most naturally thought of as
 
 
 \section{Pragmatic interpretation}
+\label{pragmatics}
 
 The \lstinline{literal-listener} described above treats utterances as true information about the world, updating her beliefs accordingly. 
 In real language understanding, however, utterances are taken as speech acts that inform the listener indirectly by conveying a speaker's intention. In this section we describe a version of the \emph{rational speech acts} model \cite{Goodman2013, Frank2012}, in which a sophisticated listener reasons about the intention of an informative speaker.
@@ -805,6 +777,7 @@ then do a version where there are two unnamed males, but only one of them was in
 
 
 \section{Semantic indices}
+\label{indices}
 
 In formal semantics \cite{montague} sentence meanings are often treated as intensions: functions from semantic indices to truth functions. The semantic theory has nothing to say about how to set these indices, only that they matter and (probably) depend on context. Yet we have already seen that a probabilistic theory of pragmatic interpretation can be used to describe the ways that context influences interpretation. Can we similarly use probabilistic tools to describe the ways that semantic indices are set based on context?
 We must first decide how semantic indices should enter into the probabilistic framework presented above (where we have so far treated meanings simply as truth functions). The simplest assumption would be that they are random variables that occur (unbound) in the meaning expression and are reasoned about by the literal listener:
@@ -897,13 +870,16 @@ Another interpretation of this modeling approach (indeed, the original interpret
 
 \section{Conclusion}
 
-\todo[inline]{noah: write a conclusion!}
+In this chapter we have illustrated the use of probabilistic modeling to study natural language semantics and pragmatics. On the one hand we have argued that uncertainty, formalized via probability, is a key organizing principle throughout language and cognition. On the other hand we have argued, by example, that we must still build detailed models of natural language architecture and structure. That is, probability provides a tool for better language modeling, which allows us to naturally capture many expects of the flexibility and power of language, but like any tool probabilistic modeling is only as good as the models it is used to create.
 
-\begin{itemize}
-\item  Kinds of variables: discrete, ordered, and continuous variables.
-\item  Roles for uncertainty: world knowledge, SF to LF translation, stochastic meanings, pragmatic coordination.
-\item  Pervasive uncertainty and joint inference: understanding is analyzable but not modular.
-\end{itemize}
+There are both a number of kinds of uncertainty and a number of roles for uncertainty in the architecture we have described.
+%\item  Kinds of variables: discrete, ordered, and continuous variables.
+%\item  Roles for uncertainty: world knowledge, SF to LF translation, stochastic meanings, pragmatic coordination.
+
+
+In the architecture we have described, uncertainty is pervasive through all aspects of language understanding. Pervasive uncertainty leads to complex interactions that can be described by joint inference of the many random choices involved in understanding. Joint inference in turn leads to a great deal of flexibility, from non-monotonic effects of explaining away (section \ref{literal}), through ambiguous compositional structure and pragmatic strengthening, to vagueness and context-specificity of indices. It is particularly important to note that even when the architecture specification is relatively modular, for instance separate specification of world knowledge (the \lstinline{...theory...}) and meaning interpretation (the \lstinline{meaning} function), the inferential effects in sentence interpretation will have complex, bi-directional interactions (as in the interaction of background knowledge and quantifier scope ambiguity in section \ref{literal}). That is, language understanding is analyzable but not modular
+
+
 
 
 \appendix
