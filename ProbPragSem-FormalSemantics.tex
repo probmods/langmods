@@ -810,23 +810,39 @@ We must first decide how semantic indices should enter into the probabilistic fr
 \end{lstlisting}
 Here we assume that a lexical item may contain an unbound occurrence of \lstinline{index} which is then bound during interpretation by  the \lstinline{(define index ...)} definition.
 Because there is now a joint inference over \lstinline{val} and \lstinline{index}, the index will tend to be set such that the utterance is most likely to be true. 
-To be concrete, consider the case of gradeable adjectives like \emph{strong}. In section \ref{lexicon} we have defined \sv{strong} = \lstinline[mathescape]{($\lambda$ (x) ($\lambda$ (d) (>= (strength x) d)))}, without specifying how \lstinline{d} is bound in sentences such as ``John is strong.'' 
+To be concrete, consider the case of gradable adjectives like \emph{strong}. In section \ref{lexicon} we have defined \sv{\mathit{strong}} = \lstinline[mathescape]{($\lambda$ (x) ($\lambda$ (d) (>= (strength x) d)))}, without specifying how \lstinline{d} is bound in sentences such as \emph{Bob is strong}.
 We could instead define \sv{strong} = \lstinline[mathescape]{($\lambda$ (x) (>= (strength x) d))}, allowing \lstinline{d} to be a free semantic index variable.\footnote{We would then have to make a corresponding change
 to the meaning of \emph{-est}: it would first bind the degree locally, then proceeded as above to saturate the threshold.}
- After applying the \lstinline{meaning} function (and simplifying composition) the utterance ``John is strong'' (with \lstinline{QUD} ``how strong is John?'') would be interpreted via:
+ After applying the \lstinline{meaning} function (and simplifying composition) the utterance ``Bob is strong'' (with \lstinline{QUD} ``how strong is Bob?'') would be interpreted via:
 \begin{lstlisting}
 (query
   ...theory...
   (define d (uniform))
-  (define val (strength 'John))
+  (define val (strength `Bob))
   val
-  (>= (strength 'John) d))
+  (>= (strength `Bob) d))
 \end{lstlisting}
-To understand this distribution, we can look at the prior (marginal) distributions over \lstinline{d} and John's strength, and the corresponding posteriors.
-\todo{Run this simulation. Put in figure. (Note, we want this for SALT paper too!)}
-The threshold variable has been influenced by context as expected: it changes from its prior to a posterior that makes the utterance likely to be true. However, this gives us the wrong interpretation of ``John is strong''! What is missing is the pressure to adjust \lstinline{d} so that the sentence is not only true, but also \emph{informative}. 
 
-Simply including the informative speaker and pragmatic listener models as defined above is not enough: without additional changes the index variables will still be inferred at the level of literal listener with no pragmatic pressures. \todo{Dan: verify that claim. put in simulation result if its interesting..} Instead, we lift the index variables to the pragmatic level. Imagine a pragmatic listener who believes that the index variables have values that she happens not to know, but which are otherwise common knowledge (i.e. known by the speaker, who assumes they are known by the listener):
+To understand this distribution, we can look at 
+%figure \ref{GAs-L0}, which plots 
+the prior (marginal) distributions over \lstinline{d} and Bob's strength, and the corresponding posteriors.
+\begin{figure}[tbh]
+\begin{center}
+\includegraphics[scale=.6]{strong-L0.pdf}
+\end{center}
+%\label{GAs-L0}
+\caption{The literal listener's interpretation of an utterance containing a free degree variable, assuming a maximally uninformative prior on the variable. 
+The inferred meaning is implausibly weak (see ``Degree posterior'', dotted line), and very little has been learned about the variable of interest (``Strength posterior'', dashed line).}
+\end{figure}
+The threshold variable has indeed been influenced by context: it changes from its prior to a posterior that makes the utterance likely to be true. 
+However, this is the wrong interpretation of \emph{Bob is strong}. Intuitively, what the listener ought to do is to adjust the estimate of Bob's strength to a fairly high value, relative to the prior estimate. 
+Instead, our literal listener increases the probability of the utterance's truth by sets the free variable in its meaning to an extremely low value, with the effect that \emph{Bob is strong} is true for virtually any height that Bob might plausibly have. 
+In addition, the listener has learned very little about the variable of interest from the utterance: the posterior distribution is barely shifted to the right of the prior.
+
+What is missing is the pressure to adjust \lstinline{d} so that the sentence is not only true, but also \emph{informative}. 
+Simply including the informative speaker and pragmatic listener models as defined above is not enough: without additional changes the index variables will still be inferred at the level of literal listener with no pragmatic pressures. 
+Instead, we lift the index variables to the pragmatic level. 
+Imagine a pragmatic listener who believes that the index variables have values that she happens not to know, but which are otherwise common knowledge (i.e. known by the speaker, who assumes they are known by the listener):\footnote{For simplicity we are assuming that it is clear from the argument structure whether the version of each function with or without indices is intended.}
 \begin{lstlisting}
 (define (listener utterance QUD)
   (query
@@ -848,8 +864,8 @@ Simply including the informative speaker and pragmatic listener models as define
     (define val (eval QUD))
     val
     (eval (meaning utterance index))))
-\end{lstlisting}\footnote{For simplicity we are assuming that it is clear from the argument structure whether the version of each function with or without indices is intended.}
-In most ways this is a very small change to the model, but it has important consequences. At a high level, the effect is that index variables will now be set in such a way that they both make the utterance likely to be true \emph{and} likely to be pragmatically useful (informative, relevant, etc); the tradeoff between these two factors results in significant contextual flexibility of the interpreted meaning. In the case of the adjective \emph{strong} we see \todo{put in model figure} that the threshold is now interpreted as roughly one standard deviation from the prior mean strength---hence \emph{strong} means significantly stronger than average, but does not require maximal strength (most informative) or permit any strength (most often true). This model of gradeable adjective interpretation (which was introduced in \cite{Lassiter2013}) has a number of appealing properties: for instance, it explains how background knowledge affects qualitative and quantitative aspects of adjective interpretation (see \cite{Lassiter2013}), and it explains why adjectives result in vaguest interpretation (see below).
+\end{lstlisting}
+In most ways this is a very small change to the model, but it has important consequences. At a high level, the effect is that index variables will now be set in such a way that they both make the utterance likely to be true \emph{and} likely to be pragmatically useful (informative, relevant, etc); the tradeoff between these two factors results in significant contextual flexibility of the interpreted meaning. In the case of the adjective \emph{strong} we see \todo{put in model figure} that the threshold is now interpreted as roughly one standard deviation from the prior mean strength---hence \emph{strong} means significantly stronger than average, but does not require maximal strength (most informative) or permit any strength (most often true). This model of gradable adjective interpretation (which was introduced in \cite{Lassiter2013}) has a number of appealing properties: for instance, it explains how background knowledge affects qualitative and quantitative aspects of adjective interpretation (see \cite{Lassiter2013}), and it explains why adjectives result in vaguest interpretation (see below).
 
 We can motivate from this example a general treatment of semantic indices: lift each index into the pragmatic inference, allowing them to bind free variables in the literal meaning, and reasoning over them jointly with world states. 
 When we don't know ahead of time which index variables will occur in the literal-listener utterance we need to generalize the above. 
@@ -951,7 +967,7 @@ Here we collect together the Church definitions forming our simple intuitive the
 \item "the teams in match1 were bob and jim. bob won match1." ... "jim is the weakest player." : initial graded inference about bob's strength. explaining away. initially think bob strong, then probably not.
 \subitem \textsv{the teams in match1 were bob and jim}= \lstinline{(equal? (teams-in-match `match1) `((Bob) (Jim)))}. (Note converting each person into the set which is his team....)
 \subitem \textsv{bob won match1}= \lstinline{(equal? (winner `match1) `(Bob))} (Note again converting Bob to his team.)
-\subitem \textsv{jim is the weakest player}= \lstinline{(equal? 'Jim (est (< (strength x) t) players))}  (Est has to grab the threshold and set it to highest value s.t. set is non-empty.) 
+\subitem \textsv{jim is the weakest player}= \lstinline{(equal? `Jim (est (< (strength x) t) players))}  (Est has to grab the threshold and set it to highest value s.t. set is non-empty.) 
 
 
 %\item  "teamA won match 3"
@@ -1663,7 +1679,7 @@ Desiderata for world / language fragment:
   -entailment related ref expr, for quantity implicature
   -ambiguous referring expressions, for horn implicature
   -quantifiers some/all, for scalar implicature 
-  -gradeable adjs, for vagueness
+  -gradable adjs, for vagueness
   -"saw" in order to get knowledge effects?
 
 sentences we want to handle:
