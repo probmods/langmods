@@ -16,6 +16,7 @@
 %\usepackage{stmaryrd}
 %\usepackage{amsfonts}
 \usepackage[small]{caption}
+%\usepackage{bigfoot} %to cram listings into footnotes
 
 \newcommand{\llbracket}{\ensuremath{\left [\!\left [}}%
 \newcommand{\rrbracket}{\ensuremath{\right ]\!\right ]}}
@@ -76,8 +77,6 @@
 %\pagestyle{empty}
  
 
-\newcommand{\theory}{...ToW theory...}
-
 
 \title{Uncertainty in Language and Thought}
 
@@ -100,65 +99,37 @@
 \pagebreak
 
 
+\todo[inline]{bibliography! we have a lot of reference chasing to do..}
 
-Words are used to communicate ideas. Ideas are mental tools for coping with a complex and uncertain world. This implies that human conceptual structures should be key to word meaning, and that probability, the mathematics of uncertainty, should be indispensable for describing both language and thought. Indeed, probabilistic models have proven enormously useful in modeling human cognition \cite{Tenenbaum, etc}, and aspects of natural language \cite{ChaterManning}. Natural language semantics and pragmatics have only recently been attacked with probabilistic tools. In this chapter we synthesize several of these modeling advances, exploring a formal model of semantics grounded, via pragmatic inference, in core conceptual structures.
-
-
-
-%\todo[inline]{Noah: This intro (taken from the lexsem grant) needs to be edited into something short and to the point...}
-%
-%Words are potentially one of the clearest windows on human knowledge and conceptual structure. 
-%If we understood the connection between words and mental representation, we could gain critical insights into almost every aspect of psychology, construct vastly more useful thinking machines, and interface the two. 
-%But what do words mean? In this project we aim to {\bf construct and explore a formal model of lexical semantics grounded, via pragmatic inference, in core conceptual structures}. 
-%We will do so using a set of modeling tools---chiefly the probabilistic programming language Church \cite{goodman2008}---that we have previously developed and used to explain  aspects of high-level human cognition.
+Language is used to communicate ideas. Ideas are mental tools for coping with a complex and uncertain world. This implies that human conceptual structures should be key to language meaning, and that probability, the mathematics of uncertainty, should be indispensable for describing both language and thought. Indeed, probabilistic models are enormously useful in modeling human cognition \cite{Tenenbaum, etc}, and aspects of natural language \cite{ChaterManning}. Probabilistic tools have only recently been used for natural language semantics and pragmatics. In this chapter we synthesize several of these modeling advances, exploring a formal model of semantics grounded, via pragmatic inference, in core conceptual structures.
 
 Flexible human cognition is derived in large part from our ability to imagine possible worlds (or situations). 
-A rich set of concepts, intuitive theories, and other mental representations support imagining and reasoning about possible worlds---together we call these the conceptual lexicon. 
-%
-We can formalize the conceptual lexicon using probabilistic programming tools, viewing commonsense knowledge as a set of interrelated definitions (or concepts) in a probabilistic programming language. 
-Probabilistic programs specify sampling procedures over possible program executions, each execution fixes (some of) the variables that describe the world, hence each collection of concepts describes how to sample from a rich space of possible worlds. 
-The inference (or conditioning, or query) operator describes how to use these distributions on worlds for reasoning. 
-%
-We have been able to explain many inferences that humans draw from sparse evidence using these tools. 
-Here we posit that this collection of concepts also forms the set of primitive elements available for lexical semantics: word meanings can be built from the pieces of conceptual structure.
-
-However, the connection between core concepts and lexical semantics is not direct: 
+A rich set of concepts, intuitive theories, and other mental representations support imagining and reasoning about possible worlds---together we will call these the conceptual lexicon. 
+Here we posit that this collection of concepts also forms the set of primitive elements available for lexical semantics: word meanings can be built from the pieces of conceptual structure. Larger semantic structures are then built from word meanings by composition, ultimately resulting in a sentence meaning as a phrase in the ``language of thought'' provided by the conceptual lexicon.
+However, the connection between core concepts and semantics is not direct: 
 first, because language must flexibly adapt to the context of communication, the connection between lexical representation and interpreted meaning is mediated by pragmatic inference;
 second, sentence meanings act as constraints on possible worlds, via their truth-value, whereas core concepts describe generation of possible worlds.
-We propose to explore a model of language that formalizes and explains these differences, again using tools of probabilistic programming. 
 
-In recent work we have made preliminary progress at combining underspecified semantic representations with a general purpose pragmatic inference mechanism.
-This potentially allows us to account for subtle aspects of language use with relatively simple semantic denotations.
-%: aspects of conveyed meaning emerge from an interaction of semantic denotation with context and core conceptual structures.
-In particular, we view semantic representation as indivisible from core cognition, and the effective meaning of words as emerging from a pragmatic inference process. 
+There are thus a number of challenges to formalizing this view of language: how can we formalize the conceptual lexicon such that is described generation of possible worlds? How can we appropriately connect lexical meaning to this conceptual lexicon? How, within this system, do sentence meanings act as constraints on possible worlds and correspondingly how does composition within language relate to composition within world knowledge?  How can pragmatic inference be included in this process? How can we account for various forms of context flexibility that arise in natural language?
 
+
+%We can formalize the conceptual lexicon using probabilistic programming tools, viewing commonsense knowledge as a set of interrelated definitions (or concepts) in a probabilistic programming language. 
+%Probabilistic programs specify sampling procedures over possible program executions, each execution fixes (some of) the variables that describe the world, hence each collection of concepts describes how to sample from a rich space of possible worlds. 
+%The inference (or conditioning, or query) operator describes how to use these distributions on worlds for reasoning. 
+
+
+In this chapter we illustrate the use of probabilistic techniques in natural language pragmatics and semantics with a concrete formal model. This model is not meant to exhaust the space of possible probabilistic models, indeed dozens of extensions are immediately apparent, but rather to show that a probabilistic framework for natural language is possible and productive.
 Our approach is similar in spirit to cognitive semantics, in that we attempt to ground semantics in mental representation, but we draw on the highly successful tools of Bayesian cognitive science to formalize these ideas. 
 Similarly, our approach draws heavily on the progress made in formal model-theoretic semantics \cite{montague1973,heimkratzer1998}, borrowing insights about how syntax drives semantic composition, but we compose elements of stochastic logics rather than deterministic ones.
-%Finally, our approach is related to recent progress in robotics (and indeed our project will benefit from ongoing collaboration with roboticist Stefanie Tellex of Brown University), but is more systematic and systematically connected to cognitive and linguistic theory. 
+Finally, like game-theoretic approaches, we place an emphasis on the the refinement of meaning through interactional, pragmatic reasoning.
 
-%We propose to study lexical semantics in the setting of an architecture for language understanding that is described in section \ref{langaugemodels}. 
-%We first provide, in section \ref{background}, background on the probabilistic programming language Church and on using Church to describe core cognition. 
-%In section \ref{lex} we describe the case studies of lexical semantics that we propose to explore in this project. 
-%We will rely heavily on computational infrastructure for inference in the Church language; the models we propose push the envelope of what is currently possible and will require new inference techniques. 
-%In section \ref{infrastr} we describe proposed work on Church inference algorithms and implementations.
-%
-%Probabilities describe degrees of belief, and probabilistic inference describes rational reasoning under uncertainty. 
-%It is no wonder, then, that probabilistic models have exploded onto the scene of modern artificial intelligence, cognitive science, and applied statistics: these are all sciences of inference under uncertainty. 
-%But as probabilistic models have become more sophisticated, the tools to formally describe them and to perform probabilistic inference have wrestled with new complexity. 
-%Just as programming more than the simplest algorithms requires tools for abstraction and composition, complex probabilistic modeling requires new progress in model representation---\emph{probabilistic} programming languages. 
-%These languages provide compositional means for describing complex probability distributions; implementations of these languages provide \emph{generic} inference engines: tools for performing efficient probabilistic inference over an arbitrary program. 
-
-%By providing a uniform and universal representation for probabilistic models, probabilistic programming provides a framework for unifying disparate Bayesian models of human cognition. 
-%Indeed, while Bayesian models have been extremely influential in cognitive science \cite[e.g.][]{tenenbaum2011}, 
-%it is only recently that we have the tools to view the Bayesian approach as a general framework for mental representation.
-%We next give a brief introduction to probabilistic programming, then an indication of how these tools can be used for modeling human cognition.
-
-%make sure to have something like this:
-In this chapter we illustrate the use of probabilistic techniques in natural language pragmatics and semantics with a concrete formal model. This model is not meant to exhaust the space of possible probabilistic models, indeed dozens of extensions are immediately apparent, but rather to show that a probabilistic framework for natural language is possible and productive.
+In section \ref{commonsense} we provide background on probabilistic modeling and stochastic lambda calculus, and introduce the running example scenario: game of tug-of-war. In section \ref{literal} we provide a model of literal interpretation of natural language utterances and describe a formal fragment of english suitable for our running scenario. Using this fragment we illustrate the emergence of non-monotonic effects in interpretation and the interaction of ambiguity with background knowledge. In section \ref{pragmatics} we describe pragmatic interpretation of meaning as an inference that depends on an informative speaker, who depends on the literal interpretation listener. This extended notion of interpretation predicts a variety of quantity implicatures and connects to recent quantitative experimental results. In section \ref{indices} we discuss the role of semantic indices in this framework and show that binding these indices at the pragmatic level allows us to deal with several issues in context-sensitivity of meaning, such as the interpretation of scalar adjectives. We conclude with general comments about the role of uncertainty in pragmatics and semantics.
 
 
 
-\section{Bayesian models of commonsense reasoning}
+\section{Probabilistic models of commonsense reasoning}
+\label{commonsense}
+
 %\begin{itemize}
 
 %\item  Knowledge as generative model, 
@@ -248,16 +219,31 @@ Multiple calls to the function will result in a sequence of values which are not
 
 To represent conditional probabilities in SLC and Church we introduce the \lstinline{query} function. Unlike simpler representations (such as Bayes nets) where conditioning is an operation that happens to a mold from the outside, \lstinline{query} can be defined within the SLC itself as an ordinary function. One way to do this is via \emph{rejection sampling}. Imagine we have a distribution represented by the function with no arguments \lstinline{thunk}, and a predicate on return values \lstinline{condition}. We can represent the conditional distribution of return values from \lstinline{thunk} that satisfy \lstinline{condition} by:
 \begin{lstlisting}[mathescape]
-(define conditional ($\lambda$ () (($\lambda$ (val) (if (predicate val) val (conditional))) (thunk))))
+(define conditional 
+   ($\lambda$ () (($\lambda$ (val) (if (predicate val) val (conditional))) (thunk))))
 \end{lstlisting}
-where we have used a stochastic recursion (conveniently specified by the named define) to build a conditional. For clarity, we introduce special syntax to specify such conditionals: 
-\todo{finish query spec}
-
+where we have used a stochastic recursion (conveniently specified by the named define) to build a conditional. 
+Conceptually this recursion samples from \lstinline{thunk} until a value is returned that satisfies \lstinline{predicate}; it is straightforward to show that the distribution over return values from this procedure is exactly the ratio used to define conditional probability in equation \ref{conditionaldef}.
+\todo{need to clarify the situation of measure zero conditions?}
+For clarity, we introduce a special syntax, \lstinline{query}, to specify such conditionals: 
+\begin{lstlisting}[mathescape]
+(query
+  ...definitions...
+  qexpr
+  condition)
+\end{lstlisting}
+where \lstinline{...definitions...} is a list of definitions, \lstinline{qexpr} is the expression of interest who's value we want, and \lstinline{condition} is a condition expression that must return \lstinline{true}. 
+This syntax is internally transformed into a thunk and predicate that can be used in the rejection sampling procedure:
+\begin{lstlisting}[mathescape]
+(define thunk ($\lambda$ () ...definitions... (list condition qexpr)))
+(define predicate ($\lambda$ (val) (equal? true (first val))))
+\end{lstlisting}
+Rejection sampling can be taken as the definition of the \lstinline{query} interface, but it is very important to note that other implementations that approximate the same distribution can be used and will often be more efficient. For instance, see \cite{wingate,etc} for alternative implementations of \lstinline{query}. In this chapter we are concerned with the computational (or competence) level of description and so need not worry about the implementation of \lstinline{query} in any detail.
 
 Memoization is a higher-order function that upgrades a stochastic function to have persistent randomness---a memoized function is evaluated as usual the first time is is called with given arguments, but thereafter returns this ``stored'' value. For instance \lstinline{(equal? (flip) (flip))} will be \lstinline{true} with probability $0.5$, but if we define a memoized flip, \lstinline{(define memflip (mem flip))}, then \lstinline{(equal? (memflip) (memflip))} will always be \lstinline{true}. This property is convenient for representing probabilistic dependencies between beliefs that rely on common properties, for instance the strengths and genders of people in a game (as illustrated below).
 %
-A technical, but important, subtlety concerns the ``location'' where a memoized random choice is created: should it be at the first use or the second? 
-In order to avoid an artificial symmetry breaking (and for technical reasons), the semantics of memoization should be defined so that all random values that may be returned by a memoized function are created when the memoized function is \emph{created}, not where it is called. 
+A technical, but important, subtlety concerns the ``location'' where a memoized random choice is created: should it be at the first use, the second, ...? This becomes a troubling question where the uses are in different parts of a program (for instance one is inside a query and another outside). 
+In order to avoid an artificial symmetry breaking (and for technical reasons), the semantics of memoization is defined so that all random values that may be returned by a memoized function are created when the memoized function is \emph{created}, not where it is called. 
 
 
 \label{eval}
@@ -270,10 +256,12 @@ In Church, as in most LISP-like languages, source code is a first-class data typ
 \end{lstlisting}
 In this snippet the variable \lstinline{bias} is not in scope at the top level where \lstinline{expression} is defined, but it is in scope where \lstinline{expression} is evaluated, inside the function bound to \lstinline{foo}. For the natural language architecture described below this allows utterances to be evaluated in the local context of comprehension. For powerful applications of these ideas in natural language semantics see \cite{kenshan}.
 
-%Do we want to give a definitional interpreter (eval) for ESLC in an appendix???
+\todo{Do we want to give a definitional interpreter (eval) for ESLC in an appendix???}
 
 \label{bottom-val}
-Church is a dynamically typed language: values have types, but expressions don't have fixed types that can be determined \emph{a priori}. For simplicity (and utility below) we assume that when an operator is applied to values outside of its domain, for instance \lstinline{(+ 1 `a)}, they return a special value \emph{error} which is itself outside the domain of all operators, except the equality operator \lstinline{eq?}. By allowing \lstinline{eq?} to test for error we permit very simple error handling.
+Church is a dynamically typed language: values have types, but expressions don't have fixed types that can be determined \emph{a priori}. 
+One consequence of dynamic typing for a probabilistic language is that expressions may take on a distribution of different types. For instance, the expression \lstinline{(if (flip) 1 true)} will be integer half the time and Boolean the other half. This has interesting implications for natural language, where we require consistent dynamic types but have no particular reason to require deterministically assigned static types.
+For simplicity (and utility below) we assume that when an operator is applied to values outside of its domain, for instance \lstinline{(+ 1 `a)}, it returns a special value \emph{error} which is itself outside the domain of all operators, except the equality operator \lstinline{eq?}. By allowing \lstinline{eq?} to test for error we permit very simple error handling, and allow \lstinline{query} (which relies on a simple equality test to decide whether to ``keep going'') to filter out mis-typed sub-computations.
 
 
 
@@ -348,38 +336,7 @@ In addition to players and teams, we have matches: events that have two teams an
 \end{lstlisting}
 Notice that the team pulling is simply the sum of how hard each member is pulling; each player pulls with their intrinsic strength, plus a random amount that indicates their effort on this match. 
  
- \begin{figure}[tbh]
-\begin{center}
- \begin{lstlisting}[mathescape]
-(define players `(Bob Jim Mary Sue Bill Evan Sally Tim Joe Jane Terrence Kate))
-(define teams `(team1 team2 team3))
-(define matches `(match1 match2 match3 match4))
-
-(define gender (mem ($\lambda$ (p) (if (flip) `male `female))))
-(define gender-mean-strength (mem ($\lambda$ (g) (gaussian 0 2))))
-(define strength (mem ($\lambda$ (p) (gaussian (gender-mean-strength (gender p)) 1))))
-
-(define team-size (uniform-draw '(1 2 3 4 5 6)))
-(define players-on-team (mem ($\lambda$ (team) (draw-n team-size players))))
-(define captain (mem ($\lambda$ (team) (uniform-draw (players-on-team team)))))
-
-(define teams-in-match (mem ($\lambda$ (match) (draw-n 2 teams))))
-(define pulling (mem ($\lambda$ (player match) (+ (strength player) (gaussian 0 0.5)))))
-(define team-pulling (mem ($\lambda$ (team match) 
-                          (sum (map (lambda (x) (pulling x match)) (players-on-team team))))))
-(define (winner match) 
-  (let ([teamA (first (teams-in-match match))]
-        [teamB (second (teams-in-match match))])
-    (if (> (team-pulling teamA match) (team-pulling teamB match))
-        teamA
-        teamB)))
-\end{lstlisting}
-\caption{An intuitive theory (or conceptual lexicon) for the tug-of-war domain.}
-\label{theory}
-\end{center}
-\end{figure}  
-
-The conceptual lexicon of functions for the tug-of-war domain is given altogether in Figure \ref{theory}.
+The conceptual lexicon of functions for the tug-of-war domain is given altogether in Appendix \ref{tow}.
 A conceptual lexicon like this one describes generative knowledge about the world---interrelated concepts that can be used to describe the causal story of how various observations come to be. 
 
 We can use this knowledge to reason from observations to predictions or latent states by using conditionalization implemented via \lstinline{query}. 
@@ -447,6 +404,8 @@ These will be less important in what follows, but we note that they are potentia
 
  
 \section{Meaning as condition}
+\label{literal}
+
 \todo[inline]{Noah:
 What if any general motivation do we give here?
 
@@ -454,6 +413,11 @@ Want to motivate meaning as conditioning from very general distributional assump
 Sentences as observations. 
 Assume sentences are independent (in literal meaning -- pragmatics changes this). 
 Implies sentence composition by sequential conditioning.}
+
+%it would be nice to somewhere mention that rescaling beliefs is a general mechanism, and that this is equivalent to query. 
+Note that any transition from distribution $P_{\text{before}}$ to distribution $P_{\text{after}}$ such that the support (i.e.\ region of non-zero probability) of $P_{\text{after}}$ is a subset of the support of $P_{\text{after}}$ can be written as multiplying by a real-valued function and then renormalizing. 
+That is, any belief update of this type can be written as the result of conditioning on some proposition.
+
 
 %This view of the belief states and their dynamics has a natural extension to language understanding: we can treat interpretation as conditioning on the literal meaning of a sentence. 
 
@@ -647,7 +611,7 @@ If more than one of these structures is interpretable using the composition oper
 Depending on the composition operators available, this may lead to (e.g.) ambiguities of quantifier scope and in whether a pronoun is bound or free.
 \item Lexical: the \lstinline{lexicon} function may be stochastic, returning different options for a single item, or words may have intrinsically stochastic meanings (and the former may generally converted to the latter). 
 \end{itemize}
-One of the crucial advantages of our architecture for language understanding is that these linguistic mechanisms automatically interact with the interpreter's beliefs about the world in an appropriate way. 
+In the literal interpretation model we have given above, \lstinline{literal-listener}, these sources of linguistic ambiguity will automatically interact with the interpreter's beliefs about the world.
 When a sentence is ambiguous in any of these ways, the listener will favor plausible interpretations over implausible ones, because the interpreter's model of the world is more likely to generate scenarios which make the sentence true under these interpretations. 
 Implausible interpretations, on the other hand, lead to frequent rejection by \lstinline{query} due to their inconsistency with background information.
 
@@ -718,13 +682,8 @@ Lexical uncertainty will not be our focus here, but we should mention two promin
 Lexical ambiguities of the ``bank''/``bank'' variety could be treated either by having the \lstinline{lexicon} function map ``bank'' to either of two discrete meanings, or by assuming that the latent mechanism which divides utterances into words recognizes two distinct words with this phonological realization.
 Intrinsically graded (e.g., prototype) meanings are most naturally thought of as stochastically denoting regions of a non-discrete conceptual space. 
 
-\subsection{Probabilistic meanings}
- \todo[inline]{This section may be vestigial. it would be nice to somewhere mention that rescaling beliefs is a general mechanism, and that this is equivalent to query. Maybe put this wherever we discuss sequential conditioning as way to update on several sentences...} 
-Note that any transition from distribution $P_{\text{before}}$ to distribution $P_{\text{after}}$ such that the support (i.e.\ region of non-zero probability) of $P_{\text{after}}$ is a subset of the support of $P_{\text{after}}$ can be written as multiplying by a real-valued function and then renormalizing. 
-That is, any belief update of this type can be written as the result of conditioning on some proposition.
 
-
-\subsection{Composition}
+\subsection{Compositionality}
 \todo[inline]{Noah: discuss that compositionality in language and thought are similar but along different `directions'...}
 \todo[inline]{Here or maybe in GD: Types useful in SLC but not in LC. (Eg potential locus of asymmetry between kinds and properties?)}
 
@@ -761,6 +720,7 @@ That is, any belief update of this type can be written as the result of conditio
 
 
 \section{Pragmatic interpretation}
+\label{pragmatics}
 
 The \lstinline{literal-listener} described above treats utterances as true information about the world, updating her beliefs accordingly. 
 In real language understanding, however, utterances are taken as speech acts that inform the listener indirectly by conveying a speaker's intention. In this section we describe a version of the \emph{rational speech acts} model \cite{Goodman2013, Frank2012}, in which a sophisticated listener reasons about the intention of an informative speaker.
@@ -817,6 +777,7 @@ then do a version where there are two unnamed males, but only one of them was in
 
 
 \section{Semantic indices}
+\label{indices}
 
 In formal semantics \cite{montague} sentence meanings are often treated as intensions: functions from semantic indices to truth functions. The semantic theory has nothing to say about how to set these indices, only that they matter and (probably) depend on context. Yet we have already seen that a probabilistic theory of pragmatic interpretation can be used to describe the ways that context influences interpretation. Can we similarly use probabilistic tools to describe the ways that semantic indices are set based on context?
 We must first decide how semantic indices should enter into the probabilistic framework presented above (where we have so far treated meanings simply as truth functions). The simplest assumption would be that they are random variables that occur (unbound) in the meaning expression and are reasoned about by the literal listener:
@@ -908,19 +869,64 @@ Another interpretation of this modeling approach (indeed, the original interpret
 
 
 \section{Conclusion}
-\begin{itemize}
-\item  Kinds of variables: discrete, ordered, and continuous variables.
-\item  Roles for uncertainty: world knowledge, SF to LF translation, stochastic meanings, pragmatic coordination.
-\item  Pervasive uncertainty and joint inference: understanding is analyzable but not modular.
-\end{itemize}
 
+In this chapter we have illustrated the use of probabilistic modeling to study natural language semantics and pragmatics. On the one hand we have argued that uncertainty, formalized via probability, is a key organizing principle throughout language and cognition. On the other hand we have argued, by example, that we must still build detailed models of natural language architecture and structure. That is, probability provides a tool for better language modeling, which allows us to naturally capture many expects of the flexibility and power of language, but like any tool probabilistic modeling is only as good as the models it is used to create.
 
+There are both a number of kinds of uncertainty and a number of roles for uncertainty in the architecture we have described.
+While the fundamental mechanisms for representing and updating beliefs are the same for discrete variables (such as those that led to scope ambiguity for quantifiers) and continuous variables (such as the threshold variable we used within scalar adjectives), there are likely to be phenomenological differences as well similarities: for instance continuous variables lend themselves to borderline cases in a way that discrete variables don't, while both support graded judgements. Similarly, the locus of creation of a random variable---within the literal listener, in the pragmatic listener, separately or tied as and index---can have profound effects on its role in language understanding. Variables restricted to the literal listener show plausibility but not informativity effects; variables in the pragmatic listener that are not indices show informativity but limited context sensitivity; etc. Overall then, uniform mechanisms of uncertainty can lead to heterogeneous phenomenology of language understudying, depending on the structure of the language understanding model. 
+
+In the architecture we have described, uncertainty is pervasive through all aspects of language understanding. Pervasive uncertainty leads to complex interactions that can be described by joint inference of the many random choices involved in understanding. Joint inference in turn leads to a great deal of flexibility, from non-monotonic effects of explaining away (section \ref{literal}), through ambiguous compositional structure and pragmatic strengthening, to vagueness and context-specificity of indices. It is particularly important to note that even when the architecture specification is relatively modular, for instance separate specification of world knowledge (the \lstinline{...theory...}) and meaning interpretation (the \lstinline{meaning} function), the inferential effects in sentence interpretation will have complex, bi-directional interactions (as in the interaction of background knowledge and quantifier scope ambiguity in section \ref{literal}). That is, language understanding is analyzable but not modular
 
 
 
 
 \appendix
 
+\section{An intuitive theory of Tug-of-War}
+\label{tow}
+Here we collect together the Church definitions forming our simple intuitive theory (or conceptual lexicon) for the tug-of-war domain.
+ \begin{lstlisting}[mathescape]
+(define players `(Bob Jim Mary Sue Bill Evan Sally Tim Joe Jane Terrence Kate))
+(define teams `(team1 team2 team3))
+(define matches `(match1 match2 match3 match4))
+
+(define gender (mem ($\lambda$ (p) (if (flip) `male `female))))
+(define gender-mean-strength (mem ($\lambda$ (g) (gaussian 0 2))))
+(define strength (mem ($\lambda$ (p) (gaussian (gender-mean-strength (gender p)) 1))))
+
+(define team-size (uniform-draw '(1 2 3 4 5 6)))
+(define players-on-team (mem ($\lambda$ (team) (draw-n team-size players))))
+(define captain (mem ($\lambda$ (team) (uniform-draw (players-on-team team)))))
+
+(define teams-in-match (mem ($\lambda$ (match) (draw-n 2 teams))))
+(define pulling (mem ($\lambda$ (player match) (+ (strength player) (gaussian 0 0.5)))))
+(define team-pulling (mem ($\lambda$ (team match) 
+                          (sum (map (lambda (x) (pulling x match)) (players-on-team team))))))
+(define (winner match) 
+  (let ([teamA (first (teams-in-match match))]
+        [teamB (second (teams-in-match match))])
+    (if (> (team-pulling teamA match) (team-pulling teamB match))
+        teamA
+        teamB)))
+\end{lstlisting}
+
+
+\section{Random Composition}
+\todo[inline]{Move the technical details about random composition here. Note a few effects of the process: more type shifting is less a priori likely; constituents have distribution over static types.}
+
+\section{A Fragment of English for Discussing Tug-of-War}
+\todo[inline]{Put in a table for our complete lexicon}
+
+
+
+
+
+
+
+%%%%%
+%stuff below here is for reference while writing. to be commented out before submission...
+%
+\pagebreak
 
 \section{Example sentences}
 \begin{itemize}
