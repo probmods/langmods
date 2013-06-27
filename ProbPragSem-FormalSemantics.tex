@@ -455,7 +455,7 @@ We assume that the set of possible compositions is sufficient to perform any syn
 \item \textbf{FC}: \lstinline{(lambda (A) (lambda (B) (lambda (x) (A (B x)))))}
 \item \textbf{BC}: \lstinline{(lambda (A) (lambda (B) (lambda (x) (B (A x)))))}
 \end{itemize}
-As discussed in section \ref{quantifiers}, we can generate quantifier scope ambiguities by including among the set of composition operators all possible combinations of \textbf{FA}, \textbf{BA}, \textbf{FC}, and \textbf{BC} with the type-shifting mechanisms of \citet{hendriks93}. 
+As discussed in section \ref{ambiguity}, we can generate quantifier scope ambiguities by including among the set of composition operators all possible combinations of \textbf{FA}, \textbf{BA}, \textbf{FC}, and \textbf{BC} with the type-shifting mechanisms of \citet{hendriks93}. 
 This treatment of quantifier scope is convenient, but others (e.g., quantifier raising or Skolem functions \cite{steedman12} ) could be implemented by complicating the syntactic or semantic mechanisms in various ways. 
 
 Our simple implementation of \lstinline{random-split} does not insert silent elements such as indices and PRO. 
@@ -601,7 +601,7 @@ That is, because there is uncertainty about the strengths of all players, in pri
 However, the utterance is more likely to be true if Jim's strength falls into the lower tail of the prior distribution. 
 Conditioning via \lstinline{query} automatically integrates these two sources of uncertainty, concluding that utterance 5 favors low values of \lstinline{(strength `Jim)} and adjusting the inferred strength of his opponent Bob accordingly. 
 
-\subsection{\label{quantifiers}Ambiguity}
+\subsection{\label{ambiguity}Ambiguity}
 The \lstinline{meaning} function will frequently associate utterances with different interpretations on different evaluations. 
 Ambiguities can arise due to any of the following:
 \begin{itemize}
@@ -669,16 +669,19 @@ Since \lstinline{team-size} is unknown, this asymmetry leads to a preference for
 On the other hand, suppose that only one match was played: then both readings can be true only if each team has the maximum possible number of players (6). 
 The listener will thus infer that \lstinline{team-size} is equal to 6, and the two readings of the utterance are equally probable, as they were in the prior.
 
-The left panel of figure \ref{quantifiers} plots the strength of each reading as the number of matches varies. 
+The left panel of the figure
+%figure \ref{scope-ambiguity}
+% changed because of weird error induced by referring to this...
+ plots the strength of each reading as the number of matches varies. 
 The right panel shows the mean inferred team size as the number of matches varies. 
 \begin{figure}[tbh]
 \begin{center}
-\includegraphics[scale=.6]{quantifiers.pdf}
+\includegraphics[scale=.55]{quantifiers.pdf}
 \end{center}
-\label{quantifiers}
-\caption{The probability of assigning each of the two readings of \emph{Most players played in some match} depends in intricate ways on the interpreter's beliefs and observations about the number of matches and the number of players on each team.}
+\label{scope-ambiguity}
+\caption{The probability of the listener interpreting the utterance \emph{Most players played in some match} according to the two possible scopal configurations depends in intricate ways on the interpreter's beliefs and observations about the number of matches and the number of players on each team (left). This, in turn, influences the total information conveyed by the utterance (right).}
 \end{figure} 
-Note that the inferred team size is insensitive to variation in the number of matches when the object wide scope reading is assigned: this is because the existence of a single match with most players in it entails that team size is 4, 5, or 6 no matter how many matches were played. 
+Note that the inferred team size is insensitive to variation in the number of matches when the object wide scope reading is assigned: this is because the existence of a single match with most players in it entails that team size is 4, 5, or 6 (with equal probability) no matter how many matches were played. 
 However, when the subject wide scope reading is assigned the inferred number of players declines steadily as the number of matches increases. 
 
 This model of language understanding predicts that the resolution of quantifier scope ambiguities should be highly sensitive to background information, and that an ambiguous utterance may lead to rather different belief update effects depending on the plausibility of the various interpretations given background knowledge. 
