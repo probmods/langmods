@@ -455,7 +455,7 @@ We assume that the set of possible compositions is sufficient to perform any syn
 \item \textbf{FC}: \lstinline{(lambda (A) (lambda (B) (lambda (x) (A (B x)))))}
 \item \textbf{BC}: \lstinline{(lambda (A) (lambda (B) (lambda (x) (B (A x)))))}
 \end{itemize}
-As discussed in section \ref{quantifiers}, we can generate quantifier scope ambiguities by including among the set of composition operators all possible combinations of \textbf{FA}, \textbf{BA}, \textbf{FC}, and \textbf{BC} with the type-shifting mechanisms of \citet{hendriks93}. 
+As discussed in section \ref{ambiguity}, we can generate quantifier scope ambiguities by including among the set of composition operators all possible combinations of \textbf{FA}, \textbf{BA}, \textbf{FC}, and \textbf{BC} with the type-shifting mechanisms of \citet{hendriks93}. 
 This treatment of quantifier scope is convenient, but others (e.g., quantifier raising or Skolem functions \cite{steedman12} ) could be implemented by complicating the syntactic or semantic mechanisms in various ways. 
 
 Our simple implementation of \lstinline{random-split} does not insert silent elements such as indices and PRO. 
@@ -574,7 +574,7 @@ That is, because there is uncertainty about the strengths of all players, in pri
 However, the utterance is more likely to be true if Jim's strength falls into the lower tail of the prior distribution. 
 Conditioning via \lstinline{query} automatically integrates these two sources of uncertainty, concluding that utterance 5 favors low values of \lstinline{(strength `Jim)} and adjusting the inferred strength of his opponent Bob accordingly. 
 
-\subsection{\label{quantifiers}Ambiguity}
+\subsection{\label{ambiguity}Ambiguity}
 The \lstinline{meaning} function will frequently associate utterances with different interpretations on different evaluations. 
 Ambiguities can arise due to any of the following:
 \begin{itemize}
@@ -585,7 +585,7 @@ Depending on the composition operators available, this may lead to (e.g.) ambigu
 \item Lexical: the \lstinline{lexicon} function may be stochastic, returning different options for a single item, or words may have intrinsically stochastic meanings (and the former may generally converted to the latter). 
 \end{itemize}
 In the literal interpretation model we have given above, \lstinline{literal-listener}, these sources of linguistic ambiguity will automatically interact with the interpreter's beliefs about the world.
-When a sentence is ambiguous in any of these ways, the listener will favor plausible interpretations over implausible ones, because the interpreter's model of the world is more likely to generate scenarios which make the sentence true under these interpretations. 
+ When a sentence is ambiguous in any of these ways, the listener will favor plausible interpretations over implausible ones, because the interpreter's model of the world is more likely to generate scenarios which make the sentence true under these interpretations. 
 Implausible interpretations, on the other hand, lead to frequent rejection by \lstinline{query} due to their inconsistency with background information.
 
 For example, consider the utterance ``Most players played in some match''. 
@@ -620,31 +620,46 @@ where $\mathbf{AR}_1 = \lambda f \lambda x \lambda y [x(\lambda z . [f(z)] (y))]
 \item ``For most players $x$, there was a match $y$ such that $x$ played in $y$.'' 
 \item ``For some match $y$, most players played in $y$.''
 \end{itemize}
-We can manipulate the plausibility of each of these interpretations by varying the number of players on each team, the number of matches, or the mechanism by which teams are selected to play in matches. 
-For example, suppose that the listener has observed that each team has two individuals in it:
+On current assumptions, both readings are generated equally often by the \lstinline{meaning} function. 
+However, a listener will actually make use of a given reading to update her beliefs only when it is possible to condition on the reading's truth. 
+This means that we can influence the probability of each reading, and so the degree to which each influences the listener's posterior belief, by manipulating relevant world knowledge: for instance, the number of players on each team and the number of matches played.
+
+For example, suppose that the listener has observed that ten matches were played:
 \begin{lstlisting}
 (query
   ...ToW theory...
   (eval QUD)
   (and 
-    (= team-size 2)
+    (= number-of-matches 10)
     (eval (meaning `(most players played in some match)))))
 \end{lstlisting}
-Given that there are twelve players and six matches in the ToW theory (fig.\ \ref{theory}), the reading with the object \emph{some match} taking wide scope is clearly false: only four players could be in any given match, and this reading requires more than half of the twelve to be involved. 
-However, the reading with \emph{most players} taking wide scope could be true in this scenario if no one played twice. 
-Because 
+Recall that there are twelve players in our model, so that team size can fall anywhere from 1 to 6 players with equal probability. 
+If the number of matches is known to be large, then the subject wide scope reading can be true even if \lstinline{team-size} is small: it could easily happen that most players played in one or another of ten matches even if each team has only one or two players. 
 
-On the other extreme, if the listener were to observe that the \lstinline{team-size} is 4 or greater, both readings would be compatible with this observation. The object wide scope reading increases in plausibility as \lstinline{team-size} increases to its maximum possible value of 6. Figure \ref{quantifier-scope-ambiguity} displays the results of a simulation showing the relationship between \lstinline{team-size} and the probability of the two readings of this utterance.
+The object wide scope reading, in contrast, is satisfiable in such a situation only if \lstinline{team-size} is 4, 5, or 6 (so that more than half of the total players are in each match). 
+Since \lstinline{team-size} is unknown, this asymmetry leads to a preference for the subject wide scope reading with large values of \lstinline{number-of-matches}: this reading is compatible with situations which are \emph{a priori} possible, but are excluded by the object wide scope reading. 
 
-%\begin{figure}[tbh]
-%\begin{center}
-%\includegraphics[scale=.65]{quantifiers.pdf}
-%\end{center}
-%\label{quantifier-scope-ambiguity}
-%\caption{}
-%\end{figure} 
+On the other hand, suppose that only one match was played: then both readings can be true only if each team has the maximum possible number of players (6). 
+The listener will thus infer that \lstinline{team-size} is equal to 6, and the two readings of the utterance are equally probable, as they were in the prior.
 
-This model predicts that structural ambiguities should behave in a similar way. Suppose we were to enrich the ToW model and lexicon to accommodate utterances such as ``Bill hit the player with the ball''. 
+The left panel of the figure
+%figure \ref{scope-ambiguity}
+% changed because of weird error induced by referring to this...
+ plots the strength of each reading as the number of matches varies. 
+The right panel shows the mean inferred team size as the number of matches varies. 
+\begin{figure}[tbh]
+\begin{center}
+\includegraphics[scale=.55]{quantifiers.pdf}
+\end{center}
+\label{scope-ambiguity}
+\caption{The probability of the listener interpreting the utterance \emph{Most players played in some match} according to the two possible scopal configurations depends in intricate ways on the interpreter's beliefs and observations about the number of matches and the number of players on each team (left). This, in turn, influences the total information conveyed by the utterance (right).}
+\end{figure} 
+Note that the inferred team size is insensitive to variation in the number of matches when the object wide scope reading is assigned: this is because the existence of a single match with most players in it entails that team size is 4, 5, or 6 (with equal probability) no matter how many matches were played. 
+However, when the subject wide scope reading is assigned the inferred number of players declines steadily as the number of matches increases. 
+
+This model of language understanding predicts that the resolution of quantifier scope ambiguities should be highly sensitive to background information, and that an ambiguous utterance may lead to rather different belief update effects depending on the plausibility of the various interpretations given background knowledge. 
+
+The model makes essentially the same predictions about the resolution of structural ambiguities. Let $u$ be an utterance with two equally probable parses.
 With no background information to constrain interpretation, either interpretation of this utterance might be appropriate, and a true ambiguity is felt. 
 However, one of the two possible interpretations is more likely to be true than the other, the literal listener will automatically prefer the parse which generates the more probable interpretation.
 In the limit, if one interpretation has zero prior probability, the syntactic ambiguity will not be felt because the interpretation that it generates will always be rejected by the \lstinline{query} function embedded in the definition of the literal listener.
@@ -709,6 +724,7 @@ First, imagine a speaker who wishes to convey that the question under discussion
 The \lstinline{language-prior} forms the \emph{a priori} (non-contextual and non-semantic) distribution over linguistic forms, which may be modeled with a probabilistic context free grammar or similar model. 
 This prior inserts a \emph{cost} for each utterance: using a less likely utterance will be dispreferred \emph{a priori}.
 It is clarifying to write the distribution implied by the \lstinline{speaker} function explicitly:
+\todo{Maybe say explicitly: this is mathematically equivalent, though we're not saying how.}
 \begin{align}
 P(\texttt{ut} | \texttt{val}, \texttt{QUD}) &\propto P(\texttt{ut}) P_{\texttt{listener}}(\texttt{val} | \texttt{ut}, \texttt{QUD}) \\
 &\propto e^{\ln(P_{\texttt{listener}}(\texttt{val} | \texttt{ut}, \texttt{QUD})) + \ln{P(\texttt{ut})}}
@@ -726,7 +742,9 @@ A more sophisticated, pragmatic, listener can now be modeled as a Bayesian agent
 \end{lstlisting}
 Notice that the prior over \lstinline{val} comes from evaluating the \lstinline{QUD} expression given the \lstinline{theory}, and the posterior comes from updating this prior given that the speaker has chosen \lstinline{utterance} to convey \lstinline{val}.
 The force of this model comes from the ability to call the \lstinline{query} function within itself \cite{Stuhlmueller2013}---each query models the inference made by one (imagined) communicator and together they capture sophisticated pragmatic reasoning. 
-Several observations are worth making: First, alternative utterances will enter into the computation in sampling (or determining the probability of) the actual utterance from \lstinline{speaker}. Similarly, alternative values are considered in the listener functions.
+Several observations are worth making: First, alternative utterances will enter into the computation in sampling (or determining the probability of) the actual utterance from \lstinline{speaker}. 
+\todo{Expand a bit---why are alternatives relevant?}
+Similarly, alternative values are considered in the listener functions.
 Second, the notion of informativity captured in the \lstinline{speaker} model is not simply information transmitted by \lstinline{utterance}, but is \emph{new} information conveyed to the listener \emph{about} the \lstinline{QUD}. 
 Information which is not new to the listener or which is not relevant to the \lstinline{QUD} will not count in the speaker's utility.
 
