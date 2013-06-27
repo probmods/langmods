@@ -8,4 +8,5 @@
 *.synctex.gz
 .dropbox
 TSWLatexianTemp*
+*.tdo
 
