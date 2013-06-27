@@ -751,6 +751,7 @@ First, imagine a speaker who wishes to convey that the question under discussion
 The \lstinline{language-prior} forms the \emph{a priori} (non-contextual and non-semantic) distribution over linguistic forms, which may be modeled with a probabilistic context free grammar or similar model. 
 This prior inserts a \emph{cost} for each utterance: using a less likely utterance will be dispreferred \emph{a priori}.
 It is clarifying to write the distribution implied by the \lstinline{speaker} function explicitly:
+\todo{Maybe say explicitly: this is mathematically equivalent, though we're not saying how.}
 \begin{align}
 P(\texttt{ut} | \texttt{val}, \texttt{QUD}) &\propto P(\texttt{ut}) P_{\texttt{listener}}(\texttt{val} | \texttt{ut}, \texttt{QUD}) \\
 &\propto e^{\ln(P_{\texttt{listener}}(\texttt{val} | \texttt{ut}, \texttt{QUD})) + \ln{P(\texttt{ut})}}
@@ -768,7 +769,9 @@ A more sophisticated, pragmatic, listener can now be modeled as a Bayesian agent
 \end{lstlisting}
 Notice that the prior over \lstinline{val} comes from evaluating the \lstinline{QUD} expression given the \lstinline{theory}, and the posterior comes from updating this prior given that the speaker has chosen \lstinline{utterance} to convey \lstinline{val}.
 The force of this model comes from the ability to call the \lstinline{query} function within itself \cite{Stuhlmueller2013}---each query models the inference made by one (imagined) communicator and together they capture sophisticated pragmatic reasoning. 
-Several observations are worth making: First, alternative utterances will enter into the computation in sampling (or determining the probability of) the actual utterance from \lstinline{speaker}. Similarly, alternative values are considered in the listener functions.
+Several observations are worth making: First, alternative utterances will enter into the computation in sampling (or determining the probability of) the actual utterance from \lstinline{speaker}. 
+\todo{Expand a bit---why are alternatives relevant?}
+Similarly, alternative values are considered in the listener functions.
 Second, the notion of informativity captured in the \lstinline{speaker} model is not simply information transmitted by \lstinline{utterance}, but is \emph{new} information conveyed to the listener \emph{about} the \lstinline{QUD}. 
 Information which is not new to the listener or which is not relevant to the \lstinline{QUD} will not count in the speaker's utility.
 
