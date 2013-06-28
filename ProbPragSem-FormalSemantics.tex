@@ -438,7 +438,7 @@ Critically, if type errors are interpreted as the non-\lstinline{true} value \em
 Thus the \lstinline{meaning} function is a stochastic mapping from strings to Church expressions; the random choices made in this mapping will be reasoned about jointly with world states while interpreting the utterance, as discussed in section \ref{ambiguity} below.
 
 To understand what the \lstinline{literal-listener} does, consider rejection sampling: we evaluate both the \lstinline{QUD} and meaning expressions, constructing whatever intermediate expressions are required; if the meaning expression has value \lstinline{true}, then we return the value of \lstinline{QUD}, otherwise we try again. 
-\todo[inline]{Dan: something about hyper intentionality? point out that the intention is a computation that can be run in a given intuitive theory environment. cite shalom ..}
+%\todo[inline]{Dan: something about hyper intentionality? point out that the intention is a computation that can be run in a given intuitive theory environment. cite shalom ..}
 It is apparent that the complexity of interpretation is an interaction between the domain theory, the meaning function, and the lexicon. 
 To make this more concrete, we return to the tug-of-war example from the previous section and begin to build a lexicon for talking about this domain in natural language. 
 
@@ -461,9 +461,9 @@ Interpreted in this way, names are directly referential since they are interpret
 A one-place predicate such as \emph{player} or \emph{man} is interpreted as a function from individuals to truth-values. 
 For example, 
 \sv{man} = \lstinline[mathescape]{($\lambda$ (x) (equal? (gender x) `male))} or \sv{player} = \lstinline[mathescape]{($\lambda$ (x) (element? x player))}.
-Similarly, transitive verbs such as \emph{won} and relational nouns such as \emph{captain} denote the (stochastic) intensions of two-place predicates. For instance, \sv{won} = \lstinline[mathescape]{($\lambda$ (match) ($\lambda$ (x) (equal? x (winner match))))} (we simplify by ignoring tense).
+Similarly, transitive verbs such as \emph{won} and relational nouns such as \emph{captain} denote the (stochastic) two-place predicates. For instance, \sv{won} = \lstinline[mathescape]{($\lambda$ (match) ($\lambda$ (x) (equal? x (winner match))))} (we simplify throughout by ignoring tense).
 %
-Intensionality is implicit in these definitions, due to the fact that the denotations of English expressions can refer to stochastic functions in the intuitive theory, such as \lstinline{gender}.
+Intensionality is implicit in these definitions because the denotations of English expressions can refer to stochastic functions in the intuitive theory, such as \lstinline{gender}.
 Thus predicates pick out functions from individuals to truth-values in any world (evaluation), but the specific function that they pick out in a world depends on the random choices (e.g., values of \lstinline{flip}) that are made in the process of constructing the world. 
 In these examples, \emph{player} is true of the same individuals in every world, since \lstinline{player} is defined deterministically in the intuitive theory (appendix \ref{tow}). 
 \emph{man}, on the other hand, denotes a predicate which will be true of a given individual (say, \lstinline{`Bob}) in 50\% of partial worlds constructed on average (assuming no relevant observations have been made). 
@@ -1006,86 +1006,90 @@ $$
 %%%%%
 %stuff below here is for reference while writing. to be commented out before submission...
 %
-\pagebreak
+%\pagebreak
+%
+%\section{Example sentences}
+%\begin{itemize}
+%\item "the teams in match1 were bob and jim. bob won match1." ... "jim is the weakest player." : initial graded inference about bob's strength. explaining away. initially think bob strong, then probably not.
+%\subitem \textsv{the teams in match1 were bob and jim}= \lstinline{(equal? (teams-in-match `match1) `((Bob) (Jim)))}. (Note converting each person into the set which is his team....)
+%\subitem \textsv{bob won match1}= \lstinline{(equal? (winner `match1) `(Bob))} (Note again converting Bob to his team.)
+%\subitem \textsv{jim is the weakest player}= \lstinline{(equal? `Jim (est (< (strength x) t) players))}  (Est has to grab the threshold and set it to highest value s.t. set is non-empty.) 
+%
+%
+%%\item  "teamA won match 3"
+%\item : some noun with graded  prototype extent?
+%\item "every player was in a match yesterday" : scope ambiguity treated either as stochastic meaning fn or underspecified semantics. manipulate priors...
+%%\item ("the match was aweful/awful for team A" : ambiguous homonym?)
+%\item "teamA has two players. one is the captain. that player on teamA is strong." : implicates not talking about the captain?  FG'12 style ad-hoc implicature.
+%%\item "a player on team A is strong" : implicature that not talking about the team captain???
+%%\item "the player" : salience and definite reference. (something about lewis and cats??)
+%\item "some of the women are stronger than jane" : implicature that not all of them are.
+%\item "team A won some of the matches" : implicature that not all of them, unless speaker had not seen all matches.
+%\item "team A won the match" vs "team A prevailed in the match" : example of horn implicature.. latter implies close match? (need notion of how close the match was?)
+%     		% closeness = smallness of difference in score
+%\item "john is strong" : gradable, depends on prior over strengths.
+%\item "the strong player" : interpreted as strongest by joint inference of threshold and reference.
+%\item "john is strong, jim is a little less strong. is jim strong?" : sorites.
+%\end{itemize}
+%
+%
+%
+%\section{Modeling sketch}
+%
+%\begin{table}[htdp]
+%\caption{default}
+%\begin{center}
+%\begin{tabular}{llc}
+%\sv{`players}&= & $`(Bob\ Jim ...)$ \\
+%\sv{`Bob}&= & $`Bob$ or $`(Bob)$ \\
+%\sv{player}&= & $\lambda.x (x\in players) $ \\
+% 
+%\end{tabular}
+%\end{center}
+%\label{default}
+%\end{table}%
+%
+%
+%
+%\noindent Basic ontology: 
+%\begin{itemize}
+%\item players: some humans
+%\item strength and other properties of people.
+%\item the set of teams: a partition of the set of players, each associated with a unique name (a capital letter) and a distinguished player (the captain)
+%\item matches: a set of data structures consisting of an integer (the match number), 2 teams, and a winner
+%\item $D_e: \{x|\mathit{player}(x)\} \cup \{x|\mathit{match}(x)\} \cup \{x|\mathit{team}(x)\}$
+%\item $D_t = \{0,1\}$
+%\item $D_d = (0,1)$
+%\end{itemize}
+%
+%\noindent Vocabulary:
+%\begin{itemize}
+%\item some names of individual players which we set out stipulatively, and the set of players (or people).
+%\item player: function from individuals (names) to $\{0,1\}$
+%\item men, women: function from individuals (names) to $\{0,1\}$, constrained so that $\mathit{player}(x) \rightarrow \mathit{man}(x) \vee \mathit{woman}(x)$
+%\item captain: function from teams t to functions from individuals x to 1 if x is t's captain, else 0
+%\item match: a function $D_e \rightarrow \{0,1\}$, true of matches only, with an optional integer argument (since we want both \emph{a match} and \emph{in match n}) 
+%\item play: a function from an integer n and two teams x,y to $\{0,1\}$: x played y in match n
+%\item win: $\mathit{win}(y)(x)$ is true iff y is a match and x is the winner in y
+%\item team: a set of players
+%\item strength: function from players to $(0,1)$, Gaussian prior (separate priors for men and woman would be useful but perhaps unnecessarily controversial)
+%\item $\theta_A$: free variables with $\mathcal{U}(0,1)$ prior, one for each adjective $A$
+%\item a, some of: $\lambda P \lambda Q . \exists x P(x) \wedge Q(x)$
+%\item every/all of: $\lambda P \lambda Q . \forall x P(x) \rightarrow Q(x)$
+%\item quantifier scope ambiguities: I think we should just give the truth-conditions of the two interpretations, mention various options for computing them but not commit to one. [The key is just that both options are possible interpretations and the pragmatic listener optimizes the probability of the disambiguated utterance given the speaker model; the mechanism for generating the LFs probably isn't important.]
+%\item strong: $\lambda x . \mathit{strength}(x) > \theta_{\mathit{strong}}$
+%\item score1, score2: auxiliary functions with apply to a match and return the score of the team listed first/second 
+%\item close: $\lambda x . \mathit{match}(x): \mathit{score1}(x) - \mathit{score2}(x)| < \theta_{\mathit{close}}$ [presupposes argument is a match, asserts it was theta-close]
+%\item the: a choice function, i.e., a function from a property to some individual who satisfies the property; the prior distribution is uniform over all individuals who have the property. (The graded salience effects should kick in at L1, in reasoning about who its more likely that the speaker would be talking about.)
+%\item less: a function from an adjective (\emph{close, strong}) and a degree $d$ to properties of individuals $x$, returning true iff the adjective holds of $x$ to a degree less than $d - \epsilon$. By default, $r = 0$. 
+%\item A little: a modifier of \emph{less} s.t.\ , where epsilon is a free parameter which we can vary to make the point about how the sorites works.
+%\item -est: function from domains and adjectives to adjectives, where the latter is true only of individuals with argmax degree of the property in the domain
+%\item a little: make this a vocabulary item  
+%\end{itemize} 
+%
 
-\section{Example sentences}
-\begin{itemize}
-\item "the teams in match1 were bob and jim. bob won match1." ... "jim is the weakest player." : initial graded inference about bob's strength. explaining away. initially think bob strong, then probably not.
-\subitem \textsv{the teams in match1 were bob and jim}= \lstinline{(equal? (teams-in-match `match1) `((Bob) (Jim)))}. (Note converting each person into the set which is his team....)
-\subitem \textsv{bob won match1}= \lstinline{(equal? (winner `match1) `(Bob))} (Note again converting Bob to his team.)
-\subitem \textsv{jim is the weakest player}= \lstinline{(equal? `Jim (est (< (strength x) t) players))}  (Est has to grab the threshold and set it to highest value s.t. set is non-empty.) 
 
 
-%\item  "teamA won match 3"
-\item : some noun with graded  prototype extent?
-\item "every player was in a match yesterday" : scope ambiguity treated either as stochastic meaning fn or underspecified semantics. manipulate priors...
-%\item ("the match was aweful/awful for team A" : ambiguous homonym?)
-\item "teamA has two players. one is the captain. that player on teamA is strong." : implicates not talking about the captain?  FG'12 style ad-hoc implicature.
-%\item "a player on team A is strong" : implicature that not talking about the team captain???
-%\item "the player" : salience and definite reference. (something about lewis and cats??)
-\item "some of the women are stronger than jane" : implicature that not all of them are.
-\item "team A won some of the matches" : implicature that not all of them, unless speaker had not seen all matches.
-\item "team A won the match" vs "team A prevailed in the match" : example of horn implicature.. latter implies close match? (need notion of how close the match was?)
-     		% closeness = smallness of difference in score
-\item "john is strong" : gradable, depends on prior over strengths.
-\item "the strong player" : interpreted as strongest by joint inference of threshold and reference.
-\item "john is strong, jim is a little less strong. is jim strong?" : sorites.
-\end{itemize}
-
-
-
-\section{Modeling sketch}
-
-\begin{table}[htdp]
-\caption{default}
-\begin{center}
-\begin{tabular}{llc}
-\sv{`players}&= & $`(Bob\ Jim ...)$ \\
-\sv{`Bob}&= & $`Bob$ or $`(Bob)$ \\
-\sv{player}&= & $\lambda.x (x\in players) $ \\
- 
-\end{tabular}
-\end{center}
-\label{default}
-\end{table}%
-
-
-
-\noindent Basic ontology: 
-\begin{itemize}
-\item players: some humans
-\item strength and other properties of people.
-\item the set of teams: a partition of the set of players, each associated with a unique name (a capital letter) and a distinguished player (the captain)
-\item matches: a set of data structures consisting of an integer (the match number), 2 teams, and a winner
-\item $D_e: \{x|\mathit{player}(x)\} \cup \{x|\mathit{match}(x)\} \cup \{x|\mathit{team}(x)\}$
-\item $D_t = \{0,1\}$
-\item $D_d = (0,1)$
-\end{itemize}
-
-\noindent Vocabulary:
-\begin{itemize}
-\item some names of individual players which we set out stipulatively, and the set of players (or people).
-\item player: function from individuals (names) to $\{0,1\}$
-\item men, women: function from individuals (names) to $\{0,1\}$, constrained so that $\mathit{player}(x) \rightarrow \mathit{man}(x) \vee \mathit{woman}(x)$
-\item captain: function from teams t to functions from individuals x to 1 if x is t's captain, else 0
-\item match: a function $D_e \rightarrow \{0,1\}$, true of matches only, with an optional integer argument (since we want both \emph{a match} and \emph{in match n}) 
-\item play: a function from an integer n and two teams x,y to $\{0,1\}$: x played y in match n
-\item win: $\mathit{win}(y)(x)$ is true iff y is a match and x is the winner in y
-\item team: a set of players
-\item strength: function from players to $(0,1)$, Gaussian prior (separate priors for men and woman would be useful but perhaps unnecessarily controversial)
-\item $\theta_A$: free variables with $\mathcal{U}(0,1)$ prior, one for each adjective $A$
-\item a, some of: $\lambda P \lambda Q . \exists x P(x) \wedge Q(x)$
-\item every/all of: $\lambda P \lambda Q . \forall x P(x) \rightarrow Q(x)$
-\item quantifier scope ambiguities: I think we should just give the truth-conditions of the two interpretations, mention various options for computing them but not commit to one. [The key is just that both options are possible interpretations and the pragmatic listener optimizes the probability of the disambiguated utterance given the speaker model; the mechanism for generating the LFs probably isn't important.]
-\item strong: $\lambda x . \mathit{strength}(x) > \theta_{\mathit{strong}}$
-\item score1, score2: auxiliary functions with apply to a match and return the score of the team listed first/second 
-\item close: $\lambda x . \mathit{match}(x): \mathit{score1}(x) - \mathit{score2}(x)| < \theta_{\mathit{close}}$ [presupposes argument is a match, asserts it was theta-close]
-\item the: a choice function, i.e., a function from a property to some individual who satisfies the property; the prior distribution is uniform over all individuals who have the property. (The graded salience effects should kick in at L1, in reasoning about who its more likely that the speaker would be talking about.)
-\item less: a function from an adjective (\emph{close, strong}) and a degree $d$ to properties of individuals $x$, returning true iff the adjective holds of $x$ to a degree less than $d - \epsilon$. By default, $r = 0$. 
-\item A little: a modifier of \emph{less} s.t.\ , where epsilon is a free parameter which we can vary to make the point about how the sorites works.
-\item -est: function from domains and adjectives to adjectives, where the latter is true only of individuals with argmax degree of the property in the domain
-\item a little: make this a vocabulary item  
-\end{itemize} 
 
 
 
