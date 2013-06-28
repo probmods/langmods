@@ -567,7 +567,7 @@ In the literal interpretation model we have given above, \lstinline{literal-list
 Implausible interpretations, on the other hand, lead to frequent rejection by \lstinline{query} due to their inconsistency with background information.
 
 For example, consider the utterance ``Most players played in some match''. 
-Depending on the composition operators used by the \lstinline{meaning} function in a given application, two interpretations are possible (see appendix \ref{composition} for details):
+Depending on the composition operators used by the \lstinline{meaning} function in a given application, two interpretations are possible (given in reduced form here; see appendix \ref{composition} for compositional details):
 \begin{itemize}
 \item ``For most players $x$, there was a match $y$ such that $x$ played in $y$.'' 
 \item ``For some match $y$, most players played in $y$.''
@@ -879,54 +879,6 @@ Here we collect together the Church definitions forming our simple intuitive the
         teamB)))
 \end{lstlisting}
 
-
-\section{Random Composition}
-\label{composition}
-
-\todo[inline]{Dan: Clean this composition stuff up (its just copied from previous footnotes). 
-Also note a few effects of the process described: more type shifting is less a priori likely; constituents have distribution over static types.}
-
-Obvious choices for inclusion in the set of composition operators are forward and backward function application and composition:
-\begin{itemize}
-\item \textbf{FA}: \lstinline{(lambda (A) (lambda (B) (A B)))}
-\item \textbf{BA}: \lstinline{(lambda (A) (lambda (B) (B A)))}
-\item \textbf{FC}: \lstinline{(lambda (A) (lambda (B) (lambda (x) (A (B x)))))}
-\item \textbf{BC}: \lstinline{(lambda (A) (lambda (B) (lambda (x) (B (A x)))))}
-\end{itemize}
-As discussed in section \ref{ambiguity}, we can generate quantifier scope ambiguities by including in the \lstinline{meaning} function a stochastic recursion which inserts zero or more of the type-shifting operators discussed in \citet{hendriks93}. 
-This treatment of quantifier scope is convenient, but others (e.g., quantifier raising \citep{may77} or Skolem functions \cite{steedman12}) could be implemented by complicating the syntactic or semantic mechanisms in various ways. 
-
-Our simple implementation of \lstinline{random-split} does not insert silent elements such as indices and PRO. 
-A complete theory would need to assume additional combinators to cope with gaps \citep{steedman00}, binding \citep{jacobson99,barker05}. 
-Alternatively, it would a richer parsing mechanisms could create and interpret structures with silent elements and movement operations.
-
-We generate this ambiguity by including among the composition operations which may be selected by the \lstinline{random-combinator} function all combinations of application and composition with the type-shifting mechanisms described in \citet{hendriks93,barker05}.
-Formally, this means that \lstinline{random-combinator} is defined as a a function which selects a composition operator $\mathit{Op}$ and then performs a stochastic recursion: depending on the outcome of a coin flip, \lstinline{random-combinator} will either output $\mathit{Op}$ or select a type-shifter $\mathcal{T}$, apply $\mathcal{T}$ to one of the arguments of $\mathit{Op}$ at random, and flip another coin to determine whether to output the result or select another type-shifter and repeat.
-\begin{lstlisting}[mathescape]
-(define (random-combinator)}
-  (let ([Op (uniform-draw `(FA BA FC BC ...))])
-    (if (flip) Op
-      (random-shift Op (random-type-shifter)))))
-(define (random-type-shifter) (uniform-draw `(AR1 AR2 VR ...)))
-(define (random-shift Op type-shifter)
-  (let ([shifted (if (flip)
-    ($\lambda$ (arg1 arg2) (Op (type-shifter arg1) arg2))
-    ($\lambda$ (arg1 arg2) (Op arg1 (type-shifter arg2))))])
-      (if (flip) shifted
-        (random-shift shifted (random-type-shifter)))))
-\end{lstlisting}
-
-For example, the object wide scope reading of ``Most players played in some match'' obtains when the meaning function proceeds as follows: 
-$$
-\mathbf{BA}(\mathbf{FA}(\sv{most})(\sv{players})
-(\mathbf{FA}(\mathbf{AR}_1(\mathbf{AR}_2(\sv{played\ in})))
-(\mathbf{FA}(\sv{some})(\sv{match})))),
-$$  
-where $\mathbf{AR}_1 = \lambda f \lambda x \lambda y [x(\lambda z . [f(z)] (y))]$, $\mathbf{AR}_2 = \lambda f \lambda x \lambda y [y(\lambda z . [f(x)] (z))]$ \cite[cf.][pp.453ff.]{barker05}, and $\mathbf{BA}$ and $\mathbf{FA}$ are defined above.
-
-
-
-
 \section{A Fragment of English for Discussing Tug-of-War}
 \label{tow-lexicon}
 
@@ -976,6 +928,61 @@ Some functional vocabulary:
 %\item \sv{the} = \lstinline[mathescape]{($\lambda$ (P) ($\lambda$ (x) (P x)))} 
 \end{itemize}
 We have had to extend the intuitive theory with a domain of discourse capturing all the entities constructed.
+
+\section{Random Composition}
+\label{composition}
+The \lstinline{meaning} function defined in section \ref{literal-listener} makes crucial use of two operations for interpreting utterances: \lstinline{random-split} and \lstinline{random-combinator}. 
+As usual, coping with complex linguistic phenomena require us to complicate either or both of these components.
+For current purposes, we have chosen to keep the syntactic component simple and complicate the semantic component: \lstinline{random-split} is merely a device for creating binary trees from strings, and does not insert silent elements such as indices and PRO. 
+Coping with (e.g.) gaps and binding will thus require additional combinatorial operations: see  \citep{jacobson99,steedman00,barker05} for discussion.
+Alternatively, it would a richer parsing mechanisms could create and interpret structures with silent elements and movement operations.
+
+Some obvious choices for inclusion in the set of composition operators are forward and backward function application and composition. 
+\begin{itemize}
+\item \textbf{FA}: \lstinline{(lambda (A) (lambda (B) (A B)))}
+\item \textbf{BA}: \lstinline{(lambda (A) (lambda (B) (B A)))}
+\item \textbf{FC}: \lstinline{(lambda (A) (lambda (B) (lambda (x) (A (B x)))))}
+\item \textbf{BC}: \lstinline{(lambda (A) (lambda (B) (lambda (x) (B (A x)))))}
+\end{itemize}
+
+Section \ref{ambiguity} discussed the process of selecting among the readings of a sentence with ambiguous quantifier scope. 
+We can generate scope ambiguities by including among the composition operations which may be selected by the \lstinline{random-combinator} function all combinations of application and composition with the type-shifting mechanisms described in \citet{hendriks93,barker05}. (This treatment of quantifier scope is convenient, but others could be implemented by complicating the syntactic or semantic mechanisms in various ways: see e.g.\ \citet{may77,steedman12}.)
+Formally, this means that \lstinline{random-combinator} is defined as a a function which selects a composition operator $\mathit{Op}$ and then performs a stochastic recursion: depending on the outcome of a coin flip, \lstinline{random-combinator} will either output $\mathit{Op}$ or select a type-shifter $\mathcal{T}$, apply $\mathcal{T}$ to one of the arguments of $\mathit{Op}$ at random, and flip another coin to determine whether to output the result or select another type-shifter and repeat.
+\begin{lstlisting}[mathescape]
+(define (random-combinator)}
+  (let ([Op (uniform-draw `(FA BA FC BC ...))])
+    (if (flip) Op
+      (random-shift Op (random-type-shifter)))))
+(define (random-type-shifter) (uniform-draw `(AR1 AR2 ...)))
+(define (random-shift Op type-shifter)
+  (let ([shifted (if (flip)
+    ($\lambda$ (arg1 arg2) (Op (type-shifter arg1) arg2))
+    ($\lambda$ (arg1 arg2) (Op arg1 (type-shifter arg2))))])
+      (if (flip) shifted
+        (random-shift shifted (random-type-shifter)))))
+(define AR1 ($\lambda$ (f) ($\lambda$ (x) ($\lambda$ (y) (x ($\lambda$ (z) ((f z) y)))))))
+(define AR2 ($\lambda$ (f) ($\lambda$ (x) ($\lambda$ (y) (y ($\lambda$ (z) ((f x) z)))))))
+\end{lstlisting}
+The choice of type-shifters here follows \citet[][pp.453ff.]{barker05}. 
+Note that each lexical item can is associated with an infinite number of (static) types, the probability of associating an item with a type declines as an exponential function of the number of type-raising operations required. 
+The mechanism for generating type ambiguities thus automatically enforces the preference for interpretation in lower types, a feature which is often stipulated in discussion of type-shifting \citep{parteerooth83,partee87}.
+
+With \lstinline{random-combinator} defined in this way, we predict the two readings of of \emph{Most players played in some match} as follows:
+\begin{itemize}
+\item The subject wide scope reading obtains when the meaning function constructs the interpretation
+$$
+\mathbf{BA}(\mathbf{FA}(\sv{most})(\sv{players})
+(\mathbf{FA}(\mathbf{AR}_2(\mathbf{AR}_1(\sv{played\ in})))
+(\mathbf{FA}(\sv{some})(\sv{match})))),
+$$  
+\item The object wide scope reading obtains when the meaning function constructs the interpretation
+$$
+\mathbf{BA}(\mathbf{FA}(\sv{most})(\sv{players})
+(\mathbf{FA}(\mathbf{AR}_1(\mathbf{AR}_2(\sv{played\ in})))
+(\mathbf{FA}(\sv{some})(\sv{match})))),
+$$  
+\end{itemize}
+
 
 %%%%%
 %stuff below here is for reference while writing. to be commented out before submission...
