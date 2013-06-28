@@ -1,22 +1,20 @@
-\documentclass[12pt]{article}
-%\usepackage{proceed2e}
-\usepackage{amsmath, amsthm, amssymb}
+\documentclass[pdfextras]{handbook}  
+
+
 \usepackage{graphicx}
 \usepackage{color}
 \usepackage{xcolor}
 \usepackage{listings}
 \usepackage{inconsolata}
-\usepackage[numbers]{natbib}
-\usepackage{hyperref}
 \usepackage{colonequals}
 \usepackage{todonotes}
-%\usepackage{bm}
 \usepackage{gb4e}
-%\usepackage{MnSymbol}
-%\usepackage{stmaryrd}
-%\usepackage{amsfonts}
-\usepackage[small]{caption}
-%\usepackage{bigfoot} %to cram listings into footnotes
+
+ \usepackage{hyperref}
+ \usepackage{amsmath, amsthm, amssymb}
+
+
+
 
 \newcommand{\llbracket}{\ensuremath{\left [\!\left [}}%
 \newcommand{\rrbracket}{\ensuremath{\right ]\!\right ]}}
@@ -25,11 +23,9 @@
 %\newcommand{\lar}[1]{\ensuremath{\langle #1 \rangle}}
 \newcommand{\denot}[1]{\ensuremath{\llbracket \mathit{#1} \rrbracket}}
 
-\newenvironment{AY11-12}{}{}
 
-%\usepackage[raggedright]{sidecap}
-%\usepackage{multirow}
 
+ 
  
  
  \lstset{
@@ -69,34 +65,42 @@
 \definecolor{solarized@cyan}{HTML}{2AA198}
 \definecolor{solarized@green}{HTML}{859900}
 
-\oddsidemargin 0.0in 
-%%this makes the odd side margin go to the default of 1inch
-\textwidth 6.5in
-%%sets the textwidth to 6.5, which leaves 1 for the remaining right margin with 8 1/2X11inch paper 
 
-%\pagestyle{empty}
+
+
+\makeindex
  
-
-
-\title{Uncertainty in Language and Thought}
-
-
 \begin{document}
+% The following turns on line numbering, which is useful for
+% reviewers, proof readers and copy editors. Comment out this line if
+% the line numbering causes problems.
+\linenumbers
 
-\listoftodos
-\pagebreak
+\title*{Probabilistic Semantics and Pragmatics: Uncertainty in Language and Thought}
+\titlerunning{Probabilistic Semantics and Pragmatics}
+
+
+\author{Noah D.~Goodman\inst{1}
+        and Daniel Lassiter\inst{1}}
+
+\institute{%
+   Stanford University
+    \texttt{\{ngoodman,lassiter\}@stanford.edu}
+ }
 
 
 \maketitle
 
-\abstract{}
 
 
 
-
+%%stuff that helps in writing:
 \tableofcontents
-
 \pagebreak
+\listoftodos
+\pagebreak
+%%%
+
 
 
 \todo[inline]{bibliography! we have a lot of reference chasing to do..}
@@ -350,7 +354,7 @@ Imagine that Bob is playing Jim in match 1; we can infer Bob's strength before o
     (equal? (players-on-team `team2) `(Jim))
     (equal? (teams-in-match `match1) `(team1 team2))))
 \end{lstlisting}
-In this and all that follows \lstinline{...ToW theory...} is an abbreviation for the definitions in figure \ref{theory}. 
+In this and all that follows \lstinline{...ToW theory...} is an abbreviation for the definitions in appendix \ref{tow}. 
 The result of this strength is simply the prior belief about Bob's strength: a distribution with mean 0.0.
 
 Now imagine that Bob wins this match:
@@ -404,26 +408,15 @@ These will be less important in what follows, but we note that they are potentia
  
 \section{Meaning as condition}
 \label{literal}
-
-\todo[inline]{Noah:
-What if any general motivation do we give here?
-
-Want to motivate meaning as conditioning from very general distributional assumptions. 
-Sentences as observations. 
-Assume sentences are independent (in literal meaning -- pragmatics changes this). 
-Implies sentence composition by sequential conditioning.}
-
-%it would be nice to somewhere mention that rescaling beliefs is a general mechanism, and that this is equivalent to query. 
-Note that any transition from distribution $P_{\text{before}}$ to distribution $P_{\text{after}}$ such that the support (i.e.\ region of non-zero probability) of $P_{\text{after}}$ is a subset of the support of $P_{\text{after}}$ can be written as multiplying by a real-valued function and then renormalizing. 
-That is, any belief update of this type can be written as the result of conditioning on some proposition.
-
-
-%This view of the belief states and their dynamics has a natural extension to language understanding: we can treat interpretation as conditioning on the literal meaning of a sentence. 
-
-\subsection{\label{literal-listener}Literal interpretation}
+\label{literal-listener}
 
 Following a productive tradition in semantics and pragmatics \citep[][etc.]{stalnaker78,lewis79,heim82}, we view the basic function of language understanding as belief update: moving from a prior belief distribution over worlds (or situations) to a posterior belief distribution given the \emph{literal meaning} of a sentence. 
-By analogy with the effects of observation on belief, we can formalize this idea naturally by defining the literal listener as:
+
+Probabilistic conditioning (or \lstinline{query}) is a very general way to describe updating of degrees of belief. Indeed, any transition from distribution $P_{\text{before}}$ to distribution $P_{\text{after}}$ such that the support (i.e.\ region of non-zero probability) of $P_{\text{after}}$ is a subset of the support of $P_{\text{before}}$ can be written as multiplying by a non-negative, real-valued function and then renormalizing. From this observation it is easy to show that any belief update can be written as the result of conditioning on some (stochastic) predicate.
+
+We next assume that each sentence provides information which is independent of other sentences given the state of the world (which may include discourse properties). From this it follows, parallel to the discussion of multiple observations as sequential conditioning above, that a sequence of sentences can be treated as sequentially updating beliefs by conditioning---so we can focus on the literal meaning of a single sentence. This independence assumption can be seen as the most basic, and most important, \emph{compositionality} assumption, which allows language understanding to proceed incrementally by utterance. (When we add pragmatic inference, in section \ref{pragmatics}, this independence assumption will weaken, but it remains essential to the basic semantic function of utterances.)
+
+How does an utterance specify which belief update to perform? We formalize the literal listener as:
 \begin{lstlisting}
 (define (literal-listener utterance QUD)
   (query
@@ -431,7 +424,9 @@ By analogy with the effects of observation on belief, we can formalize this idea
     (eval QUD)
     (eval (meaning utterance))))
 \end{lstlisting}
-This function specifies the posterior distribution over answers to the Question Under Discussion (\lstinline{QUD}) given that the literal meaning of the utterance is true.\footnote{On QUD models, see \citealt{ginzburg95a,vankuppevelt95,roberts96,beaverclark08} among many others.} Notice that the prior distribution is specified by a conceptual lexicon---the \lstinline{...theory...}---and the \lstinline{QUD} will be evaluated in the local environment where all functions defined by this theory are in scope. That is, the question of interest is determined by the \emph{expression} \lstinline{QUD} while its answer is determined by the \emph{value} of this expression in the local context of reasoning by the literal listener: the value of \lstinline{(eval QUD)}. (For a description of the \lstinline{eval} operator see section \ref{eval} above.)
+This function specifies the posterior distribution over answers to the Question Under Discussion (\lstinline{QUD}) given that the literal meaning of the utterance is true.\footnote{On QUD models, see \citealt{ginzburg95a,vankuppevelt95,roberts96,beaverclark08} among many others.} 
+Notice that the prior distribution for the literal listener is specified by a conceptual lexicon---the \lstinline{...theory...}---and the \lstinline{QUD} will be evaluated in the local environment where all functions defined by this theory are in scope. That is, the question of interest is determined by the \emph{expression} \lstinline{QUD} while its answer is determined by the \emph{value} of this expression in the local context of reasoning by the literal listener: the value of \lstinline{(eval QUD)}. (For a description of the \lstinline{eval} operator see section \ref{eval} above.)
+Hence the semantic effect of an utterance is a function from \lstinline{QUD}s to posteriors, rather than directly a posterior over worlds. Using the \lstinline{QUD} in this way has two beneficial consequences: first, it limits the holism of belief update, triggering representation of only a large enough situation to capture the sentence meaning (described below) about the question of current interest; second, it has important effects on the informative speaker described below (which will only be informative about the \lstinline{QUD}, not about the world in general).
 
 The \lstinline{meaning} function is a map from strings (surface forms) to Church expressions (logical forms, which include functions defined in \lstinline{...theory...}).
 Many theories of syntactic and semantic composition could be used to provide this mapping. 
