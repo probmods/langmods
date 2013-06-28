@@ -20,7 +20,7 @@
 
 \newcommand{\llbracket}{\ensuremath{\left [\!\left [}}%
 \newcommand{\rrbracket}{\ensuremath{\right ]\!\right ]}}
-\providecommand{\sv}[1]{\ensuremath{\llbracket #1 \rrbracket}}
+\providecommand{\sv}[1]{\ensuremath{\llbracket \mathit{#1} \rrbracket}}
 \providecommand{\textsv}[1]{\ensuremath{\llbracket \text{#1} \rrbracket}}
 %\newcommand{\lar}[1]{\ensuremath{\langle #1 \rangle}}
 \newcommand{\denot}[1]{\ensuremath{\llbracket \mathit{#1} \rrbracket}}
@@ -444,10 +444,9 @@ For concreteness, we consider a simple system in which a string is recursively s
          ((random-combinator) (meaning (first subs)) (meaning (second subs))))))
 \end{lstlisting}
 Here the predicate \lstinline{lexical-item?} determines if the (remaining) utterance is a single lexical item (entry in the lexicon), if so it is looked up with the \lstinline{lexicon} function.
-%\todo[inline]{``remaining'' suggests we're already within the recursion---maybe we should ease the poor linguists into it a bit?}
 The function \lstinline{random-split} takes a string and returns the list of two substrings that result from splitting at a random position in the length of the string.
 The function \lstinline{random-combinator} chooses a random composition operator, such as left application or right composition. 
-We assume that the set of possible compositions is sufficient to perform any syntactic operations needed.\footnote{\label{composition}The set of composition operators includes at least forward and backward application and composition:
+We assume that the set of possible compositions is sufficient to perform any syntactic operations needed.\footnote{\label{composition}Obvious choices for inclusion in the set of composition operators are forward and backward function application and composition:
 \begin{itemize}
 \item \textbf{FA}: \lstinline{(lambda (A) (lambda (B) (A B)))}
 \item \textbf{BA}: \lstinline{(lambda (A) (lambda (B) (B A)))}
@@ -455,7 +454,7 @@ We assume that the set of possible compositions is sufficient to perform any syn
 \item \textbf{BC}: \lstinline{(lambda (A) (lambda (B) (lambda (x) (B (A x)))))}
 \end{itemize}
 As discussed in section \ref{ambiguity}, we can generate quantifier scope ambiguities by including in the \lstinline{meaning} function a stochastic recursion which inserts zero or more of the type-shifting operators discussed in \citet{hendriks93}. 
-This treatment of quantifier scope is convenient, but others (e.g., quantifier raising or Skolem functions \cite{steedman12} ) could be implemented by complicating the syntactic or semantic mechanisms in various ways. 
+This treatment of quantifier scope is convenient, but others (e.g., quantifier raising \citep{may77} or Skolem functions \cite{steedman12}) could be implemented by complicating the syntactic or semantic mechanisms in various ways. 
 
 Our simple implementation of \lstinline{random-split} does not insert silent elements such as indices and PRO. 
 A complete theory would need to assume additional combinators to cope with gaps \citep{steedman00}, binding \citep{jacobson99,barker05}. 
@@ -861,7 +860,7 @@ Another interpretation of this modeling approach (indeed, the original interpret
 \begin{itemize}
 \item horn implicature
 \item  "the" vs "a": same basic meaning, but the variable from "the" is lifted to L1, hence is influenced by salience. (competition between "a" and "the"?)
-\subitem \sv{the} = \lstinline{($\lambda$ (P) ($\lambda (x) (P x)))}, with the variable $x$ lifted up to the pragmatic listener. 
+\subitem \sv{the} = \lstinline[mathescape]{($\lambda$ (P) ($\lambda$ (x) (P x)))}, with the variable $x$ lifted up to the pragmatic listener. 
 \item  presupposition accommodation: "the strong player" == the strongest.
 \item quantifier scope??
 \end{itemize}
@@ -910,7 +909,7 @@ Here we collect together the Church definitions forming our simple intuitive the
 (define teams-in-match (mem ($\lambda$ (match) (draw-n 2 teams))))
 (define pulling (mem ($\lambda$ (player match) (+ (strength player) (gaussian 0 0.5)))))
 (define team-pulling (mem ($\lambda$ (team match) 
-                          (sum (map (lambda (x) (pulling x match)) (players-on-team team))))))
+                          (sum (map ($\lambda$  (x) (pulling x match)) (players-on-team team))))))
 (define (winner match) 
   (let ([teamA (first (teams-in-match match))]
         [teamB (second (teams-in-match match))])
@@ -948,7 +947,7 @@ And transitive verbs
 (we simplify by ignoring tense):
 \begin{itemize}
 \item \sv{won} = \lstinline[mathescape]{($\lambda$ (match) ($\lambda$ (x) (equal? x (winner match))))}
-\item \sv{played\ in} =  \lstinline[mathescape]{($\lambda$ (match) ($\lambda$ (team-list) (all (map (lambda (x) (element? x (teams-in-match match)))) team-list)))} 
+\item \sv{played\ in} =  \lstinline[mathescape]{($\lambda$ (match) ($\lambda$ (team-list) (all (map ($\lambda$  (x) (element? x (teams-in-match match)))) team-list)))} 
 \item \sv{be\ on} =  \lstinline[mathescape]{($\lambda$ (team) ($\lambda$ (x) (element? x (players-on-team team))))} 
 \item \sv{captain} = \lstinline[mathescape]{($\lambda$ (team) ($\lambda$ (x) (equal? x (captain team))))}
 \end{itemize}
