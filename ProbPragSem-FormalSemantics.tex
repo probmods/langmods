@@ -400,7 +400,7 @@ Another way of saying this is that our knowledge of the world, the generative mo
 There are a number of other patterns of reasoning that are common results of probabilistic inference over structured models. 
 For instance, \emph{screening off} describes the situation when two variables that were a priori dependent become independent after an observation (in some sense the opposite of explaining away).
 Other patterns include Occam's razor (complexity of hypotheses is automatically penalized), transfer learning (an inductive bias learned from one domain constrains interpretation of evidence in a new domain), and the blessing of abstraction (abstract knowledge can be learned faster than concrete knowledge). 
-These will be less important in what follows, but we note that they are potentially important for the question of language learning---when we view learning as an inference, the dynamics of probabilistic inference come to bear on the learning problem. For detailed examples 
+These will be less important in what follows, but we note that they are potentially important for the question of language learning---when we view learning as an inference, the dynamics of probabilistic inference come to bear on the learning problem. For detailed examples of these patterns, using Church representation, see \url{http://bit.ly/ProbMods}.
 
  
 \section{Meaning as condition}
@@ -625,8 +625,31 @@ Intrinsically graded (e.g., prototype) meanings are most naturally thought of as
 
 
 \subsection{Compositionality}
-\todo[inline]{Noah: discuss that compositionality in language and thought are similar but along different `directions'...}
-\todo[inline]{Here or maybe in GD: Types useful in SLC but not in LC. (Eg potential locus of asymmetry between kinds and properties?)}
+%\todo[inline]{Noah: discuss that compositionality in language and thought are similar but along different `directions'...}
+%\todo[inline]{Here or maybe in GD: Types useful in SLC but not in LC. (Eg potential locus of asymmetry between kinds and properties?)}
+
+It should be clear that compositionally has played a key role in our model of language interpretation thus far. It has in fact played several key roles: expressions in SLC are built from simpler expressions, sequences of utterances are interpreted by sequential conditioning, the \lstinline{meaning} function composes SLC expressions to form sentence meanings. There are thus several, interlocking ``direction'' of compositionality at work, and they result in interactions that could appear non-compositional if only one direction was considered. Let us focus on two: compositionality of world knowledge and compositionality of linguistic meaning.
+
+Compositionality of world knowledge refers to the way that we use SLC to build distributions over possible worlds, not by directly assigning probabilities to all possible expressions, but by an evaluation process that recursively samples values for sub-expressions. 
+That is, we have a compositional language for specifying generative models of the world.
+%
+Compositionality of linguistic meaning  refers to the way that \emph{conditions} on worlds are built up from simpler pieces (via the \lstinline{meaning} function and evaluation of the meaning). 
+This is the standard truth-functional semantics approach to meaning composition.
+%
+Interpreted meaning---the posterior distribution arrived at by \lstinline{literal-listener}---is not immediately compositional along either world knowledge or linguistic structure. 
+Instead it arises from the interaction of these two factors.
+The glue between these two structures is the conceptual lexicon; it defines the conceptual language for imagining particular situations, and the primitive semantic vocabulary for semantic meaning.
+
+An alternative approach to compositional probabilistic semantics would be to let each linguistic expression denote a distribution or probability directly, and build the linguistic interpretation by composing them. This appears attractive: it is more direct and simpler (and does not rely on complex generative knowledge of the world). 
+How would we compose these distributions? For instance take ``Jack is strong and Bob is strong''. If ``Jack is strong'' has probability $0.2$ and ``Bob is strong'' has probability $0.3$, what is the probability of the whole sentence? 
+A natural approach would be to multiply the two probabilities. 
+However this implies that their strengths are independent---which is intuitively unlikely: if Jack and Bob are both men, then learning that Jack is strong suggests than men are strong, which suggests that Bill is strong.
+A more productive strategy is the one we have taken: world knowledge specifies a joint distribution on Bob and Jacks strengths (by first sampling the prototypical strength of men, then sampling the strength of each), and the sentence imposes a \emph{constraint} on this distribution (that each man's strength exceeds a threshold). 
+The sentence denotes not a world probability simpliciter, but a constraint on worlds which \emph{is} built compositionally. 
+
+\todo{mention fuzzy logic (too much independence), and shalom and van eijk's recent work (no compositionality to background distribution).}
+
+
 
 %\item  Sentence meanings: in formal semantics there are two views of meaning. the belief update view (roughly, dynamic semantics) and the intensions---functions from world to truth---view (the Montague, Lewis, etc view). Which is ``correct''? What's the relationship between belief and truth?
 
