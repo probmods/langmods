@@ -1,0 +1,107 @@
+accepted = 0#
+n.sims = 300#
+results = rep(NA, n.sims)
+n.sims = 1000
+results = rep(NA, n.sims)
+approx.equal = function(v1,v2) {return(all(sapply(1:length(v1),
+return(#
+		all(sapply(1:length(v1), FUN=function(i) {#
+        	return(abs(v1[i] - v2[i]) < .2)#
+        })))#
+    }
+approx.equal = function(v1,v2) {#
+	return(#
+		all(sapply(1:length(v1), FUN=function(i) {#
+        	return(abs(v1[i] - v2[i]) < .2)#
+        })))#
+    }
+v1 = c(1,2,3,4,5)
+v2 = c(9, 10, 3, 2, 8)
+abs(v1[i] - v2[i])
+abs(v1-v2)
+abs(v1-v2) < 3
+all(abs(v1-v2) < 3)
+approx.equal = function(v1,v2) return(abs(v1 - v2) < .1)
+approx.equal(v1,v2)
+approx.equal = function(v1,v2) return(all(abs(v1 - v2) < .1))
+approx.equal(v1,v2)
+observed.strengths = c(-1.1, .5, -.3, .7)
+gender.str = rnorm(2, 0, 2)
+gender.str
+genders = c(1, 2, 1, sample(c(1,2), 1)) # 1='m', 2 = 'f'
+genders
+simulated.strengths = sapply(genders, function(g) {#
+    return(rnorm(1, gender.str[g], 1))#
+    })
+simulated.strengths
+approx.equal(observed.strengths, simulated.strengths)
+accepted = 0#
+n.sims = 1000#
+results = rep(NA, n.sims)#
+approx.equal = function(v1,v2) return(all(abs(v1 - v2) < .1))#
+observed.strengths = c(-1.1, .5, -.3, .7)#
+while (accepted < n.sims) {#
+  gender.str = rnorm(2, 0, 2)#
+  genders = c(1, 2, 1, sample(c(1,2), 1)) # 1='m', 2 = 'f'#
+  # positions: bob = -1.1, jane = .5, jim = -.3, pat = .7#
+  simulated.strengths = sapply(genders, function(g) {#
+    return(rnorm(1, gender.str[g], 1))#
+    })#
+  if (approx.equal(observed.strengths, simulated.strengths)) {#
+    accepted = accepted + 1#
+    results[accepted] = genders[4]#
+  }#
+}
+accepted = 0#
+n.sims = 300#
+results = rep(NA, n.sims)#
+approx.equal = function(v1,v2) return(all(abs(v1 - v2) < .1))#
+observed.strengths = c(-1.1, .5, -.3, .7)#
+while (accepted < n.sims) {#
+  gender.str = rnorm(2, 0, 2)#
+  genders = c(1, 2, 1, sample(c(1,2), 1)) # 1='m', 2 = 'f'#
+  # positions: bob = -1.1, jane = .5, jim = -.3, pat = .7#
+  simulated.strengths = sapply(genders, function(g) {#
+    return(rnorm(1, gender.str[g], 1))#
+    })#
+  if (approx.equal(observed.strengths, simulated.strengths)) {#
+    accepted = accepted + 1#
+    results[accepted] = genders[4]#
+  }#
+}
+summary(results)
+length(results)
+length(which(results==1))
+111/300
+literal.only = function(n.sims) {#
+  results = matrix(NA, nrow=n.sims, ncol=2)#
+  accepted = 0#
+  while (accepted < n.sims) {#
+    theta = runif(1, -100, 100) # uniform prior on thetas over sufficient interval#
+    height = rnorm(1, 0, 2.25)#
+    if (height > theta) {#
+      accepted = accepted + 1#
+      results[accepted,] = c(height, theta)#
+    }#
+  }#
+  return(results)#
+}
+literal.only.sim = literal.only(100000)#
+par(mfrow=c(1,2))#
+curve(dnorm(x, 0, 2.25), xlim=c(-10,10), lty=1, lwd=3, col='red', xlab='Strength', ylab='Probability density')#
+abline(h=.05, lty=4, lwd=3, col='black')#
+plot(density(literal.only.sim[,1]), col='blue', lwd=3, lty=2)#
+lines(density(literal.only.sim[,2]), col='green', lwd=3, lty=3)#
+legend('topright', c('Strength prior', 'Strength posterior', 'Degree prior', 'Degree posterior'), lty=c(1, 2, 4, 3), col=c('red', 'blue', 'black', 'green'), text.col=c('red', 'blue', 'black', 'green'), cex=.8)
+par(mfrow=c(1,2))#
+curve(dnorm(x, 0, 2.25), xlim=c(-10,10), lty=1, lwd=3, col='red', xlab='Strength', ylab='Probability density')#
+abline(h=.05, lty=4, lwd=3, col='black')#
+lines(density(literal.only.sim[,1]), col='blue', lwd=3, lty=2)#
+lines(density(literal.only.sim[,2]), col='green', lwd=3, lty=3)#
+legend('topright', c('Strength prior', 'Strength posterior', 'Degree prior', 'Degree posterior'), lty=c(1, 2, 4, 3), col=c('red', 'blue', 'black', 'green'), text.col=c('red', 'blue', 'black', 'green'), cex=.8)
+par(mfrow=c(1,1))#
+curve(dnorm(x, 0, 2.25), xlim=c(-10,10), lty=1, lwd=3, col='red', xlab='Strength', ylab='Probability density')#
+abline(h=.05, lty=4, lwd=3, col='black')#
+lines(density(literal.only.sim[,1]), col='blue', lwd=3, lty=2)#
+lines(density(literal.only.sim[,2]), col='green', lwd=3, lty=3)#
+legend('topright', c('Strength prior', 'Strength posterior', 'Degree prior', 'Degree posterior'), lty=c(1, 2, 4, 3), col=c('red', 'blue', 'black', 'green'), text.col=c('red', 'blue', 'black', 'green'), cex=.8)

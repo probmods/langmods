@@ -302,7 +302,7 @@ We could, for instance observe the strengths and genders of several players, and
        (= (strength `Pat) 0.7)))
 \end{lstlisting}
 \todo{run this simulation}
-The result of this query is that Pat is female with probability around .6. 
+The result of this query is that Pat is more likely to be female than male (probability .63). 
 This is because the observed males are weaker than Jane, the observed female, and so a strong player such as Pat is likely to be female as well.
 
 In the game of tug-of-war players are on teams, which themselves have properties such as captains:
@@ -597,7 +597,7 @@ The left panel of the figure
 The right panel shows the mean inferred team size as the number of matches varies. 
 \begin{figure}[tbh]
 \begin{center}
-\includegraphics[scale=.55]{quantifiers.pdf}
+\includegraphics[scale=.45]{quantifiers.pdf}
 \end{center}
 \label{scope-ambiguity}
 \caption{The probability of the listener interpreting the utterance \emph{Most players played in some match} according to the two possible scopal configurations depends in intricate ways on the interpreter's beliefs and observations about the number of matches and the number of players on each team (left). This, in turn, influences the total information conveyed by the utterance (right).}
@@ -776,9 +776,8 @@ the prior (marginal) distributions over \lstinline{d} and Bob's strength, and th
 \end{center}
 %\label{GAs-L0}
 \caption{The literal listener's interpretation of an utterance containing a free degree variable, assuming a maximally uninformative prior on the variable. 
-The inferred meaning is implausibly weak (see ``Degree posterior'', dotted line), and very little has been learned about the variable of interest (``Strength posterior'', dashed line).}
+This listener's exclusive preference for true interpretations leads to an extremely low values of the free variable (see ``Degree posterior'', dotted line). As a result the utterance conveys no information about the variable of interest: the strength posterior (dashed line) is equivalent ot the prior (solid line).}
 \end{figure}
-\todo[inline]{Dan: re-run simulation with wider window for theta.}
 The interpretation of the free degree variable has indeed been influenced by context: it changes from its prior to a posterior that makes the utterance likely to be true. 
 However, this is the wrong interpretation of \emph{Bob is strong}. Intuitively, what the listener ought to do is to adjust the estimate of Bob's strength to a fairly high value, relative to the prior estimate. 
 Instead, our literal listener increases the probability of the utterance's truth by sets the free variable in its meaning to an extremely low value, with the effect that \emph{Bob is strong} is true for virtually any height that Bob might plausibly have. 

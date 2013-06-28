@@ -129,9 +129,7 @@ curve(dnorm(x, 0, 2.25), add=T, col='red')
 accepted = 0
 n.sims = 300
 results = rep(NA, n.sims)
-approx.equal = function(v1,v2) {return(all(sapply(1:length(v1), 
-                                                 FUN=function(i) {
-                                                   return(abs(v1[i] - v2[i]) < .2)})))}
+approx.equal = function(v1,v2) return(all(abs(v1 - v2) < .1))
 observed.strengths = c(-1.1, .5, -.3, .7)
 while (accepted < n.sims) {
   gender.str = rnorm(2, 0, 2)
