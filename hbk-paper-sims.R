@@ -118,3 +118,30 @@ for (team.size in 2:(num.players/2)) {
     } 
   }
 }
+
+# 
+g.mean = rnorm(100000, 0, 2)
+str = sapply(g.mean, FUN=function(x){return(rnorm(1, x, 1))})
+plot(density(str))
+curve(dnorm(x, 0, 2.25), add=T, col='red')
+
+# Pat's gender
+accepted = 0
+n.sims = 300
+results = rep(NA, n.sims)
+approx.equal = function(v1,v2) {return(all(sapply(1:length(v1), 
+                                                 FUN=function(i) {
+                                                   return(abs(v1[i] - v2[i]) < .2)})))}
+observed.strengths = c(-1.1, .5, -.3, .7)
+while (accepted < n.sims) {
+  gender.str = rnorm(2, 0, 2)
+  genders = c(1, 2, 1, sample(c(1,2), 1)) # 1='m', 2 = 'f'
+  # positions: bob = -1.1, jane = .5, jim = -.3, pat = .7
+  simulated.strengths = sapply(genders, function(g) {
+    return(rnorm(1, gender.str[g], 1))
+    })
+  if (approx.equal(observed.strengths, simulated.strengths)) {
+    accepted = accepted + 1
+    results[accepted] = genders[4]
+  }
+}

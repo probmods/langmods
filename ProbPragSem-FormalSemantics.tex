@@ -101,7 +101,7 @@
 
 \todo[inline]{bibliography! we have a lot of reference chasing to do..}
 
-Language is used to communicate ideas. Ideas are mental tools for coping with a complex and uncertain world. This implies that human conceptual structures should be key to language meaning, and that probability, the mathematics of uncertainty, should be indispensable for describing both language and thought. Indeed, probabilistic models are enormously useful in modeling human cognition \cite{Tenenbaum, etc}, and aspects of natural language \cite{ChaterManning}. Probabilistic tools have only recently been used for natural language semantics and pragmatics. In this chapter we synthesize several of these modeling advances, exploring a formal model of semantics grounded, via pragmatic inference, in core conceptual structures.
+Language is used to communicate ideas. Ideas are mental tools for coping with a complex and uncertain world. This implies that human conceptual structures should be key to language meaning, and that probability, the mathematics of uncertainty, should be indispensable for describing both language and thought. Indeed, probabilistic models are enormously useful in modeling human cognition \cite{Tenenbaum, etc}, and aspects of natural language \cite{bodetal03,ChaterManning}. Probabilistic tools have only recently been used for natural language semantics and pragmatics. In this chapter we synthesize several of these modeling advances, exploring a formal model of semantics grounded, via pragmatic inference, in core conceptual structures.
 
 Flexible human cognition is derived in large part from our ability to imagine possible worlds (or situations). 
 A rich set of concepts, intuitive theories, and other mental representations support imagining and reasoning about possible worlds---together we will call these the conceptual lexicon. 
@@ -120,10 +120,10 @@ There are thus a number of challenges to formalizing this view of language: how 
 
 In this chapter we illustrate the use of probabilistic techniques in natural language pragmatics and semantics with a concrete formal model. This model is not meant to exhaust the space of possible probabilistic models, indeed dozens of extensions are immediately apparent, but rather to show that a probabilistic framework for natural language is possible and productive.
 Our approach is similar in spirit to cognitive semantics, in that we attempt to ground semantics in mental representation, but we draw on the highly successful tools of Bayesian cognitive science to formalize these ideas. 
-Similarly, our approach draws heavily on the progress made in formal model-theoretic semantics \cite{montague1973,heimkratzer1998}, borrowing insights about how syntax drives semantic composition, but we compose elements of stochastic logics rather than deterministic ones.
+Similarly, our approach draws heavily on the progress made in formal model-theoretic semantics \cite{montague1973,gamut90,heimkratzer1998}, borrowing insights about how syntax drives semantic composition, but we compose elements of stochastic logics rather than deterministic ones.
 Finally, like game-theoretic approaches, we place an emphasis on the the refinement of meaning through interactional, pragmatic reasoning.
 
-In section \ref{commonsense} we provide background on probabilistic modeling and stochastic lambda calculus, and introduce the running example scenario: game of tug-of-war. In section \ref{literal} we provide a model of literal interpretation of natural language utterances and describe a formal fragment of english suitable for our running scenario. Using this fragment we illustrate the emergence of non-monotonic effects in interpretation and the interaction of ambiguity with background knowledge. In section \ref{pragmatics} we describe pragmatic interpretation of meaning as an inference that depends on an informative speaker, who depends on the literal interpretation listener. This extended notion of interpretation predicts a variety of quantity implicatures and connects to recent quantitative experimental results. In section \ref{indices} we discuss the role of semantic indices in this framework and show that binding these indices at the pragmatic level allows us to deal with several issues in context-sensitivity of meaning, such as the interpretation of scalar adjectives. We conclude with general comments about the role of uncertainty in pragmatics and semantics.
+In section \ref{commonsense} we provide background on probabilistic modeling and stochastic lambda calculus, and introduce the running example scenario: the game of tug-of-war. In section \ref{literal} we provide a model of literal interpretation of natural language utterances and describe a formal fragment of english suitable for our running scenario. Using this fragment we illustrate the emergence of non-monotonic effects in interpretation and the interaction of ambiguity with background knowledge. In section \ref{pragmatics} we describe pragmatic interpretation of meaning as an inference that depends on an informative speaker, who depends on the literal interpretation listener. This extended notion of interpretation predicts a variety of quantity implicatures and connects to recent quantitative experimental results. In section \ref{indices} we discuss the role of semantic indices in this framework and show that binding these indices at the pragmatic level allows us to deal with several issues in context-sensitivity of meaning, such as the interpretation of scalar adjectives. We conclude with general comments about the role of uncertainty in pragmatics and semantics.
 
 
 
@@ -294,7 +294,7 @@ We are now already in a position to make useful inferences.
 We could, for instance observe the strengths and genders of several players, and then Pat's strength but not gender, and ask for the latter:
 \begin{lstlisting}[mathescape]
 (query
-  (define gender (mem ($\lambda$ (p) (if (flip) `man `woman))))
+  (define gender (mem ($\lambda$ (p) (if (flip) `male `female))))
   (define gender-mean-strength (mem ($\lambda$ (g) (gaussian 0 2))))
   (define strength (mem ($\lambda$ (p) (gaussian (gender-mean-strength (gender p)) 1))))
   
@@ -303,16 +303,15 @@ We could, for instance observe the strengths and genders of several players, and
   (and (equal? (gender `Bob) `male) (= (strength `Bob) -1.1)
        (equal? (gender `Jane) `female) (= (strength `Jane) 0.5)
        (equal? (gender `Jim) `male) (= (strength `Jim) -0.3)
-       (= (strength 'Pat) 0.7)))
+       (= (strength `Pat) 0.7)))
 \end{lstlisting}
 \todo{run this simulation}
-The result of this query is that Pat is female with probability XX---because the observed males are weaker than the observed female, Pat, who is strong, is likely female.
+The result of this query is that Pat is female with probability around .6. 
+This is because the observed males are weaker than Jane, the observed female, and so a strong player such as Pat is likely to be female as well.
 
-%\todo[inline]{We could already talk about explaining away and screening off here... should we?}
-%\todo[inline]{I think it's more intuitive as you do it below, using results and inferring strengths.}
 In the game of tug-of-war players are on teams, which themselves have properties such as captains:
 \begin{lstlisting}[mathescape]
-(define players `(Bob Jim Mary Sue Bill Evan Sally Tim Joe Jane Terrence Kate))
+(define players `(Bob Jim Mary Sue Bill Evan Sally Tim Pat Jane Terrence Kate))
 (define team-size (uniform-draw '(1 2 3 4 5 6)))
 (define players-on-team (mem ($\lambda$ (team) (draw-n team-size players))))
 (define captain (mem ($\lambda$ (team) (uniform-draw (players-on-team team)))))
@@ -455,7 +454,7 @@ We assume that the set of possible compositions is sufficient to perform any syn
 \item \textbf{FC}: \lstinline{(lambda (A) (lambda (B) (lambda (x) (A (B x)))))}
 \item \textbf{BC}: \lstinline{(lambda (A) (lambda (B) (lambda (x) (B (A x)))))}
 \end{itemize}
-As discussed in section \ref{ambiguity}, we can generate quantifier scope ambiguities by including among the set of composition operators all possible combinations of \textbf{FA}, \textbf{BA}, \textbf{FC}, and \textbf{BC} with the type-shifting mechanisms of \citet{hendriks93}. 
+As discussed in section \ref{ambiguity}, we can generate quantifier scope ambiguities by including in the \lstinline{meaning} function a stochastic recursion which inserts zero or more of the type-shifting operators discussed in \citet{hendriks93}. 
 This treatment of quantifier scope is convenient, but others (e.g., quantifier raising or Skolem functions \cite{steedman12} ) could be implemented by complicating the syntactic or semantic mechanisms in various ways. 
 
 Our simple implementation of \lstinline{random-split} does not insert silent elements such as indices and PRO. 
