@@ -22,11 +22,6 @@
 \providecommand{\textsv}[1]{\ensuremath{\llbracket \text{#1} \rrbracket}}
 %\newcommand{\lar}[1]{\ensuremath{\langle #1 \rangle}}
 \newcommand{\denot}[1]{\ensuremath{\llbracket \mathit{#1} \rrbracket}}
-
-
-
- 
- 
  
  \lstset{
   language=Scheme, % Andreas Stuhlmüller. Scheme listings. https://github.com/stuhlmueller/scheme-listings.git
@@ -644,7 +639,7 @@ An alternative approach to compositional probabilistic semantics would be to let
 How would we compose these distributions? For instance take ``Jack is strong and Bob is strong''. If ``Jack is strong'' has probability $0.2$ and ``Bob is strong'' has probability $0.3$, what is the probability of the whole sentence? 
 A natural approach would be to multiply the two probabilities. 
 However this implies that their strengths are independent---which is intuitively unlikely: if Jack and Bob are both men, then learning that Jack is strong suggests than men are strong, which suggests that Bill is strong.
-A more productive strategy is the one we have taken: world knowledge specifies a joint distribution on Bob and Jacks strengths (by first sampling the prototypical strength of men, then sampling the strength of each), and the sentence imposes a \emph{constraint} on this distribution (that each man's strength exceeds a threshold). 
+A more productive strategy is the one we have taken: world knowledge specifies a joint distribution on the strength of Bob and Jack (by first sampling the prototypical strength of men, then sampling the strength of each), and the sentence imposes a \emph{constraint} on this distribution (that each man's strength exceeds a threshold). 
 The sentence denotes not a world probability simpliciter, but a constraint on worlds which \emph{is} built compositionally. 
 
 \todo{mention fuzzy logic (too much independence), and shalom and van eijk's recent work (no compositionality to background distribution).}
@@ -783,7 +778,8 @@ the prior (marginal) distributions over \lstinline{d} and Bob's strength, and th
 \caption{The literal listener's interpretation of an utterance containing a free degree variable, assuming a maximally uninformative prior on the variable. 
 The inferred meaning is implausibly weak (see ``Degree posterior'', dotted line), and very little has been learned about the variable of interest (``Strength posterior'', dashed line).}
 \end{figure}
-The threshold variable has indeed been influenced by context: it changes from its prior to a posterior that makes the utterance likely to be true. 
+\todo[inline]{Dan: re-run simulation with wider window for theta.}
+The interpretation of the free degree variable has indeed been influenced by context: it changes from its prior to a posterior that makes the utterance likely to be true. 
 However, this is the wrong interpretation of \emph{Bob is strong}. Intuitively, what the listener ought to do is to adjust the estimate of Bob's strength to a fairly high value, relative to the prior estimate. 
 Instead, our literal listener increases the probability of the utterance's truth by sets the free variable in its meaning to an extremely low value, with the effect that \emph{Bob is strong} is true for virtually any height that Bob might plausibly have. 
 In addition, the listener has learned very little about the variable of interest from the utterance: the posterior distribution is barely shifted to the right of the prior.
@@ -987,8 +983,8 @@ Formally, this means that \lstinline{random-combinator} is defined as a a functi
 (define AR2 ($\lambda$ (f) ($\lambda$ (x) ($\lambda$ (y) (y ($\lambda$ (z) ((f x) z)))))))
 \end{lstlisting}
 The choice of type-shifters here follows \citet[][pp.453ff.]{barker05}. 
-Note that each lexical item can is associated with an infinite number of (static) types, the probability of associating an item with a type declines as an exponential function of the number of type-raising operations required. 
-The mechanism for generating type ambiguities thus automatically enforces the preference for interpretation in lower types, a feature which is often stipulated in discussion of type-shifting \citep{parteerooth83,partee87}.
+Note that each lexical item has the potential to be interpreted in any of an infinite number of (static) types; however, the probability of associating an item with an interpretation in some type declines exponentially with the the number of type-raising operations required to construct this interpretation. 
+The use of a stochastic recursion to generate type ambiguities thus automatically enforces the preference for interpretation in lower types, a feature which is often stipulated in discussions of type-shifting \citep{parteerooth83,partee87}.
 
 With \lstinline{random-combinator} defined in this way, we predict the two readings of of \emph{Most players played in some match} as follows:
 \begin{itemize}
