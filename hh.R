@@ -106,9 +106,9 @@ prior.prob = table(played)/n.sims
 l0.probabilities.given.some = c(0, prior.prob[2:4]/sum(prior.prob[2:4]))
 l0.probabilities.given.all = c(0, 0, 0, 1)
 plot(prior, type='b', pch=19, col='black', lwd=3, xlab="Number of matches Jane played in", ylab="Probability according to literal listener", xlim=c(0,3), ylim=c(0,1), main="Literal listener")
-lines(0:3, l0.probabilities.given.some, type='b', lty=2, lwd=3, col='red')
-lines(0:3, l0.probabilities.given.all, type='b', lty=3, lwd=3, col='blue')
-legend(x=0, y=.6, c('Prior', 'Some', "All"), lty=c(1,2,3), col=c('black','red', 'blue'), text.col=c('black','red', 'blue'), cex=2)
+lines(0:3, l0.probabilities.given.some, type='b', pch=19, lty=2, lwd=3, col='red')
+lines(0:3, l0.probabilities.given.all, type='b',pch=19, lty=3, lwd=3, col='blue')
+legend('topleft', c('Prior', 'Some', "All"), lty=c(1,2,3), col=c('black','red', 'blue'), text.col=c('black','red', 'blue'), cex=1.5)
 
 #L1 probs
 L1.posterior.some = prior * c(0,utt.some)
@@ -118,21 +118,21 @@ L1.posterior.all = L1.posterior.all/sum(L1.posterior.all)
 plot(prior, type='b', pch=19, col='black', lwd=3, xlab="Number of matches Jane played in", ylab="Probability according to reflective listener", xlim=c(0,3), ylim=c(0,1), main="Pragmatic listener")
 #plot(0:3, L1.posterior.some, xaxt='n', type='b', pch=19, col='red', lwd=3, xlab="Number of matches Jane played in", ylab="Probability according to reflective listener", ylim=c(0,1), main="Pragmatic listener")
 axis(1, 0:3)
-lines(L1.posterior.some, type='b', lty=2, pch=19,lwd=3, col='red')
-lines(L1.posterior.all, type='b', lty=3, pch=19,lwd=3, col='blue')
-legend(x=0, y=.6,  c('Prior','Some', "All"), lty=c(1,2,3), col=c('black','red', 'blue'), text.col=c('black','red', 'blue'), cex=2)
+lines(L1.posterior.some, type='b', lty=2, pch=19, lwd=3, col='red')
+lines(L1.posterior.all, type='b', lty=3, pch=19, lwd=3, col='blue')
+legend('topleft', c('Prior','Some', "All"), lty=c(1,2,3), col=c('black','red', 'blue'), text.col=c('black','red', 'blue'), cex=1.5)
 
 # S1 probs
 par(mfrow=c(1,1))
 norm = l0.probabilities.given.all[4]+l0.probabilities.given.some[4]
-utt.some = c(1, 1, l0.probabilities.given.some[4]/norm)
-utt.all = c(0, 0, l0.probabilities.given.all[4]/norm)
-plot(1:3, utt.some, xaxt='n', type='b', pch=19, col='red', lwd=3, xlab="Number of matches Jane played in", ylab="Probability that speaker chooses utterance", ylim=c(0,1), main="Speaker", xlim=c(-1,3))
+utt.some = c(0, 1, 1, l0.probabilities.given.some[4]/norm)
+utt.all = c(0, 0, 0, l0.probabilities.given.all[4]/norm)
+plot(0:3, utt.some, xaxt='n', type='b', pch=19, col='red', lwd=3, xlab="Number of matches Jane played in", ylab="Probability that speaker chooses utterance", ylim=c(0,1), main="Speaker", xlim=c(-1,3))
 axis(1, 0:3)
-lines(utt.all, type='b', lty=2, lwd=3, col='blue')
-lines(0:3, c(1, 0, 0, 0), col='black', lwd=3, lty=3)
+lines(0:3, utt.all, lty=2, lwd=3, col='blue', type='b', pch=19)
+lines(0:3, c(1, 0, 0, 0), col='black', type='b', lwd=3, lty=3, pch=19)
 #legend(x=0, y=.6, c('None', 'Some', "All"), lty=c(3, 1,2), col=c('black', 'red', 'blue'), text.col=c('black', 'red', 'blue'), cex=2)
-legend('bottomleft', c('None', 'Some', "All"), lty=c(3, 1,2), col=c('black', 'red', 'blue'), text.col=c('black', 'red', 'blue'), cex=2)
+legend(-1.2, .7, c('"None"', '"Some"', '"All"'), lty=c(3, 1,2), col=c('black', 'red', 'blue'), text.col=c('black', 'red', 'blue'), cex=2)
 
 
 

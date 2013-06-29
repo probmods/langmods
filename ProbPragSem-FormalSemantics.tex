@@ -841,8 +841,14 @@ Imagine a pragmatic listener who believes that the index variables have values t
 \end{lstlisting}
 In most ways this is a very small change to the model, but it has important consequences. 
 At a high level, the effect is that index variables will now be set in such a way that they both make the utterance likely to be true \emph{and} likely to be pragmatically useful (informative, relevant, etc); the tradeoff between these two factors results in significant contextual flexibility of the interpreted meaning. 
+\todo[inline]{Dan insert adj sim results here}
 In the case of the adjective \emph{strong} we see \todo{put in model figure} that the threshold is now interpreted as roughly one standard deviation from the prior mean strength---hence \emph{strong} means significantly stronger than average, but does not require maximal strength (most informative) or permit any strength (most often true). 
-This model of gradable adjective interpretation (which was introduced in \cite{lassitergoodman13}) has a number of appealing properties: for instance, it explains how background knowledge affects qualitative and quantitative aspects of adjective interpretation, and it explains why vagueness is a pervasive feature of adjective interpretation. 
+This model of gradable adjective interpretation (which was introduced in \cite{lassitergoodman13}) has a number of appealing properties. 
+For instance, the precise interpretation is highly sensitive to the prior probability distribution on answers to the QUD. 
+We thus predicts that gradable adjective interpretation should display considerable sensitivity to background knowledge. 
+This is indeed the case, as for example in the different interpretations of ``strong boy'', ``strong football player'', ``strong wall'', and so forth. 
+Prior expectations about the degree to which objects in a reference class have some property frequently plays a considerable role in determining the interpretation of adjectives which encode the relevant property. 
+This account also predicts that vagueness should be a pervasive feature of adjective interpretation. 
 See \cite{lassitergoodman13} for detailed discussion of these features, and discussion of vagueness in section \ref{vagueness} below. 
 
 We can motivate from this example a general treatment of semantic indices: lift each index into the pragmatic inference, allowing them to bind free variables in the literal meaning, and reasoning over them jointly with world states. 
