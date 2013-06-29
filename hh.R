@@ -100,23 +100,15 @@ played = sapply(1:n.sims, FUN=function(t){
 		return(length(which(players==1)))
 	})
 
-par(mfrow=c(1,3))
-prior = table(played)/n.sims
+#L0
+par(mfrow=c(1,2))
+prior.prob = table(played)/n.sims
 l0.probabilities.given.some = c(0, prior.prob[2:4]/sum(prior.prob[2:4]))
 l0.probabilities.given.all = c(0, 0, 0, 1)
 plot(prior, type='b', pch=19, col='black', lwd=3, xlab="Number of matches Jane played in", ylab="Probability according to literal listener", xlim=c(0,3), ylim=c(0,1), main="Literal listener")
 lines(0:3, l0.probabilities.given.some, type='b', lty=2, lwd=3, col='red')
 lines(0:3, l0.probabilities.given.all, type='b', lty=3, lwd=3, col='blue')
 legend(x=0, y=.6, c('Prior', 'Some', "All"), lty=c(1,2,3), col=c('black','red', 'blue'), text.col=c('black','red', 'blue'), cex=2)
-
-# S1 probs
-norm = l0.probabilities.given.all[4]+l0.probabilities.given.some[4]
-utt.some = c(1, 1, l0.probabilities.given.some[4]/norm)
-utt.all = c(0, 0, l0.probabilities.given.all[4]/norm)
-plot(1:3, utt.some, xaxt='n', type='b', pch=19, col='red', lwd=3, xlab="Number of matches Jane played in", ylab="Probability that speaker chooses utterance", ylim=c(0,1), main="Speaker")
-axis(1, 0:3)
-lines(utt.all, type='b', lty=2, lwd=3, col='blue')
-legend(x=0, y=.6, c('Some', "All"), lty=c(1,2), col=c('red', 'blue'), text.col=c('red', 'blue'), cex=2)
 
 #L1 probs
 L1.posterior.some = prior * c(0,utt.some)
@@ -130,17 +122,21 @@ lines(L1.posterior.some, type='b', lty=2, pch=19,lwd=3, col='red')
 lines(L1.posterior.all, type='b', lty=3, pch=19,lwd=3, col='blue')
 legend(x=0, y=.6,  c('Prior','Some', "All"), lty=c(1,2,3), col=c('black','red', 'blue'), text.col=c('black','red', 'blue'), cex=2)
 
+# S1 probs
+par(mfrow=c(1,1))
+norm = l0.probabilities.given.all[4]+l0.probabilities.given.some[4]
+utt.some = c(1, 1, l0.probabilities.given.some[4]/norm)
+utt.all = c(0, 0, l0.probabilities.given.all[4]/norm)
+plot(1:3, utt.some, xaxt='n', type='b', pch=19, col='red', lwd=3, xlab="Number of matches Jane played in", ylab="Probability that speaker chooses utterance", ylim=c(0,1), main="Speaker", xlim=c(-1,3))
+axis(1, 0:3)
+lines(utt.all, type='b', lty=2, lwd=3, col='blue')
+lines(0:3, c(1, 0, 0, 0), col='black', lwd=3, lty=3)
+#legend(x=0, y=.6, c('None', 'Some', "All"), lty=c(3, 1,2), col=c('black', 'red', 'blue'), text.col=c('black', 'red', 'blue'), cex=2)
+legend('bottomleft', c('None', 'Some', "All"), lty=c(3, 1,2), col=c('black', 'red', 'blue'), text.col=c('black', 'red', 'blue'), cex=2)
 
-utt.prob.given.3 = prior.prob[2:4]/sum(prior.prob[2:4])
-
-barplot(matrix(c(
-	0, 1, 1, 
-)))
 
 
-some.prob = c(0, 1, 1, x)
-all.prob = c(0, 0, 0, y)
-plot(some.prob, type='b', pch=11, col='blue')
+
 
 
 

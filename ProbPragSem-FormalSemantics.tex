@@ -96,10 +96,6 @@
 \pagebreak
 %%%
 
-
-
-\todo[inline]{bibliography! we have a lot of reference chasing to do..}
-
 Language is used to communicate ideas. Ideas are mental tools for coping with a complex and uncertain world. This implies that human conceptual structures should be key to language meaning, and that probability, the mathematics of uncertainty, should be indispensable for describing both language and thought. Indeed, probabilistic models are enormously useful in modeling human cognition \citep{tenenbaumetal11}
 %Tenenbaum, etc}, 
 and aspects of natural language \citep{bodetal03,chater06}. Probabilistic tools have only recently been used for natural language semantics and pragmatics. In this chapter we synthesize several of these modeling advances, exploring a formal model of semantics grounded, via pragmatic inference, in core conceptual structures.
@@ -478,10 +474,9 @@ Gradable adjectives such as \emph{strong} and \emph{weak} denote relations betwe
 For instance, \sv{strong} = \lstinline[mathescape]{($\lambda$ (x) ($\lambda$ (d) (>= (strength x) d)))}.
 The interpretation of \emph{strong} and \emph{weak} as predicates requires pragmatic inference of the value of the vague threshold value: see section \ref{indices} below.
 The relative and superlative forms are more straightforward, as the threshold is bound locally. For instance, the superlative morpheme \emph{-est} is defined so that, for example, \emph{strongest player} will denote a property that is true of Bill if and only if the greatest degree of strength that Bill possesses is equal to the greatest degree of strength that any player possesses: 
- \sv{\text{-}est} = \lstinline[mathescape]{($\lambda$ (A) ($\lambda$ (N) ($\lambda$ (x) (= (argmax A x) (argmax ($\lambda$ (d) (some (map ($\lambda$ (x) (>= (A x) d)) N))))))))}.
+ \sv{\text{-}est} = \lstinline[mathescape]{($\lambda$ (A) ($\lambda$ (N) ($\lambda$ (x) (= (argmax A x) (argmax ($\lambda$ (d) (some (map ($\lambda$ (x) ((A x) d)) N))))))))}.
 
-\todo[inline]{i'd rather leave the threshold as an unbound variable, and define -est to bind this variable before doing its work. discuss with dan... note that this def of -est is broken.}
-
+\todo[inline]{i'd rather leave the threshold as an unbound variable, and define -est to bind this variable before doing its work. discuss with dan... }
 
 Finally, we can adopt standard meanings for functional vocabulary, such as quantifiers: \sv{every} = \lstinline[mathescape]{($\lambda$ (P) ($\lambda$ (Q) (all (map ($\lambda$ (x) (not (and (P x) (not Q x)))) domain-of-individuals))))}.
 
@@ -533,8 +528,8 @@ Suppose, however, the speaker continues with the utterance:\footnote{We assume f
 \item Possible interpretation:\\ 
 \textbf{BA}(\sv{Jim})(\textbf{FA}(\sv{is})(\textbf{FA}(\sv{the})(\textbf{FA}(\textbf{BA}(\sv{weak})(\sv{\text{-}est}))(\sv{player}))))
 \item [$\equiv$] \sv{\text{-}est}(\sv{weak})(\sv{player})(\sv{Jim})
-\item [$=$] \lstinline[mathescape]{(((($\lambda$ (A) ($\lambda$ (N) ($\lambda$ (x) (= (argmax A x) (argmax ($\lambda$ (d) (some (map ($\lambda$ (x) (> (A x) d)) N)))))))) ($\lambda$ (x) (element? x player))) ($\lambda$ (x) ($\lambda$ ($\theta$) (> (weakness x) $\theta$)))) `Jim)}
-\item [$\equiv$] \lstinline[mathescape]{(= (argmax ($\lambda$ (d) (> (weakness `Jim) d))) (argmax ($\lambda$ (d) (some (map ($\lambda$ (x) (> (weakness x) d)) ($\lambda$ (x) (element? x player)))))))    }
+\item [$=$] \lstinline[mathescape]{(((($\lambda$ (A) ($\lambda$ (N) ($\lambda$ (x) (= (argmax A x) (argmax ($\lambda$ (d) (some (map ($\lambda$ (x) ((A x) d)) N)))))))) ($\lambda$ (x) (element? x player))) ($\lambda$ (x) ($\lambda$ ($\theta$) (> (weakness x) $\theta$)))) `Jim)}
+\item [$\equiv$] \lstinline[mathescape]{(= (argmax ($\lambda$ (d) (> (weakness `Jim) d))) (argmax ($\lambda$ (d) (some (map ($\lambda$ (x) ((weakness x) d)) ($\lambda$ (x) (element? x player)))))))    }
 \end{itemize}
 \end{itemize}
 This is a function which will return 1 if and only if Jim's degree of weakness is the greatest of any player, i.e., if his strength is less than that of any other player. 
@@ -571,7 +566,7 @@ Depending on the composition operators used by the \lstinline{meaning} function 
 \item ``For most players $x$, there was a match $y$ such that $x$ played in $y$.'' 
 \item ``For some match $y$, most players played in $y$.''
 \end{itemize}
-\todo{Give the (reduced) church expressions for each of these meanings, too.}
+%\todo{Give the (reduced) church expressions for each of these meanings, too.}
 On current assumptions, both readings are generated equally often by the \lstinline{meaning} function. 
 However, a listener will actually make use of a given reading to update her beliefs only when it is possible to condition on the reading's truth. 
 This means that we can influence the probability of each reading, and so the degree to which each influences the listener's posterior belief, by manipulating relevant world knowledge: for instance, the number of players on each team and the number of matches played.
@@ -737,15 +732,22 @@ That is, the listener can reasonable infer from the speaker's choice not to make
 
 For example, suppose that it is common knowledge that teams have four players, and that three matches were played. The speaker knows exactly who played and how many times, and utters ``Jane played in some matches''. How many matches did she play in, then?\footnote{Note that this reasoning goes through only if the alternative set does not include more informative numerical expressions (``Jane played in exactly two matches''), or if these are dispreferred by the speaker for some reason (e.g., overinformativity). Our approach shares with other theories of implicature the need to place such restrictions on the set of relevant alternatives.} Then, if Jane played in zero matches, the probability that the speaker will use either utterance is zero. If she played in one or two matches, the probability that the speaker will utter ``Jane played in some matches'' is non-zero, but the probability that the speaker will utter ``Jane played in all the matches'' is still zero. 
 
-However, the situation changes dramatically if Jane in fact played in all the matches: now the speaker prefers the more informative utterance ``Jane played in all the matches'' by a factor of about 3. This is because the choice of this utterance over the less informative alternative increases the probability that the listener will assign to the true answer to the QUD (3) by this factor. 
+However, the situation changes dramatically if Jane in fact played in all the matches: now the speaker prefers the more informative utterance ``Jane played in all the matches'' by a factor of about 3. This is because the probability that the speaker will choose this utterance over the less informative alternative increases the probability that the listener will assign to the true answer to the QUD (3) by this factor. 
+\begin{figure}[tbh]
+\begin{center}
+\includegraphics[scale=.3]{S1.pdf}
+\end{center}
+\label{sprk-SI}
+\caption{Normalized probability that the speaker will utter ``none'', ``some'', or ``all'' in the situation described, generated by reasoning about which utterance will most effectively bring the literal listener to select the correct answer to the QUD ``How many matches did Jane play in?''.}
+\end{figure}
 
 The listener does not know how many matches Jane played in but can reason by cases in this way about the speaker's utterance choice. If the correct answer were ``3'' the speaker would probably not have chosen ``some'', because the listener is much less likely to choose the answer ``3'' if the utterance is ``some'' as opposed to ``all''. The listener can thus conclude that the correct answer probably is not ``3'', i.e., that ``Jane played in all the matches'' is false.
 \begin{figure}[tbh]
-%\begin{center}
-\includegraphics[scale=.3]{SI.pdf}
-%\end{center}
-%\label{GAs-L0}
-\caption{Three stages of the interpretation of ``Jane played in some matches'', assuming that the only relevant alternative is ``Jane played in all the matches''. Note that the while the literal listener (left pane) assigns a moderate probability (.3) to the ``all'' situation given this utterance, the pragmatic listener (right pane) assigns this situation a very low probability, approximately .09. The difference is due to the fact that the pragmatic listener reasons about the utterance choices of the speaker (center pane).}
+\begin{center}
+\includegraphics[scale=.4]{listeners.pdf}
+\end{center}
+\label{listener-SI}
+\caption{Interpretation of ``Jane played in some matches'' by the literal and pragmatic listeners, assuming that the only relevant alternative is ``Jane played in all the matches''. While the literal listener (left pane) assigns a moderate probability to the ``all'' situation given this utterance, the pragmatic listener (right pane) assigns this situation a very low probability. The difference is due to the fact that the pragmatic listener reasons about the utterance choices of the speaker (figure \ref{sprk-SI} above), taking into account that the speaker is more likely to say ``all'' than ``some'' if ``all'' is true (center pane).}
 \end{figure}
 In this way, our model yields a broadly Gricean explanation of quantity implicature, but without stipulating ad-hoc rules of conversation. Instead, the content of Grice's Maxim of Quantity falls out of the recursive pragmatic reasoning process whenever it is reasonable to assume that the speakers is making an effort to be informative. (For related formal reconstructions of Gricean reasoning about quantity implicature, see \citet{franke09,Vogel-etal:2013}.)
  
@@ -840,14 +842,21 @@ Imagine a pragmatic listener who believes that the index variables have values t
 In most ways this is a very small change to the model, but it has important consequences. 
 At a high level, the effect is that index variables will now be set in such a way that they both make the utterance likely to be true \emph{and} likely to be pragmatically useful (informative, relevant, etc); the tradeoff between these two factors results in significant contextual flexibility of the interpreted meaning. 
 In the case of the adjective \emph{strong} we see \todo{put in model figure} that the threshold is now interpreted as roughly one standard deviation from the prior mean strength---hence \emph{strong} means significantly stronger than average, but does not require maximal strength (most informative) or permit any strength (most often true). 
-This model of gradable adjective interpretation (which was introduced in \cite{lassitergoodman13}) has a number of appealing properties: for instance, it explains how background knowledge affects qualitative and quantitative aspects of adjective interpretation (see \cite{lassitergoodman13}), and it explains why vagueness is a pervasive feature of adjective interpretation (see below).
+This model of gradable adjective interpretation (which was introduced in \cite{lassitergoodman13}) has a number of appealing properties: for instance, it explains how background knowledge affects qualitative and quantitative aspects of adjective interpretation, and it explains why vagueness is a pervasive feature of adjective interpretation. 
+See \cite{lassitergoodman13} for detailed discussion of these features, and discussion of vagueness in section \ref{vagueness} below. 
 
 We can motivate from this example a general treatment of semantic indices: lift each index into the pragmatic inference, allowing them to bind free variables in the literal meaning, and reasoning over them jointly with world states. 
 When we don't know ahead of time which index variables will occur in the literal-listener utterance we need to generalize the above. 
 One way is to treat \lstinline{index} as a memoized function mapping variable names to (random) values appropriate for their types.\footnote{The semantics of a memoized function is such that its value on all inputs is formally (if not actually) fixed when the function is created. Thus a memoized \lstinline{index} function would result in index variables that are reasoned about at the pragmatic listener level, although they are made only as needed in the literal listener.} 
 Then either the lexical entires should change from free variables to lookups (e.g. \lstinline{d} to \lstinline{(index d)}) or the meaning function is responsible for detecting unbound variables and decorating them with \lstinline[mathescape]{(index ...)}.
 
-Another interpretation of this modeling approach (indeed, the original interpretation, introduced in \cite{bergen12}) is as the result of \emph{lexical uncertainty}: each index represents a lingering uncertainty about word meaning (in context) which the listener must incorporate in the interpretation process. This interpretation is appealing in that it connects naturally to language acquisition and change \cite{SmithFrankGoodman}. For instance, upon hearing a new word a learner would initially treat it as underdetermined (essentially an index variables ranging over all expressions of the appropriate type), inferring its meaning on each usage from contextual cues. Over time the prior over this `index' would tighten until only the correct meaning remained, and no contextual flexibility was left. A difficulty with the lexical uncertainty interpretation is explaining why certain aspects of a word's meaning are so much more flexible than others. This is natural from the free-index interpretation since the dimensions of flexibility are explicitly represented as unbound variables in lexical entries. A more structured (e.g. hierarchical) notion of lexical uncertainty may be able to reconcile these interpretations, which are essential equivalent.
+Another interpretation of this modeling approach (indeed, the original interpretation, introduced in \cite{bergen12}) is as the result of \emph{lexical uncertainty}: each index represents a lingering uncertainty about word meaning (in context) which the listener must incorporate in the interpretation process. 
+This interpretation is appealing in that it connects naturally to language acquisition and change \cite{SmithFrankGoodman}. 
+For instance, upon hearing a new word a learner would initially treat it as underdetermined (essentially an index variables ranging over all expressions of the appropriate type), inferring its meaning on each usage from contextual cues. 
+Over time the prior over this `index' would tighten until only the correct meaning remained, and no contextual flexibility was left. 
+A difficulty with the lexical uncertainty interpretation is explaining why certain aspects of a word's meaning are so much more flexible than others. 
+This is natural from the free-index interpretation since the dimensions of flexibility are explicitly represented as unbound variables in lexical entries. 
+A more structured (e.g. hierarchical) notion of lexical uncertainty may be able to reconcile these interpretations, which are essential equivalent.
 
 
 \subsection{Other applications of index variables}
@@ -866,9 +875,7 @@ Another interpretation of this modeling approach (indeed, the original interpret
 \item quantifier scope??
 \end{itemize}
 
-\subsection{Vagueness}
-
-
+\subsection{\label{vagueness}Vagueness}
 \todo[inline]{Dan: Discuss vagueness more generally. Sorites.}
 %
 % vagueness – of interest to linguists, philosophers, psychologists, cs, etc.
