@@ -300,7 +300,6 @@ We could, for instance observe the strengths and genders of several players, and
        (equal? (gender `Jim) `male) (= (strength `Jim) -0.3)
        (= (strength `Pat) 0.7)))
 \end{lstlisting}
-\todo{run this simulation}
 The result of this query is that Pat is more likely to be female than male (probability .63). 
 This is because the observed males are weaker than Jane, the observed female, and so a strong player such as Pat is likely to be female as well.
 
@@ -841,8 +840,19 @@ Imagine a pragmatic listener who believes that the index variables have values t
 \end{lstlisting}
 In most ways this is a very small change to the model, but it has important consequences. 
 At a high level, the effect is that index variables will now be set in such a way that they both make the utterance likely to be true \emph{and} likely to be pragmatically useful (informative, relevant, etc); the tradeoff between these two factors results in significant contextual flexibility of the interpreted meaning. 
-\todo[inline]{Dan insert adj sim results here}
-In the case of the adjective \emph{strong} we see \todo{put in model figure} that the threshold is now interpreted as roughly one standard deviation from the prior mean strength---hence \emph{strong} means significantly stronger than average, but does not require maximal strength (most informative) or permit any strength (most often true). 
+\begin{figure}[tbh]
+\begin{center}
+\includegraphics[scale=.4]{L1-strong-interp.pdf}
+\end{center}
+\label{L1-adjective-interp}
+\caption{The pragmatic listener's interpretation of an utterance containing a free degree variable, assuming a maximally uninformative prior on the variable. 
+This listener does not only consider the pressure to make utterances true, but balances this pressure with a countervailing force: the speaker's desire to make informative statements. 
+Very weak meanings are likely to be true, but uninformative; very strong meanings are informative, but likely to be false. 
+This process balances out into a ``significantly greater than expected'' meaning which remains somewhat uncertain.}
+\end{figure}
+
+In the case of the adjective \emph{strong} we see that the listener's posterior estimate of the free degree variable in the adjective's meaning is a distribution centered at roughly one standard deviation from the prior mean strength.
+Hence \emph{strong} is interpreted as meaning ``significantly stronger than average'', but does not require maximal strength (most informative) or permit any strength (most often true). 
 This model of gradable adjective interpretation (which was introduced in \cite{lassitergoodman13}) has a number of appealing properties. 
 For instance, the precise interpretation is highly sensitive to the prior probability distribution on answers to the QUD. 
 We thus predicts that gradable adjective interpretation should display considerable sensitivity to background knowledge. 
@@ -881,28 +891,77 @@ A more structured (e.g. hierarchical) notion of lexical uncertainty may be able 
 \item quantifier scope??
 \end{itemize}
 
-\subsection{\label{vagueness}Vagueness}
-\todo[inline]{Dan: Discuss vagueness more generally. Sorites.}
-%
-% vagueness – of interest to linguists, philosophers, psychologists, cs, etc.
-% say what sorites is, why it's interesting
-% 
-% bill is strong – from above
-% if x is just a little weaker than y and x is strong then y is strong
-% so, everyone is strong
-% show conclusion can have low prob 
+\subsection{\label{vagueness}Vagueness and indeterminate boundaries}
+The model of gradable adjective interpretation introduced by \citet{lassitergoodman13} and described briefly in section \ref{indices} above suggests a broader lesson. 
+Probabilistic models of the type described here make it possible to maintain the attractive formal precision of model-theoretic semantics while also making room for vagueness and indeterminate boundaries in both word meanings and psychological categories. 
+There is considerable evidence from both psychological \citep[e.g.][]{rosch78,murphy02,hampton07} and linguistic \citep{taylor2003linguistic} research that a lack of sharp boundaries is a pervasive features of lexical meaning and conceptual representation. 
 
-%\paragraph{Sorites paradox} The much-discussed \emph{sorites paradox} is a key puzzle of gradable adjectives, for example:
-%\begin{exe}
-%\ex{\label{e2} 	 Sorites paradox:	}
-%\begin{xlist}
-%\ex{\label{e2a} 	A man who is 7 feet tall is tall.	}
-%\ex{\label{e2b} 	A man who is 0.01 inches less tall than someone who is tall is also tall.	}
-%\ex{\label{e2c} 	Therefore, a man who is 4 feet tall is tall.	}
-%\end{xlist}
-%\end{exe}
-%This argument is logically valid, and the premises \ref{e2a} and \ref{e2b} appear to be reasonable; but the conclusion \ref{e2c} is clearly false. An account of vagueness should explain both the logical puzzle (which premise is incorrect?) and the psychological problem (why do people find the premises so compelling, while also maintaining that the conclusion is completely implausible? \cite[Cf.][]{fara00}).
-%
+Linguistic indeterminacy and vagueness---our primary objects of interest here---can be understood as uncertainty about the precise interpretation of expressions in context, modeled in probabilistic terms. 
+Our model predicts that uncertainty should be able to enter into the interpretation process in a variety of ways, as we discussed already in section \ref{ambiguity} above. 
+ the case of lexical meaning, there are at least four possible sources of uncertainty:
+\begin{itemize}
+\item Reference to a non-deterministic concept: A word is defined as referring (deterministically) to a conceptual representation which has indeterminate boundaries. E.g., 
+\begin{itemize}
+\item \sv{foo} = \lstinline[mathescape]{($\lambda$ (x) (bar x))}
+\item \lstinline[mathescape]{(define bar ($\lambda$ (x) (flip)))}
+\end{itemize}
+\item Stochastic reference to concepts: The lexical entry of a word invokes a distribution over two (deterministic or stochastic) concepts, e.g.  
+\begin{itemize}
+\item \sv{foo} = \lstinline[mathescape]{(if (flip) ($\lambda$ (x) (property1 x)) ($\lambda$ (x) (property2 x)))}
+\item \lstinline[mathescape]{(define property1 ($\lambda$ (x) ...))}
+\item \lstinline[mathescape]{(define property2 ($\lambda$ (x) (if (flip) ...)))}
+\end{itemize}
+\item Unlifted free variable: the meaning of a word/phrase/sentence contains a free variable whose value must be estimated by the literal listener. 
+\item Lifted free variable: the meaning of a word/phrase/sentence contains a free variable whose value is bound to an index which is estimated at the level of the pragmatic listener (section \ref{indices}). 
+\end{itemize}
+Note that the first two sources of indeterminacy are intrinsic to the definitions of words/concepts, while the third and fourth will generally invoke context-sensitive pragmatic processes. 
+
+As we pointed out above, gradable adjectives are generally interpreted as including a free ``threshold'' or ``standard'' variable. In order to derive an appropriate context-sensitive meaning for adjectives such as ``strong'', we lift this variable to the pragmatic listener. 
+When we do so, the uniform prior distribution on interpretations of this variable changes to a decidedly non-uniform posterior distribution (figure \ref{L1-adjective-interp}, dotted line). 
+This interpretation process makes it possible for the utterance to convey a considerable amount of information about both the answer to the QUD and the contextual meaning of ``strong''. 
+However, the interpretation is still uncertain, leaving open the possibility that the boundary between ``strong'' and ``not strong'' could fall reasonably lie anywhere between 1 and 5.
+
+This model of adjective interpretation predicts a number of important features of vague adjectives. 
+(For more discussion of vagueness and some alternative accounts see Lassiter, this volume).
+
+\textbf{Borderline cases}. An individual whose degree of strength falls in the middle of the posterior distribution on interpretations of ``strong'' will be a borderline case of ``strong''. 
+An individual with strength 3 will have a roughly equal chance of counting as ``tall'' and ``not tall'', making her a borderline case.  
+ 
+\textbf{Tolerance principles}. Suppose Bill has strength 4.5 and Mary has strength 4.4. It would be odd for someone to confidently agree to the claim that Sam is strong, but to deny confidently that Mary is strong. 
+Our model explains this intuition: when two individuals' strength is separated by a small gap, it will never be the case that one counts as ``strong'' with high probability and the other with low probability. 
+This could happen only if the gap were larger, or if the posterior distribution on interpretations of ``strong'' had sharp discontinuities or very low variance \citep{lassitergoodman13}. 
+
+\textbf{The sorites paradox}. The following is an instance of a famous puzzle:
+\begin{itemize}
+\item Bill is strong.
+\item Anyone who is just a tiny but less strong than a strong person is also strong.
+\item Therefore, everyone is strong, no matter how weak.
+\end{itemize}
+People generally find the premises plausible, but the conclusion (which follows logically) is not at all plausible. Evidently something is wrong with the second premise, but what? 
+
+Our probabilistic approach, built as it is upon a bivalent logic, requires that the conclusion is false if the premises are true. 
+This is unproblematic, since we can start with a person who is clearly strong and move down a series of individuals of decreasing strength; the probability that a given individual counts as ``strong'' will decrease gradually from 1 to 0. 
+
+However, this account does not yet explain the psychological aspect of the puzzle: why do people express confidence in the second premise if it is false? 
+\citet{lassitergoodman13} argue that the second premise is also evaluated probabilistically, by considering the probability of truth under all values of $x$, $y$, and $d$ that could be plugged into the open sentence 
+\begin{center}
+If $x$ is $d$-strong and $y$ is $\epsilon$ less tall than $x$, then $y$ is $d$-strong.
+\end{center}
+Suppose that we sample a value of $d$ from the posterior distribution on thresholds and find two individuals: $x$, whose strength is greater than $d$ (so that $x$ counts as ``strong''), and $y$, whose strength is $\epsilon$ less than $x$'s strength. 
+Then, if $\epsilon$ is fairly small (say, .1), then the probability that $y$ is also ``strong'' on this interpretation is approximately .92. 
+That is, it is very unlikely that $y$ fails to count as ``strong'' if $x$ does, because the posterior distribution on $d$ is sufficiently diffuse that it is very unlikely that $d$ will fall into a small gap between $x$ and $y$.
+We can also explore the effects of varying the gap size; the probability of the second premise is plotted against gap sizes from 0 to 1 in figure \ref{sorites}.
+ \begin{figure}[tbh]
+\begin{center}
+\includegraphics[scale=.4]{sorites-prob.pdf}
+\end{center}
+\label{sorites}
+\caption{Probability of the second premise of the sorites in our simulation, under gaps of varying sizes.}
+\end{figure}
+
+Thus, the second premise is felt as strong because it is extremely likely to be true in a given scenario, even though---in its strict universally quantified reading---it is false.
+Note that psychological research supports the suggestion that people are willing to judge a universally quantified sentence true even if in the presence of exceptions, as long it has sufficiently high probability of being true of a randomly chosen example \citep{sloman98}.
+
 %Our approach to adjective interpretation offers a new account of the sorites paradox. The argument is logically unsound because the second premise \ref{e2b} is not \emph{strictly true}: if $x$'s height is very close to the cutoff, $\theta$, then $x$ may count as ``tall'' while someone just slightly shorter does not. However, the second premise is  \emph{highly plausible} because the probability that $\theta$ and $x$'s height will be so close is small. 
 %%In other words, the posterior distribution on $\theta$ describes the inferred meaning of ``tall'' in a particular context; the distribution on $w$ described the height of someone known to be ``tall'' given this distribution on meanings. 
 %Indeed, if we choose the height $h$ of $x$ and the threshold $\theta$ from the joint posterior distribution that \lstinline{L1-sv} defines given the utterance \emph{$x$ is tall},
