@@ -89,7 +89,7 @@ lines(sws.team.size, col='red', lty=2, lwd=3)
 lines(ows.team.size, col='blue', lty=3, lwd=3)
 legend('bottomleft', c("Marginal", "With subject wide scope", "With object wide scope"), text.col=c('black', 'red', 'blue'), lty=c(1,2,3), col=c('black', 'red', 'blue'), cex=.7)
 
-
+# scalar implicature
 
 
 
