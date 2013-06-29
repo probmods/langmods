@@ -113,7 +113,7 @@ legend(x=0, y=.6, c('Prior', 'Some', "All"), lty=c(1,2,3), col=c('black','red', 
 norm = l0.probabilities.given.all[4]+l0.probabilities.given.some[4]
 utt.some = c(1, 1, l0.probabilities.given.some[4]/norm)
 utt.all = c(0, 0, l0.probabilities.given.all[4]/norm)
-plot(1:3, utt.some, xaxt='n', type='b', pch=19, col='red', lwd=3, xlab="Number of matches Jane played in", ylab="Probability that speaker chooses utterance", ylim=c(0,1), main="Speaker")
+plot(1:3, utt.some, xaxt='n', type='b', xlim=c(0,3), pch=19, col='red', lwd=3, xlab="Number of matches Jane played in", ylab="Probability that speaker chooses utterance", ylim=c(0,1), main="Speaker")
 axis(1, 0:3)
 lines(utt.all, type='b', lty=2, lwd=3, col='blue')
 legend(x=0, y=.6, c('Some', "All"), lty=c(1,2), col=c('red', 'blue'), text.col=c('red', 'blue'), cex=2)
