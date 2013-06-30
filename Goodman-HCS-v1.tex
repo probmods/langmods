@@ -103,11 +103,11 @@ and aspects of natural language \citep{bodetal03,chater06}. Probabilistic tools 
 Flexible human cognition is derived in large part from our ability to imagine possible worlds (or situations). 
 A rich set of concepts, intuitive theories, and other mental representations support imagining and reasoning about possible worlds---together we will call these the conceptual lexicon. 
 Here we posit that this collection of concepts also forms the set of primitive elements available for lexical semantics: word meanings can be built from the pieces of conceptual structure. Larger semantic structures are then built from word meanings by composition, ultimately resulting in a sentence meaning as a phrase in the ``language of thought'' provided by the conceptual lexicon.
-However, the connection between core concepts and semantics is not direct: 
+However, the connection between cognition and semantics is not direct: 
 first, because language must flexibly adapt to the context of communication, the connection between lexical representation and interpreted meaning is mediated by pragmatic inference;
 second, sentence meanings act as constraints on possible worlds, via their truth-value, whereas core concepts describe generation of possible worlds.
 
-There are thus a number of challenges to formalizing this view of language: how can we formalize the conceptual lexicon such that is described generation of possible worlds? How can we appropriately connect lexical meaning to this conceptual lexicon? How, within this system, do sentence meanings act as constraints on possible worlds and correspondingly how does composition within language relate to composition within world knowledge?  How can pragmatic inference be included in this process? How can we account for various forms of context flexibility that arise in natural language?
+There are thus a number of challenges to formalizing this view of language: how can we formalize the conceptual lexicon to describe generation of possible worlds? How can we appropriately connect lexical meaning to this conceptual lexicon? How, within this system, do sentence meanings act as constraints on possible worlds and correspondingly how does composition within language relate to composition within world knowledge?  How can pragmatic inference be included in this process? How can we account for various forms of contextual flexibility that arise in natural language?
 
 
 %We can formalize the conceptual lexicon using probabilistic programming tools, viewing commonsense knowledge as a set of interrelated definitions (or concepts) in a probabilistic programming language. 
@@ -199,7 +199,7 @@ It can be shown that this system can represent any computable distribution in an
 This simple calculus is universal but cumbersome to work with. 
 \citet{goodman08} introduce Church, an enriched SLC that can be realized as a \emph{probabilistic programming language}, just as the programming language LISP is an enriched lambda calculus. 
 Church starts with the pure subset of Scheme (which is itself essentially lambda calculus enriched with primitive data types, operators, and useful syntax) and extends it with elementary random primitives (ERPs), the inference function \lstinline{query}, and the memoization function \emph{mem}. 
-We next describe key pieces of the language semantics; further details and examples of using Church for cognitive modeling can be found at \url{http://bit.ly/ProbMods}.
+We next describe key pieces of the language semantics; further details and examples of using Church for cognitive modeling can be found at \url{http://probmods.org}.
 In what follows we will assume passing familiarity with the Polish notation used in LISP-family languages (fully parenthesized and operator initial), and will occasionally build on ideas from programming languages---\cite{abelson1983structure} is an excellent background on these ideas. 
 
 Rather than restricting to the $\oplus$ uniform random choice between two options (which is sufficient, but results in extremely cumbersome representations), Church includes an interface for adding elementary random primitives (ERPs). 
@@ -393,7 +393,7 @@ Another way of saying this is that our knowledge of the world, the generative mo
 There are a number of other patterns of reasoning that are common results of probabilistic inference over structured models. 
 For instance, \emph{screening off} describes the situation when two variables that were a priori dependent become independent after an observation (in some sense the opposite of explaining away).
 Other patterns include Occam's razor (complexity of hypotheses is automatically penalized), transfer learning (an inductive bias learned from one domain constrains interpretation of evidence in a new domain), and the blessing of abstraction (abstract knowledge can be learned faster than concrete knowledge). 
-These will be less important in what follows, but we note that they are potentially important for the question of language learning---when we view learning as an inference, the dynamics of probabilistic inference come to bear on the learning problem. For detailed examples of these patterns, using Church representation, see \url{http://bit.ly/ProbMods}.
+These will be less important in what follows, but we note that they are potentially important for the question of language learning---when we view learning as an inference, the dynamics of probabilistic inference come to bear on the learning problem. For detailed examples of these patterns, using Church representation, see \url{http://probmods.org}.
 
  
 \section{Meaning as condition}
