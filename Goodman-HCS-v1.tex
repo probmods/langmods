@@ -17,7 +17,7 @@
 \usepackage{graphicx}
 \usepackage{color}
 \usepackage{xcolor}
-\usepackage{listings}
+\usepackage{listings} 
 \usepackage{inconsolata}
 \usepackage{colonequals}
 \usepackage[disable]{todonotes}
@@ -837,7 +837,7 @@ To understand this distribution, we can look at
 the prior (marginal) distributions over \lstinline{d} and Bob's strength, and the corresponding posteriors (figure \ref{strong-L0}).
 %
 \begin{figure}[tbh]
-\begin{center}
+\begin{center} 
 \includegraphics[scale=.5]{strong-L0.pdf}
 \end{center}
 \label{strong-L0}
@@ -880,14 +880,14 @@ In most ways this is a very small change to the model, but it has important cons
 At a high level, the effect is that index variables will now be set in such a way that they both make the utterance likely to be true \emph{and} likely to be pragmatically useful (informative, relevant, etc); the tradeoff between these two factors results in significant contextual flexibility of the interpreted meaning. 
 \begin{figure}[tbh]
 \begin{center}
-\includegraphics[scale=.4]{L1-strong-interp.pdf}
+\includegraphics[scale=.38]{L1-strong-interp.pdf}
 \end{center}
 \label{L1-adjective-interp}
 \caption{The pragmatic listener's interpretation of an utterance containing a free degree variable, assuming a maximally uninformative prior on the variable. 
 This listener does not only consider the pressure to make utterances true, but balances this pressure with a countervailing force: the speaker's desire to make informative statements. 
 Very weak meanings are likely to be true, but uninformative; very strong meanings are informative, but likely to be false. 
 This process balances out into a ``significantly greater than expected'' meaning which remains somewhat uncertain.}
-\end{figure}
+\end{figure} 
 
 In the case of the adjective \emph{strong} we see that the listener's posterior estimate of the free degree variable in the adjective's meaning is a distribution centered at roughly one standard deviation from the prior mean strength.
 Hence \emph{strong} is interpreted as meaning ``significantly stronger than average'', but does not require maximal strength (most informative) or permit any strength (most often true). 
@@ -969,7 +969,7 @@ We can also explore the effects of varying the gap size; the probability of the 
 \includegraphics[scale=.4]{sorites-prob.pdf}
 \end{center}
 \label{sorites}
-\caption{Probability of the second premise of the sorites in our simulation, under gaps of varying sizes.}
+\caption{In our simulations, the probability of the second premise of the sorites paradox is close to 1 with very small gaps between individuals, but decreases steadily toward 0 as the size of the gap increases.}
 \end{figure}
 
 Thus, the second premise is felt as strong because it is extremely likely to be true in a given scenario, even though---in its strict universally quantified reading---it is false.
