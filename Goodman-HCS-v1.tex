@@ -958,7 +958,7 @@ This is unproblematic, since we can start with a person who is clearly strong an
 However, this account does not yet explain the psychological aspect of the puzzle: why do people express confidence in the second premise if it is false? 
 \citet{lassitergoodman13} argue that the second premise is also evaluated probabilistically, by considering the probability of truth under all values of $x$, $y$, and $d$ that could be plugged into the open sentence 
 \begin{center}
-If $x$ is $d$-strong and $y$ is $\epsilon$ less tall than $x$, then $y$ is $d$-strong.
+If $x$ is $d$-strong and $y$ is $\epsilon$ less strong than $x$, then $y$ is $d$-strong.
 \end{center}
 Suppose that we sample a value of $d$ from the posterior distribution on thresholds and find two individuals: $x$, whose strength is greater than $d$ (so that $x$ counts as ``strong''), and $y$, whose strength is $\epsilon$ less than $x$'s strength. 
 Then, if $\epsilon$ is fairly small (say, .1), then the probability that $y$ is also ``strong'' on this interpretation is approximately .92. 
@@ -1027,7 +1027,7 @@ In this chapter we have illustrated the use of probabilistic modeling to study n
 There are both a number of kinds of uncertainty and a number of roles for uncertainty in the architecture we have described.
 While the fundamental mechanisms for representing and updating beliefs are the same for discrete variables (such as those that led to scope ambiguity for quantifiers) and continuous variables (such as the threshold variable we used within scalar adjectives), there are likely to be phenomenological differences as well similarities: for instance continuous variables lend themselves to borderline cases in a way that discrete variables don't, while both support graded judgements. Similarly, the locus of creation of a random variable---within the literal listener, in the pragmatic listener, separately or tied as and index---can have profound effects on its role in language understanding. Variables restricted to the literal listener show plausibility but not informativity effects; variables in the pragmatic listener that are not indices show informativity but limited context sensitivity; etc. Overall then, uniform mechanisms of uncertainty can lead to heterogeneous phenomenology of language understudying, depending on the structure of the language understanding model. 
 
-In the architecture we have described, uncertainty is pervasive through all aspects of language understanding. Pervasive uncertainty leads to complex interactions that can be described by joint inference of the many random choices involved in understanding. Joint inference in turn leads to a great deal of flexibility, from non-monotonic effects of explaining away (section \ref{literal}), through ambiguous compositional structure and pragmatic strengthening, to vagueness and context-specificity of indices. It is particularly important to note that even when the architecture specification is relatively modular, for instance separate specification of world knowledge (the \lstinline{...theory...}) and meaning interpretation (the \lstinline{meaning} function), the inferential effects in sentence interpretation will have complex, bi-directional interactions (as in the interaction of background knowledge and quantifier scope ambiguity in section \ref{literal}). That is, language understanding is analyzable but not modular
+In the architecture we have described, uncertainty is pervasive through all aspects of language understanding. Pervasive uncertainty leads to complex interactions that can be described by joint inference of the many random choices involved in understanding. Joint inference in turn leads to a great deal of flexibility, from non-monotonic effects of explaining away (section \ref{literal}), through ambiguous compositional structure and pragmatic strengthening, to vagueness and context-specificity of indices. It is particularly important to note that even when the architecture specification is relatively modular, for instance separate specification of world knowledge (the \lstinline{...theory...}) and meaning interpretation (the \lstinline{meaning} function), the inferential effects in sentence interpretation will have complex, bi-directional interactions (as in the interaction of background knowledge and quantifier scope ambiguity in section \ref{literal}). That is, language understanding is analyzable but not modular.
 
 
 
@@ -1101,7 +1101,7 @@ Gradable adjectives:
 \end{itemize}
 The weakness scale is simply the strength scale with the sign reversed.
 
-Some functional vocabulary:
+Quantifiers and the superlative morpheme:
 \begin{itemize}
 \item \lstinline{(define domain-of-individuals (union player team match))}
 \item \sv{every} = \lstinline[mathescape]{($\lambda$ (P) ($\lambda$ (Q) (all (map ($\lambda$ (x) (not (and (P x) (not Q x)))) domain-of-individuals))))}
@@ -1162,7 +1162,7 @@ $$
 $$
 \mathbf{BA}(\mathbf{FA}(\sv{most})(\sv{players})
 (\mathbf{FA}(\mathbf{AR}_1(\mathbf{AR}_2(\sv{played\ in})))
-(\mathbf{FA}(\sv{some})(\sv{match})))),
+(\mathbf{FA}(\sv{some})(\sv{match})))).
 $$  
 \end{itemize}
 
