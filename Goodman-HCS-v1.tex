@@ -112,7 +112,7 @@
 
 Language is used to communicate ideas. Ideas are mental tools for coping with a complex and uncertain world. Thus human conceptual structures should be key to language meaning, and probability---the mathematics of uncertainty---should be indispensable for describing both language and thought. Indeed, probabilistic models are enormously useful in modeling human cognition \citep{tenenbaumetal11}
 %Tenenbaum, etc}, 
-and aspects of natural language \citep{bodetal03,chater06}. With a few localized exceptions \citep{adams75,cohen99b}, probabilistic tools have only recently been begun to be used widely in natural language semantics and pragmatics. In this chapter we synthesize several of these modeling advances, exploring a formal model of semantics grounded, via pragmatic inference, in conceptual structure.
+and aspects of natural language \citep{bodetal03,chater06}. With a few early exceptions \citep[e.g.][]{adams75,cohen99b}, probabilistic tools have only recently been used in natural language semantics and pragmatics. In this chapter we synthesize several of these modeling advances, exploring a formal model of semantics grounded, via pragmatic inference, in conceptual structure.
 
 Flexible human cognition is derived in large part from our ability to imagine possible worlds (or situations). 
 A rich set of concepts, intuitive theories, and other mental representations support imagining and reasoning about possible worlds---together we will call these the conceptual lexicon. 
@@ -173,7 +173,7 @@ In later sections, we demonstrate how these tools can be used to provide new ins
 Probability is fundamentally a set of tools for manipulating degrees of belief. 
 The probability\footnote{Throughout the chapter we will presume that we are dealing with probabilities over discrete domains. Almost everything we say  applies equally well to probability densities, and more generally probability measures, but the mathematics becomes more subtle in ways that would distract from our main objectives.} of a proposition is simply a real number between $0$ and $1$ describing an agent's degree of belief in that proposition. 
 More generally, a \emph{random variable} $A$ is an assignment of a probability $P(A{=}a)$ to each of a set of exhaustive and mutually exclusive outcomes $a$, such that $\sum_a P(A{=}a)=1$. 
-The joint probability $P(A{=}a,B{=}b)$, of two random variable values) is the degree of belief we assign to the proposition that both $A{=}a$ and $B{=}b$. 
+The joint probability $P(A{=}a,B{=}b)$, of two random variable values is the degree of belief we assign to the proposition that both $A{=}a$ and $B{=}b$. 
 
 \todo[inline]{We should define ``distribution''  and ``marginal'' somewhere.} 
 
@@ -485,15 +485,16 @@ This is because the denotation of \emph{man} is a function which returns 1 if an
 as a memoized stochastic function which takes on values \lstinline{`male} and \lstinline{`female} with equal probability for each argument in each world. 
 
 Gradable adjectives such as \emph{strong} and \emph{weak} denote relations between individuals and degrees \citep[][etc.]{cresswell76,vonstechow84}. 
-For instance, \sv{strong} = \lstinline[mathescape]{($\lambda$ (x) ($\lambda$ (d) (>= (strength x) d)))}.
+For instance, \sv{strong} = \lstinline[mathescape]{($\lambda$ (x) ($\lambda$ ($\theta$) (>= (strength x) $\theta$)))}, where $\theta$ is a variable over degrees (or ``thresholds'').
 The interpretation of \emph{strong} and \emph{weak} as predicates requires pragmatic inference of the value of the vague threshold value: see section \ref{indices} below.
 The relative and superlative forms are more straightforward, as the threshold is bound locally. For instance, the superlative morpheme \emph{-est} is defined so that, for example, \emph{strongest player} will denote a property that is true of Bill if and only if the greatest degree of strength that Bill possesses is equal to the greatest degree of strength that any player possesses: \\
- \sv{\text{-}est} = \lstinline[mathescape]{($\lambda$ (A) ($\lambda$ (N) ($\lambda$ (x) (= (argmax A x) (argmax ($\lambda$ (d) (some (map ($\lambda$ (x) ((A x) d)) N))))))))}.
+ \sv{\text{-}est} = \lstinline[mathescape]{($\lambda$ (A) ($\lambda$ (N) ($\lambda$ ($\theta$) (= (argmax A x) (argmax ($\lambda$ ($\theta$) (some (map ($\lambda$ (x) ((A x) $\theta$)) N))))))))}.
 
 %\todo[inline]{Leave the threshold as an unbound variable, and define -est to bind this variable before doing its work. discuss with dan... }
 
 Finally, we can adopt standard meanings for functional vocabulary, such as quantifiers: \\
 \sv{every} = \lstinline[mathescape]{($\lambda$ (P) ($\lambda$ (Q) (all (map ($\lambda$ (x) (not (and (P x) (not Q x)))) domain-of-individuals))))}.
+These definitions are meant to be illustrative, rather than definitive: many alternative definitions of these items could have been used instead to illustrate the theory of language understanding described here.
 
 \subsection{Example interpretations}
 
@@ -543,8 +544,8 @@ Suppose, however, the speaker continues with the utterance:\footnote{We assume f
 \item Possible interpretation:\\ 
 \textbf{BA}(\sv{Jim})(\textbf{FA}(\sv{is})(\textbf{FA}(\sv{the})(\textbf{FA}(\textbf{BA}(\sv{weak})(\sv{\text{-}est}))(\sv{player}))))
 \item [$\equiv$] \sv{\text{-}est}(\sv{weak})(\sv{player})(\sv{Jim})
-\item [$=$] \lstinline[mathescape]{(((($\lambda$ (A) ($\lambda$ (N) ($\lambda$ (x) (= (argmax A x) (argmax ($\lambda$ (d) (some (map ($\lambda$ (x) ((A x) d)) N)))))))) ($\lambda$ (x) (element? x player))) ($\lambda$ (x) ($\lambda$ ($\theta$) (> (weakness x) $\theta$)))) `Jim)}
-\item [$\equiv$] \lstinline[mathescape]{(= (argmax ($\lambda$ (d) (> (weakness `Jim) d))) (argmax ($\lambda$ (d) (some (map ($\lambda$ (x) ((weakness x) d)) ($\lambda$ (x) (element? x player)))))))    }
+\item [$=$] \lstinline[mathescape]{(((($\lambda$ (A) ($\lambda$ (N) ($\lambda$ (x) (= (argmax A x) (argmax ($\lambda$ ($\theta$) (some (map ($\lambda$ (x) ((A x) $\theta$)) N)))))))) ($\lambda$ (x) (element? x player))) ($\lambda$ (x) ($\lambda$ ($\theta$) (> (weakness x) $\theta$)))) `Jim)}
+\item [$\equiv$] \lstinline[mathescape]{(= (argmax ($\lambda$ ($\theta$) (> (weakness `Jim) $\theta$))) (argmax ($\lambda$ ($\theta$) (some (map ($\lambda$ (x) ((weakness x) $\theta$)) ($\lambda$ (x) (element? x player)))))))    }
 \end{itemize}
 \end{itemize}
 This is a function which will return 1 if and only if Jim's degree of weakness is the greatest of any player, i.e., if his strength is less than that of any other player. 
@@ -820,38 +821,38 @@ We must first decide how semantic indices should enter into the probabilistic fr
 \end{lstlisting}
 Here we assume that a lexical item may contain an unbound occurrence of \lstinline{index} which is then bound during interpretation by  the \lstinline{(define index ...)} definition.
 Because there is now a joint inference over \lstinline{val} and \lstinline{index}, the index will tend to be set such that the utterance is most likely to be true. 
-To be concrete, consider the case of gradable adjectives like \emph{strong}. In section \ref{lexicon} we have defined \sv{\mathit{strong}} = \lstinline[mathescape]{($\lambda$ (x) ($\lambda$ (d) (>= (strength x) d)))}, without specifying how \lstinline{d} is bound in sentences such as \emph{Bob is strong}.
-We could instead define \sv{strong} = \lstinline[mathescape]{($\lambda$ (x) (>= (strength x) d))}, allowing \lstinline{d} to be a free semantic index variable.\footnote{We would then have to make a corresponding change
-to the meaning of \emph{-est}: it would first bind the degree locally, then proceeded as above to saturate the threshold.}
+To be concrete, consider the case of gradable adjectives like \emph{strong}. In section \ref{lexicon} we have defined \sv{\mathit{strong}} = \lstinline[mathescape]{($\lambda$ (x) ($\lambda$ ($\theta$) (>= (strength x) $\theta$)))}, without specifying how \lstinline[mathescape]{$\theta$} is bound in sentences such as \emph{Bob is strong}.
+We could instead define \sv{strong} = \lstinline[mathescape]{($\lambda$ (x) (>= (strength x) $\theta$))}, allowing \lstinline[mathescape]{$\theta$} to be a free semantic index variable.\footnote{We would then have to make a corresponding change
+to the meaning of \emph{-est}: it would first bind the threshold variable locally, then proceeded as above to saturate the threshold.}
  After applying the \lstinline{meaning} function (and simplifying composition) the utterance ``Bob is strong'' (with \lstinline{QUD} ``how strong is Bob?'') would be interpreted via:
 \begin{lstlisting}
 (query
   ...theory...
-  (define d (uniform))
+  (define $\theta$ (uniform))
   (define val (strength `Bob))
   val
-  (>= (strength `Bob) d))
+  (>= (strength `Bob) $\theta$))
 \end{lstlisting}
 
 To understand this distribution, we can look at 
-%figure \ref{GAs-L0}, which plots 
-the prior (marginal) distributions over \lstinline{d} and Bob's strength, and the corresponding posteriors (figure \ref{strong-L0}).
+%figure \ref{strong-L0}, which plots 
+the prior (marginal) distributions over $\theta$ and Bob's strength, and the corresponding posteriors (figure \ref{strong-L0}).
 %
 \begin{figure}[tbh]
 \begin{center} 
-\includegraphics[scale=.5]{strong-L0.pdf}
+\includegraphics[scale=.45]{strong-L0.pdf}
 \end{center}
 \label{strong-L0}
-\caption{The literal listener's interpretation of an utterance containing a free degree variable, assuming a maximally uninformative prior on the variable. 
-This listener's exclusive preference for true interpretations leads to a tendency to select extremely low values of the free variable (see ``Degree posterior'', dotted line). As a result the utterance conveys no information about the variable of interest: the strength posterior (dashed line) is equivalent to the prior (solid line).}
+\caption{The literal listener's interpretation of an utterance containing a free threshold variable $\theta$, assuming a maximally uninformative prior. 
+This listener's exclusive preference for true interpretations leads to a tendency to select extremely low values of $\theta$ (see ``Threshold posterior'', dotted line). As a result the utterance conveys no information about the variable of interest: the strength posterior (dashed line) is equivalent to the prior (solid line).}
 \end{figure}
 %
-The interpretation of the free degree variable has indeed been influenced by context: it changes from its uniform prior to a posterior that makes the utterance likely to be true (i.e. peaked at the bottom of the domain---set here to -100). 
+The interpretation of the free threshold variable has indeed been influenced by context: it changes from its uniform prior to a posterior that makes the utterance likely to be true (i.e. peaked at the bottom of the domain---set here to -100). 
 However, this gives the wrong interpretation of \emph{Bob is strong}. Intuitively, what the listener ought to do is to adjust the estimate of Bob's strength to a fairly high value, relative to the prior estimate. 
-Instead, our literal listener maximizes the probability of the utterance's truth by setting the free variable in its meaning to a value to low that the utterance will be true for virtually any height that Bob might plausibly have. 
+Instead, our literal listener maximizes the probability of the utterance's truth by setting the free variable in its meaning to a value so low that the utterance will be true for virtually any height that Bob might plausibly have. 
 Thus the listener learns nothing at all about the variable of interest from the utterance: the posterior distribution on Bob's height is the same as the prior.
 
-What is missing is the pressure to adjust \lstinline{d} so that the sentence is not only true, but also \emph{informative}. 
+What is missing is the pressure to adjust $\theta$ so that the sentence is not only true, but also \emph{informative}. 
 Simply including the informative speaker and pragmatic listener models as defined above is not enough: without additional changes the index variables will still be inferred at the level of literal listener with no pragmatic pressures. 
 Instead, we \emph{lift} the index variables to the pragmatic level. 
 Imagine a pragmatic listener who believes that the index variable has a value that she happens not to know, but which is otherwise common knowledge (i.e. known by the speaker, who assumes it is known by the listener):\footnote{For simplicity we are assuming that it is clear from the argument structure whether the version of each function with or without indices is intended.}
@@ -884,7 +885,7 @@ At a high level, the effect is that index variables will now be set in such a wa
 \includegraphics[scale=.38]{L1-strong-interp.pdf}
 \end{center}
 \label{L1-adjective-interp}
-\caption{The pragmatic listener's interpretation of an utterance containing a free degree variable, assuming a maximally uninformative prior on the variable. 
+\caption{The pragmatic listener's interpretation of an utterance containing a free threshold variable $\theta$, assuming a maximally uninformative prior. 
 This listener does not only consider the pressure to make utterances true, but balances this pressure with a countervailing force: the speaker's desire to make informative statements. 
 Very weak meanings are likely to be true, but uninformative; very strong meanings are informative, but likely to be false. 
 This process balances out into a ``significantly greater than expected'' meaning which remains somewhat uncertain.}
@@ -898,12 +899,12 @@ We thus predicts that gradable adjective interpretation should display considera
 This is indeed the case, as for example in the different interpretations of ``strong boy'', ``strong football player'', ``strong wall'', and so forth. 
 Prior expectations about the degree to which objects in a reference class have some property frequently plays a considerable role in determining the interpretation of adjectives which encode the relevant property. 
 This account also predicts that vagueness should be a pervasive feature of adjective interpretation. 
-See \cite{lassitergoodman13} for detailed discussion of these features, and discussion of vagueness in section \ref{vagueness} below. 
+See \cite{lassitergoodman13} for detailed discussion of these features, and discussion of vagueness below. 
 
 We can motivate from this example a general treatment of semantic indices: lift each index into the pragmatic inference, allowing them to bind free variables in the literal meaning, and reasoning over them jointly with world states. 
 When we don't know ahead of time which index variables will occur in the utterance considered by the literal-listener we need to generalize the above. 
 One way is to treat \lstinline{index} as a memoized function mapping variable names to (random) values appropriate for their types.\footnote{The semantics of a memoized function is such that its value on all inputs is formally (if not actually) fixed when the function is created. Thus a memoized \lstinline{index} function would result in index variables that are reasoned about at the pragmatic listener level, although they are made only as needed in the literal listener.} 
-Then either the lexical entires should change from free variables to lookups (e.g. \lstinline{d} to \lstinline{(index d)}) or the meaning function is responsible for detecting unbound variables and decorating them with \lstinline[mathescape]{(index ...)}.
+Then either the lexical entires should change from free variables to lookups (e.g. \lstinline[mathescape]{$\theta$} to \lstinline[mathescape]{(index $\theta$)}) or the meaning function is responsible for detecting unbound variables and decorating them with \lstinline[mathescape]{(index ...)}.
 
 \subsection{\label{vagueness}Vagueness and indeterminate boundaries}
 The model of gradable adjective interpretation introduced by \citet{lassitergoodman13} and described briefly in section \ref{indices} above suggests a broader lesson. 
@@ -914,10 +915,10 @@ Linguistic indeterminacy and vagueness---our primary objects of interest here---
 Our model predicts that uncertainty should be able to enter into the interpretation process in a variety of ways, as we discussed already in section \ref{ambiguity} above. 
  the case of lexical meaning, there are at least four possible sources of uncertainty:
 \begin{itemize}
-\item Reference to a non-deterministic concept: A word is defined as referring (deterministically) to a conceptual representation which has indeterminate boundaries. E.g., 
+\item Reference to a non-deterministic concept: A word is defined as referring (deterministically) to a conceptual representation which incorporates a stochastic element. E.g., 
 \begin{itemize}
 \item \sv{foo} = \lstinline[mathescape]{($\lambda$ (x) (bar x))}
-\item \lstinline[mathescape]{(define bar ($\lambda$ (x) (flip)))}
+\item \lstinline[mathescape]{(define bar ($\lambda$ (x) (if (flip) ... )))}
 \end{itemize}
 \item Stochastic reference to concepts: The lexical entry of a word invokes a distribution over two (deterministic or stochastic) concepts, e.g.  
 \begin{itemize}
@@ -936,10 +937,10 @@ This interpretation process makes it possible for the utterance to convey a cons
 However, the interpretation is still uncertain, leaving open the possibility that the boundary between ``strong'' and ``not strong'' could fall reasonably lie anywhere between 1 and 5.
 
 This model of adjective interpretation predicts a number of important features of vague adjectives. 
-(For more discussion of vagueness and some alternative accounts see Lassiter, this volume).
+(For more discussion of vagueness and an overview of theories see Lassiter, this volume).
 
 \textbf{Borderline cases}. An individual whose degree of strength falls in the middle of the posterior distribution on interpretations of ``strong'' will be a borderline case of ``strong''. 
-An individual with strength 3 will have a roughly equal chance of counting as ``tall'' and ``not tall'', making her a borderline case.  
+That is, an individual with strength 3 will have a roughly equal chance of counting as ``tall'' and as ``not tall''.  
  
 \textbf{Tolerance principles}. Suppose Bill has strength 4.5 and Mary has strength 4.4. It would be odd for someone to confidently agree to the claim that Sam is strong, but to deny confidently that Mary is strong. 
 Our model explains this intuition: when two individuals' strength is separated by a small gap, it will never be the case that one counts as ``strong'' with high probability and the other with low probability. 
@@ -956,7 +957,7 @@ People generally find the premises plausible, but the conclusion (which follows 
 Our probabilistic approach, built as it is upon a bivalent logic, requires that the conclusion is false if the premises are true. 
 This is unproblematic, since we can start with a person who is clearly strong and move down a series of individuals of decreasing strength; the probability that a given individual counts as ``strong'' will decrease gradually from 1 to 0. 
 
-However, this account does not yet explain the psychological aspect of the puzzle: why do people express confidence in the second premise if it is false? 
+However, this account does not yet explain the psychological aspect of the puzzle \citep{graff00}: why do people express confidence in the second premise if it is false? 
 \citet{lassitergoodman13} argue that the second premise is also evaluated probabilistically, by considering the probability of truth under all values of $x$, $y$, and $d$ that could be plugged into the open sentence 
 \begin{center}
 If $x$ is $d$-strong and $y$ is $\epsilon$ less strong than $x$, then $y$ is $d$-strong.
@@ -974,7 +975,7 @@ We can also explore the effects of varying the gap size; the probability of the 
 \end{figure}
 
 Thus, the second premise is felt as strong because it is extremely likely to be true in a given scenario, even though---in its strict universally quantified reading---it is false.
-Note that psychological research supports the suggestion that people are willing to judge a universally quantified sentence true even if in the presence of exceptions, as long it has sufficiently high probability of being true of a randomly chosen example \citep{sloman98}.
+Note that psychological research supports the suggestion that people are willing to judge a universally quantified sentence true even if in the presence of exceptions, as long it has sufficiently high probability of being true of a randomly chosen example \citep{sloman98}. This account builds on previous probabilistic approaches to the vagueness and the sorites \citep{borel07,black37,edgington97,lawry08,frazeebeaver10,egre11,lassiter11}, but is the first to offer a specific account of why vague adjectives should have context-sensitive probabilistic interpretations and of how the distribution is determined in a particular context of utterance.
 
 %Our approach to adjective interpretation offers a new account of the sorites paradox. The argument is logically unsound because the second premise \ref{e2b} is not \emph{strictly true}: if $x$'s height is very close to the cutoff, $\theta$, then $x$ may count as ``tall'' while someone just slightly shorter does not. However, the second premise is  \emph{highly plausible} because the probability that $\theta$ and $x$'s height will be so close is small. 
 %%In other words, the posterior distribution on $\theta$ describes the inferred meaning of ``tall'' in a particular context; the distribution on $w$ described the height of someone known to be ``tall'' given this distribution on meanings. 
@@ -1096,9 +1097,9 @@ Note that the denotation of \emph{played in} takes such a list as its second arg
 
 Gradable adjectives:
 \begin{itemize}
-\item \sv{strong} = \lstinline[mathescape]{($\lambda$ (x) ($\lambda$ (d) (>= (strength x) d)))}
+\item \sv{strong} = \lstinline[mathescape]{($\lambda$ (x) ($\lambda$ ($\theta$) (>= (strength x) $\theta$)))}
 \item \lstinline{(define (weakness x) (- 0 (strength x))))}
-\item \sv{weak} = \lstinline[mathescape]{($\lambda$ (x) ($\lambda$ (d) (>= (weakness x) d)))}
+\item \sv{weak} = \lstinline[mathescape]{($\lambda$ (x) ($\lambda$ ($\theta$) (>= (weakness x) $\theta$)))}
 \end{itemize}
 The weakness scale is simply the strength scale with the sign reversed.
 
@@ -1108,7 +1109,7 @@ Quantifiers and the superlative morpheme:
 \item \sv{every} = \lstinline[mathescape]{($\lambda$ (P) ($\lambda$ (Q) (all (map ($\lambda$ (x) (not (and (P x) (not Q x)))) domain-of-individuals))))}
 \item \sv{some} = \lstinline[mathescape]{($\lambda$ (P) ($\lambda$ (Q) (some (map ($\lambda$ (x) (and (P x) (Q x))) domain-of-individuals))))}
 \item \sv{most} = \lstinline[mathescape]{($\lambda$ (P) ($\lambda$ (Q) (> (proportion-true (map ($\lambda$ (x) (and (P x) (Q x))) domain-of-individuals)) .5)))}
-\item \sv{\text{-}est} = \lstinline[mathescape]{($\lambda$ (A) ($\lambda$ (N) ($\lambda$ (x) (= (argmax A x) (argmax ($\lambda$ (d) (some (map ($\lambda$ (x) (>= (A x) d)) N))))))))}
+\item \sv{\text{-}est} = \lstinline[mathescape]{($\lambda$ (A) ($\lambda$ (N) ($\lambda$ (x) (= (argmax A x) (argmax ($\lambda$ ($\theta$) (some (map ($\lambda$ (x) (>= (A x) $\theta$)) N))))))))}
 %\item \sv{the} = \lstinline[mathescape]{($\lambda$ (P) ($\lambda$ (x) (P x)))} 
 \end{itemize}
 We have had to extend the intuitive theory with a domain of discourse capturing all the entities constructed.
