@@ -105,3 +105,1143 @@ abline(h=.05, lty=4, lwd=3, col='black')#
 lines(density(literal.only.sim[,1]), col='blue', lwd=3, lty=2)#
 lines(density(literal.only.sim[,2]), col='green', lwd=3, lty=3)#
 legend('topright', c('Strength prior', 'Strength posterior', 'Degree prior', 'Degree posterior'), lty=c(1, 2, 4, 3), col=c('red', 'blue', 'black', 'green'), text.col=c('red', 'blue', 'black', 'green'), cex=.8)
+n.sims = 10
+n.sims = 10
+matches = sapply(1:n.sims, FUN=function(t){return(sample(players, size=players.per.team*2, replace=F))})
+num.matches = 3
+players.per.team = 4
+players = 1:12
+matches = sapply(1:n.sims, FUN=function(t){return(sample(players, size=players.per.team*2, replace=F))})
+matches
+element(9, c(1,2,3))
+member(9, c(9))
+n.sims = 10
+played = sapply(1:n.sims, FUN=function(t){#
+		return(unique(as.vector(sapply(1:num.matches, FUN=function(i){sample(players, size=players.per.team*2, replace=F)}))))#
+	})
+played
+num.matches
+n.sims = 10#
+played = sapply(1:n.sims, FUN=function(t){#
+		players = as.vector(sapply(1:num.matches, FUN=function(i){sample(players, size=players.per.team*2, replace=F)}))#
+		return(length(which(players==1)))#
+	})
+played
+n.sims = 100000#
+played = sapply(1:n.sims, FUN=function(t){#
+		players = as.vector(sapply(1:num.matches, FUN=function(i){sample(players, size=players.per.team*2, replace=F)}))#
+		return(length(which(players==1)))#
+	})
+plot(table(played))
+plot(table(played)/num.matches)
+plot(table(played)/n.sims)
+plot(table(played)/n.sims, xlab="Number of matches Jane played in", ylab="Probability")
+plot(some.prob, type='b', pch=11, col='blue')
+some.prob = c(0, 1, 1, x)
+plot(table(played)/n.sims, xlab="Number of matches Jane played in", ylab="Probability")
+table(played)/n.sims
+prior.prob = table(played)/n.sims
+played[2:4]/sum(played[2:4])
+played[2:4]
+prior.prob[2:4]
+utt.prob.given.3 = prior.prob[2:4]/sum(prior.prob[2:4])
+utt.prob.given.3
+l0.probabilities.given.some = prior.prob[2:4]/sum(prior.prob[2:4])
+l0.probabilities.given.some = prior.prob[2:4]/sum(prior.prob[2:4])
+l0.probabilities.given.all = prior.prob[2:4]/sum(prior.prob[2:4])
+l0.probabilities.given.some = prior.prob[2:4]/sum(prior.prob[2:4])#
+l0.probabilities.given.all = c(0, 0, 0, 1)
+prior = table(played)/n.sims
+plot(prior, xlab="Number of matches Jane played in", ylab="Probability")
+plot(prior, type='b', pch=19, col='red', xlab="Number of matches Jane played in", ylab="Probability")
+lines(l0.probabilities.given.some, type='b', col='blue')
+plot(prior, type='b', pch=19, col='black', lwd=3, xlab="Number of matches Jane played in", ylab="Probability according to literal listener")
+lines(l0.probabilities.given.all, type='b', lwd=3, col='blue')
+probabilities.given.all
+prior = table(played)/n.sims#
+l0.probabilities.given.some = c(0, prior.prob[2:4]/sum(prior.prob[2:4]))#
+l0.probabilities.given.all = c(0, 0, 0, 1)#
+plot(prior, type='b', pch=19, col='black', lwd=3, xlab="Number of matches Jane played in", ylab="Probability according to literal listener")#
+lines(l0.probabilities.given.some, type='b', lwd=3, col='red')#
+lines(l0.probabilities.given.all, type='b', lwd=3, col='blue')
+prior = table(played)/n.sims#
+l0.probabilities.given.some = c(0, prior.prob[2:4]/sum(prior.prob[2:4]))#
+l0.probabilities.given.all = c(0, 0, 0, 1)#
+plot(prior, type='b', pch=19, col='black', lwd=3, xlab="Number of matches Jane played in", ylab="Probability according to literal listener")#
+lines(0:3, l0.probabilities.given.some, type='b', lwd=3, col='red')#
+lines(0:3, l0.probabilities.given.all, type='b', lwd=3, col='blue')
+plot(prior, type='b', pch=19, col='black', lwd=3, xlab="Number of matches Jane played in", ylab="Probability according to literal listener", xlim=c(0,3), ylim=c(0,1))
+lines(0:3, l0.probabilities.given.some, type='b', lwd=3, col='red')
+lines(0:3, l0.probabilities.given.all, type='b', lwd=3, col='blue')
+prior = table(played)/n.sims#
+l0.probabilities.given.some = c(0, prior.prob[2:4]/sum(prior.prob[2:4]))#
+l0.probabilities.given.all = c(0, 0, 0, 1)#
+plot(prior, type='b', pch=19, col='black', lwd=3, xlab="Number of matches Jane played in", ylab="Probability according to literal listener", xlim=c(0,3), ylim=c(0,1))#
+lines(0:3, l0.probabilities.given.some, type='b', lty=2, lwd=3, col='red')#
+lines(0:3, l0.probabilities.given.all, type='b', lty=3, lwd=3, col='blue')
+l0.probabilities.given.some
+utt.some = c(0, 1, 1, 1/l0.probabilities.given.some[4])#
+utt.all = c(0, 1, , 1/l0.probabilities.given.all[4])
+utt.some = c(0, 1, 1, 1/l0.probabilities.given.some[4])#
+utt.all = c(0, 0, 0, 1/l0.probabilities.given.all[4])
+utt.all
+utt.some
+l0.probabilities.given.some
+l0.probabilities.given.all
+?barplot
+l0.probabilities.given.some[4]
+l0.probabilities.given.all
+utt.some = c(1, 1, l0.probabilities.given.some[4]/norm)
+norm = l0.probabilities.given.all[4]+l0.probabilities.given.some[4]
+utt.some = c(1, 1, l0.probabilities.given.some[4]/norm)
+utt.all = c(0, 0, l0.probabilities.given.all[4]/norm)
+utt.some
+utt.all = c(0, 0, l0.probabilities.given.all[4]/norm)
+plot(utt.some, pch=19, col='black', lwd=3, xlab="Number of matches actually played", ylab="Probability that speaker chooses utterance")
+norm = l0.probabilities.given.all[4]+l0.probabilities.given.some[4]
+utt.some = c(1, 1, l0.probabilities.given.some[4]/norm)
+utt.all = c(0, 0, l0.probabilities.given.all[4]/norm)
+plot(utt.some, xaxt='n', type='b', pch=19, col='black', lwd=3, xlab="Number of matches actually played", ylab="Probability that speaker chooses utterance")
+plot(utt.some, xaxt='n', type='b', pch=19, col='red', lwd=3, xlab="Number of matches actually played", ylab="Probability that speaker chooses utterance")
+axis(1, 1:3)
+lines(utt.all, type='b', lty=2, lwd=3, col='blue')
+plot(utt.some, xaxt='n', type='b', pch=19, col='red', lwd=3, xlab="Number of matches actually played", ylab="Probability that speaker chooses utterance", ylim=c(0,1))
+axis(1, 1:3)
+lines(utt.all, type='b', lty=2, lwd=3, col='blue')
+legend('topright', c('Some', "All"), lty=c(1,2), col=c('red', 'blue'), text.col=c('red', 'blue'))
+prior
+L1.posterior.some = prior*utt.some
+prior
+L1.posterior.some = prior*c(0,utt.some)
+L1.posterior.all = prior*c(0,utt.all)
+L1.posterior.some = prior*c(0,utt.some)#
+L1.posterior.all = prior*c(0,utt.all)#
+plot(L1.posterior.some, xaxt='n', type='b', pch=19, col='red', lwd=3, xlab="Number of matches actually played", ylab="Probability that speaker chooses utterance", ylim=c(0,1))#
+axis(1, 1:3)#
+lines(L1.posterior.all, type='b', lty=2, lwd=3, col='blue')#
+legend('topright', c('Some', "All"), lty=c(1,2), col=c('red', 'blue'), text.col=c('red', 'blue'))
+L1.posterior.some.NN = prior*c(0,utt.some)#
+L1.posterior.all.NN = prior*c(0,utt.all)#
+NC = L1.posterior.some.NN + L1.posterior.all.NC#
+L1.posterior.some = L1.posterior.some.NN/NC#
+L1.posterior.all = L1.posterior.all.NN/NC
+NC = L1.posterior.some.NN + L1.posterior.all.NC
+NC = L1.posterior.some.NN + L1.posterior.all.NN
+L1.posterior.some = L1.posterior.some.NN/NC
+L1.posterior.all = L1.posterior.all.NN/NC
+plot(L1.posterior.some, xaxt='n', type='b', pch=19, col='red', lwd=3, xlab="Number of matches actually played", ylab="Probability that speaker chooses utterance", ylim=c(0,1))
+axis(1, 1:3)
+lines(L1.posterior.all, type='b', lty=2, lwd=3, col='blue')
+legend('topright', c('Some', "All"), lty=c(1,2), col=c('red', 'blue'), text.col=c('red', 'blue'))
+NC
+L1.posterior.some
+L1.posterior.some.NN = prior[2:4]*utt.some
+L1.posterior.all.NN = prior[2:4]*utt.all
+NC = L1.posterior.some.NN + L1.posterior.all.NN
+L1.posterior.some = L1.posterior.some.NN/NC
+L1.posterior.all = L1.posterior.all.NN/NC
+plot(L1.posterior.some, xaxt='n', type='b', pch=19, col='red', lwd=3, xlab="Number of matches actually played", ylab="Probability that speaker chooses utterance", ylim=c(0,1))
+lines(L1.posterior.all, type='b', lty=2, lwd=3, col='blue')
+legend('topright', c('Some', "All"), lty=c(1,2), col=c('red', 'blue'), text.col=c('red', 'blue'))
+par(mfrow=c(1,3))#
+prior = table(played)/n.sims#
+l0.probabilities.given.some = c(0, prior.prob[2:4]/sum(prior.prob[2:4]))#
+l0.probabilities.given.all = c(0, 0, 0, 1)#
+plot(prior, type='b', pch=19, col='black', lwd=3, xlab="Number of matches Jane played in", ylab="Probability according to literal listener", xlim=c(0,3), ylim=c(0,1))#
+lines(0:3, l0.probabilities.given.some, type='b', lty=2, lwd=3, col='red')#
+lines(0:3, l0.probabilities.given.all, type='b', lty=3, lwd=3, col='blue')#
+#
+# S1 probs#
+norm = l0.probabilities.given.all[4]+l0.probabilities.given.some[4]#
+utt.some = c(1, 1, l0.probabilities.given.some[4]/norm)#
+utt.all = c(0, 0, l0.probabilities.given.all[4]/norm)#
+plot(utt.some, xaxt='n', type='b', pch=19, col='red', lwd=3, xlab="Number of matches actually played", ylab="Probability that speaker chooses utterance", ylim=c(0,1))#
+axis(1, 1:3)#
+lines(utt.all, type='b', lty=2, lwd=3, col='blue')#
+legend('topright', c('Some', "All"), lty=c(1,2), col=c('red', 'blue'), text.col=c('red', 'blue'))#
+#
+#L1 probs#
+L1.posterior.some.NN = prior[2:4]*utt.some#
+L1.posterior.all.NN = prior[2:4]*utt.all#
+NC = L1.posterior.some.NN + L1.posterior.all.NN#
+L1.posterior.some = L1.posterior.some.NN/NC#
+L1.posterior.all = L1.posterior.all.NN/NC#
+plot(L1.posterior.some, xaxt='n', type='b', pch=19, col='red', lwd=3, xlab="Number of matches actually played", ylab="Probability that speaker chooses utterance", ylim=c(0,1))#
+axis(1, 1:3)#
+lines(L1.posterior.all, type='b', lty=2, lwd=3, col='blue')#
+legend('topright', c('Some', "All"), lty=c(1,2), col=c('red', 'blue'), text.col=c('red', 'blue'))
+NC
+L1.posterior.all
+utt.all
+utt.some
+L1.posterior.some.NN = prior[2:4]*utt.some#
+L1.posterior.all.NN = prior[2:4]*utt.all#
+NC = L1.posterior.some.NN + L1.posterior.all.NN#
+L1.posterior.some = L1.posterior.some.NN/NC#
+L1.posterior.all = L1.posterior.all.NN/NC#
+plot(L1.posterior.some, xaxt='n', type='b', pch=19, col='red', lwd=3, xlab="Number of matches Jane played in", ylab="Probability according to reflective listener", ylim=c(0,1))#
+axis(1, 1:3)#
+lines(L1.posterior.all, type='b', lty=2, lwd=3, col='blue')#
+legend('topright', c('Some', "All"), lty=c(1,2), col=c('red', 'blue'), text.col=c('red', 'blue'))
+par(mfrow=c(1,3))#
+prior = table(played)/n.sims#
+l0.probabilities.given.some = c(0, prior.prob[2:4]/sum(prior.prob[2:4]))#
+l0.probabilities.given.all = c(0, 0, 0, 1)#
+plot(prior, type='b', pch=19, col='black', lwd=3, xlab="Number of matches Jane played in", ylab="Probability according to literal listener", xlim=c(0,3), ylim=c(0,1))#
+lines(0:3, l0.probabilities.given.some, type='b', lty=2, lwd=3, col='red')#
+lines(0:3, l0.probabilities.given.all, type='b', lty=3, lwd=3, col='blue')#
+legend('topright', c('Some', "All"), lty=c(1,2), col=c('red', 'blue'), text.col=c('red', 'blue'))#
+#
+# S1 probs#
+norm = l0.probabilities.given.all[4]+l0.probabilities.given.some[4]#
+utt.some = c(1, 1, l0.probabilities.given.some[4]/norm)#
+utt.all = c(0, 0, l0.probabilities.given.all[4]/norm)#
+plot(utt.some, xaxt='n', type='b', pch=19, col='red', lwd=3, xlab="Number of matches Jane played in", ylab="Probability that speaker chooses utterance", ylim=c(0,1))#
+axis(1, 1:3)#
+lines(utt.all, type='b', lty=2, lwd=3, col='blue')#
+legend('topright', c('Some', "All"), lty=c(1,2), col=c('red', 'blue'), text.col=c('red', 'blue'))
+legend('topleft', c('Some', "All"), lty=c(1,2), col=c('red', 'blue'), text.col=c('red', 'blue'), cex=2)
+prior[2:4]
+utt.some
+L1.posterior.some.NN
+L1.posterior.some = prior[2:4]*utt.some/sum(prior[2:4]*utt.some)#
+L1.posterior.all = prior[2:4]*utt.all/sum(prior[2:4]*utt.all)#
+plot(L1.posterior.some, xaxt='n', type='b', pch=19, col='red', lwd=3, xlab="Number of matches Jane played in", ylab="Probability according to reflective listener", ylim=c(0,1))#
+axis(1, 1:3)#
+lines(L1.posterior.all, type='b', lty=2, lwd=3, col='blue')#
+legend('topright', c('Some', "All"), lty=c(1,2), col=c('red', 'blue'), text.col=c('red', 'blue'), cex=2)
+L1.posterior.all
+L1.posterior.some
+prior[2:4]
+utt.some
+utt.some[3]
+prob.3.given.some = utt.all[3]
+utt.all[3]
+L1.posterior.some = utt.some/utt.all
+L1.posterior.some
+L1.posterior.some = c(0,0,utt.some[3]/utt.all[3])#
+L1.posterior.all = c(1,1,utt.all[3]/utt.some[3])
+L1.posterior.some = c(0,0,utt.some[3]/utt.all[3])#
+L1.posterior.all = c(1,1,utt.all[3]/utt.some[3])#
+plot(L1.posterior.some, xaxt='n', type='b', pch=19, col='red', lwd=3, xlab="Number of matches Jane played in", ylab="Probability according to reflective listener", ylim=c(0,1))#
+axis(1, 1:3)#
+lines(L1.posterior.all, type='b', lty=2, lwd=3, col='blue')#
+legend('topright', c('Some', "All"), lty=c(1,2), col=c('red', 'blue'), text.col=c('red', 'blue'), cex=2)
+L1.posterior.some
+L1.posterior.all
+L1.posterior.some = L1.posterior.some/sum(L1.posterior.some)
+L1.posterior.some = c(0,0,utt.some[3]/utt.all[3])#
+L1.posterior.some = L1.posterior.some/sum(L1.posterior.some)#
+L1.posterior.all = c(1,1,utt.all[3]/utt.some[3])#
+L1.posterior.all = L1.posterior.all/sum(L1.posterior.all)#
+plot(L1.posterior.some, xaxt='n', type='b', pch=19, col='red', lwd=3, xlab="Number of matches Jane played in", ylab="Probability according to reflective listener", ylim=c(0,1))#
+axis(1, 1:3)#
+lines(L1.posterior.all, type='b', lty=2, lwd=3, col='blue')#
+legend('topright', c('Some', "All"), lty=c(1,2), col=c('red', 'blue'), text.col=c('red', 'blue'), cex=2)
+L1.posterior.some = prior * utt.some
+L1.posterior.some = L1.posterior.some/sum(L1.posterior.some)
+L1.posterior.all = prior * utt.all
+L1.posterior.all = L1.posterior.all/sum(L1.posterior.all)
+plot(L1.posterior.some, xaxt='n', type='b', pch=19, col='red', lwd=3, xlab="Number of matches Jane played in", ylab="Probability according to reflective listener", ylim=c(0,1))
+axis(1, 1:3)
+lines(L1.posterior.all, type='b', lty=2, lwd=3, col='blue')
+legend('topright', c('Some', "All"), lty=c(1,2), col=c('red', 'blue'), text.col=c('red', 'blue'), cex=2)
+L1.posterior.some = prior * c(0,utt.some)#
+L1.posterior.some = L1.posterior.some/sum(L1.posterior.some)#
+L1.posterior.all = prior * c(0,utt.all)#
+L1.posterior.all = L1.posterior.all/sum(L1.posterior.all)#
+plot(L1.posterior.some, xaxt='n', type='b', pch=19, col='red', lwd=3, xlab="Number of matches Jane played in", ylab="Probability according to reflective listener", ylim=c(0,1))#
+axis(1, 0:3)#
+lines(L1.posterior.all, type='b', lty=2, lwd=3, col='blue')#
+legend('topright', c('Some', "All"), lty=c(1,2), col=c('red', 'blue'), text.col=c('red', 'blue'), cex=2)
+par(mfrow=c(1,3))#
+prior = table(played)/n.sims#
+l0.probabilities.given.some = c(0, prior.prob[2:4]/sum(prior.prob[2:4]))#
+l0.probabilities.given.all = c(0, 0, 0, 1)#
+plot(prior, type='b', pch=19, col='black', lwd=3, xlab="Number of matches Jane played in", ylab="Probability according to literal listener", xlim=c(0,3), ylim=c(0,1))#
+lines(0:3, l0.probabilities.given.some, type='b', lty=2, lwd=3, col='red')#
+lines(0:3, l0.probabilities.given.all, type='b', lty=3, lwd=3, col='blue')#
+legend('topleft', c('Some', "All"), lty=c(1,2), col=c('red', 'blue'), text.col=c('red', 'blue'), cex=2)#
+#
+# S1 probs#
+norm = l0.probabilities.given.all[4]+l0.probabilities.given.some[4]#
+utt.some = c(1, 1, l0.probabilities.given.some[4]/norm)#
+utt.all = c(0, 0, l0.probabilities.given.all[4]/norm)#
+plot(utt.some, xaxt='n', type='b', pch=19, col='red', lwd=3, xlab="Number of matches Jane played in", ylab="Probability that speaker chooses utterance", ylim=c(0,1))#
+axis(1, 1:3)#
+lines(utt.all, type='b', lty=2, lwd=3, col='blue')#
+legend('topright', c('Some', "All"), lty=c(1,2), col=c('red', 'blue'), text.col=c('red', 'blue'), cex=2)#
+#
+#L1 probs#
+prob.3.given.some = utt.all[3]#
+#
+L1.posterior.some = prior * c(0,utt.some)#
+L1.posterior.some = L1.posterior.some/sum(L1.posterior.some)#
+L1.posterior.all = prior * c(0,utt.all)#
+L1.posterior.all = L1.posterior.all/sum(L1.posterior.all)#
+plot(L1.posterior.some, xaxt='n', type='b', pch=19, col='red', lwd=3, xlab="Number of matches Jane played in", ylab="Probability according to reflective listener", ylim=c(0,1))#
+axis(1, 0:3)#
+lines(L1.posterior.all, type='b', lty=2, lwd=3, col='blue')#
+legend('topright', c('Some', "All"), lty=c(1,2), col=c('red', 'blue'), text.col=c('red', 'blue'), cex=2)
+par(mfrow=c(1,3))#
+prior = table(played)/n.sims#
+l0.probabilities.given.some = c(0, prior.prob[2:4]/sum(prior.prob[2:4]))#
+l0.probabilities.given.all = c(0, 0, 0, 1)#
+plot(prior, type='b', pch=19, col='black', lwd=3, xlab="Number of matches Jane played in", ylab="Probability according to literal listener", xlim=c(0,3), ylim=c(0,1))#
+lines(0:3, l0.probabilities.given.some, type='b', lty=2, lwd=3, col='red')#
+lines(0:3, l0.probabilities.given.all, type='b', lty=3, lwd=3, col='blue')#
+legend('topleft', c('Some', "All"), lty=c(1,2), col=c('red', 'blue'), text.col=c('red', 'blue'), cex=2)#
+#
+# S1 probs#
+norm = l0.probabilities.given.all[4]+l0.probabilities.given.some[4]#
+utt.some = c(1, 1, l0.probabilities.given.some[4]/norm)#
+utt.all = c(0, 0, l0.probabilities.given.all[4]/norm)#
+plot(utt.some, xaxt='n', type='b', pch=19, col='red', lwd=3, xlab="Number of matches Jane played in", ylab="Probability that speaker chooses utterance", ylim=c(0,1))#
+axis(1, 1:3)#
+lines(utt.all, type='b', lty=2, lwd=3, col='blue')#
+legend('topright', c('Some', "All"), lty=c(1,2), col=c('red', 'blue'), text.col=c('red', 'blue'), cex=2)#
+#
+#L1 probs#
+prob.3.given.some = utt.all[3]#
+#
+L1.posterior.some = prior * c(0,utt.some)#
+L1.posterior.some = L1.posterior.some/sum(L1.posterior.some)#
+L1.posterior.all = prior * c(0,utt.all)#
+L1.posterior.all = L1.posterior.all/sum(L1.posterior.all)#
+plot(L1.posterior.some, xaxt='n', type='b', pch=19, col='red', lwd=3, xlab="Number of matches Jane played in", ylab="Probability according to reflective listener", ylim=c(0,1))#
+axis(1, 0:3)#
+lines(L1.posterior.all, type='b', lty=2, lwd=3, col='blue')#
+legend('topright', c('Some', "All"), lty=c(1,2), col=c('red', 'blue'), text.col=c('red', 'blue'), cex=2)
+par(mfrow=c(1,3))#
+prior = table(played)/n.sims#
+l0.probabilities.given.some = c(0, prior.prob[2:4]/sum(prior.prob[2:4]))#
+l0.probabilities.given.all = c(0, 0, 0, 1)#
+plot(prior, type='b', pch=19, col='black', lwd=3, xlab="Number of matches Jane played in", ylab="Probability according to literal listener", xlim=c(0,3), ylim=c(0,1), main="Literal listener")#
+lines(0:3, l0.probabilities.given.some, type='b', lty=2, lwd=3, col='red')#
+lines(0:3, l0.probabilities.given.all, type='b', lty=3, lwd=3, col='blue')#
+legend('topleft', c('Some', "All"), lty=c(1,2), col=c('red', 'blue'), text.col=c('red', 'blue'), cex=2)#
+#
+# S1 probs#
+norm = l0.probabilities.given.all[4]+l0.probabilities.given.some[4]#
+utt.some = c(1, 1, l0.probabilities.given.some[4]/norm)#
+utt.all = c(0, 0, l0.probabilities.given.all[4]/norm)#
+plot(utt.some, xaxt='n', type='b', pch=19, col='red', lwd=3, xlab="Number of matches Jane played in", ylab="Probability that speaker chooses utterance", ylim=c(0,1), main="Speaker")#
+axis(1, 1:3)#
+lines(utt.all, type='b', lty=2, lwd=3, col='blue')#
+legend('topright', c('Some', "All"), lty=c(1,2), col=c('red', 'blue'), text.col=c('red', 'blue'), cex=2)#
+#
+#L1 probs#
+prob.3.given.some = utt.all[3]#
+#
+L1.posterior.some = prior * c(0,utt.some)#
+L1.posterior.some = L1.posterior.some/sum(L1.posterior.some)#
+L1.posterior.all = prior * c(0,utt.all)#
+L1.posterior.all = L1.posterior.all/sum(L1.posterior.all)#
+plot(L1.posterior.some, xaxt='n', type='b', pch=19, col='red', lwd=3, xlab="Number of matches Jane played in", ylab="Probability according to reflective listener", ylim=c(0,1), main="Pragmatic listener")#
+axis(1, 0:3)#
+lines(L1.posterior.all, type='b', lty=2, lwd=3, col='blue')#
+legend('topright', c('Some', "All"), lty=c(1,2), col=c('red', 'blue'), text.col=c('red', 'blue'), cex=2)
+legend(.6, 0, c('Some', "All"), lty=c(1,2,3), col=c('black','red', 'blue'), text.col=c('black','red', 'blue'), cex=2)
+par(mfrow=c(1,3))#
+prior = table(played)/n.sims#
+l0.probabilities.given.some = c(0, prior.prob[2:4]/sum(prior.prob[2:4]))#
+l0.probabilities.given.all = c(0, 0, 0, 1)#
+plot(prior, type='b', pch=19, col='black', lwd=3, xlab="Number of matches Jane played in", ylab="Probability according to literal listener", xlim=c(0,3), ylim=c(0,1), main="Literal listener")#
+lines(0:3, l0.probabilities.given.some, type='b', lty=2, lwd=3, col='red')#
+lines(0:3, l0.probabilities.given.all, type='b', lty=3, lwd=3, col='blue')#
+legend(.6, 0, c('Prior', 'Some', "All"), lty=c(1,2,3), col=c('black','red', 'blue'), text.col=c('black','red', 'blue'), cex=2)#
+#
+# S1 probs#
+norm = l0.probabilities.given.all[4]+l0.probabilities.given.some[4]#
+utt.some = c(1, 1, l0.probabilities.given.some[4]/norm)#
+utt.all = c(0, 0, l0.probabilities.given.all[4]/norm)#
+plot(utt.some, xaxt='n', type='b', pch=19, col='red', lwd=3, xlab="Number of matches Jane played in", ylab="Probability that speaker chooses utterance", ylim=c(0,1), main="Speaker")#
+axis(1, 1:3)#
+lines(utt.all, type='b', lty=2, lwd=3, col='blue')#
+legend('topright', c('Some', "All"), lty=c(1,2), col=c('red', 'blue'), text.col=c('red', 'blue'), cex=2)#
+#
+#L1 probs#
+prob.3.given.some = utt.all[3]#
+#
+L1.posterior.some = prior * c(0,utt.some)#
+L1.posterior.some = L1.posterior.some/sum(L1.posterior.some)#
+L1.posterior.all = prior * c(0,utt.all)#
+L1.posterior.all = L1.posterior.all/sum(L1.posterior.all)#
+plot(L1.posterior.some, xaxt='n', type='b', pch=19, col='red', lwd=3, xlab="Number of matches Jane played in", ylab="Probability according to reflective listener", ylim=c(0,1), main="Pragmatic listener")#
+axis(1, 0:3)#
+lines(L1.posterior.all, type='b', lty=2, lwd=3, col='blue')#
+legend('topright', c('Some', "All"), lty=c(1,2), col=c('red', 'blue'), text.col=c('red', 'blue'), cex=2)
+par(mfrow=c(1,3))#
+prior = table(played)/n.sims#
+l0.probabilities.given.some = c(0, prior.prob[2:4]/sum(prior.prob[2:4]))#
+l0.probabilities.given.all = c(0, 0, 0, 1)#
+plot(prior, type='b', pch=19, col='black', lwd=3, xlab="Number of matches Jane played in", ylab="Probability according to literal listener", xlim=c(0,3), ylim=c(0,1), main="Literal listener")#
+lines(0:3, l0.probabilities.given.some, type='b', lty=2, lwd=3, col='red')#
+lines(0:3, l0.probabilities.given.all, type='b', lty=3, lwd=3, col='blue')#
+legend(x=0, y=.6, c('Prior', 'Some', "All"), lty=c(1,2,3), col=c('black','red', 'blue'), text.col=c('black','red', 'blue'), cex=2)#
+#
+# S1 probs#
+norm = l0.probabilities.given.all[4]+l0.probabilities.given.some[4]#
+utt.some = c(1, 1, l0.probabilities.given.some[4]/norm)#
+utt.all = c(0, 0, l0.probabilities.given.all[4]/norm)#
+plot(utt.some, xaxt='n', type='b', pch=19, col='red', lwd=3, xlab="Number of matches Jane played in", ylab="Probability that speaker chooses utterance", ylim=c(0,1), main="Speaker")#
+axis(1, 1:3)#
+lines(utt.all, type='b', lty=2, lwd=3, col='blue')#
+legend('topright', c('Some', "All"), lty=c(1,2), col=c('red', 'blue'), text.col=c('red', 'blue'), cex=2)#
+#
+#L1 probs#
+prob.3.given.some = utt.all[3]#
+#
+L1.posterior.some = prior * c(0,utt.some)#
+L1.posterior.some = L1.posterior.some/sum(L1.posterior.some)#
+L1.posterior.all = prior * c(0,utt.all)#
+L1.posterior.all = L1.posterior.all/sum(L1.posterior.all)#
+plot(L1.posterior.some, xaxt='n', type='b', pch=19, col='red', lwd=3, xlab="Number of matches Jane played in", ylab="Probability according to reflective listener", ylim=c(0,1), main="Pragmatic listener")#
+axis(1, 0:3)#
+lines(L1.posterior.all, type='b', lty=2, lwd=3, col='blue')#
+legend('topright', c('Some', "All"), lty=c(1,2), col=c('red', 'blue'), text.col=c('red', 'blue'), cex=2)
+par(mfrow=c(1,3))#
+prior = table(played)/n.sims#
+l0.probabilities.given.some = c(0, prior.prob[2:4]/sum(prior.prob[2:4]))#
+l0.probabilities.given.all = c(0, 0, 0, 1)#
+plot(prior, type='b', pch=19, col='black', lwd=3, xlab="Number of matches Jane played in", ylab="Probability according to literal listener", xlim=c(0,3), ylim=c(0,1), main="Literal listener")#
+lines(0:3, l0.probabilities.given.some, type='b', lty=2, lwd=3, col='red')#
+lines(0:3, l0.probabilities.given.all, type='b', lty=3, lwd=3, col='blue')#
+legend(x=0, y=.6, c('Prior', 'Some', "All"), lty=c(1,2,3), col=c('black','red', 'blue'), text.col=c('black','red', 'blue'), cex=2)#
+#
+# S1 probs#
+norm = l0.probabilities.given.all[4]+l0.probabilities.given.some[4]#
+utt.some = c(1, 1, l0.probabilities.given.some[4]/norm)#
+utt.all = c(0, 0, l0.probabilities.given.all[4]/norm)#
+plot(utt.some, xaxt='n', type='b', pch=19, col='red', lwd=3, xlab="Number of matches Jane played in", ylab="Probability that speaker chooses utterance", ylim=c(0,1), main="Speaker")#
+axis(1, 1:3)#
+lines(utt.all, type='b', lty=2, lwd=3, col='blue')#
+legend(x=0, y=.6, c('Some', "All"), lty=c(1,2), col=c('red', 'blue'), text.col=c('red', 'blue'), cex=2)#
+#
+#L1 probs#
+prob.3.given.some = utt.all[3]#
+#
+L1.posterior.some = prior * c(0,utt.some)#
+L1.posterior.some = L1.posterior.some/sum(L1.posterior.some)#
+L1.posterior.all = prior * c(0,utt.all)#
+L1.posterior.all = L1.posterior.all/sum(L1.posterior.all)#
+plot(L1.posterior.some, xaxt='n', type='b', pch=19, col='red', lwd=3, xlab="Number of matches Jane played in", ylab="Probability according to reflective listener", ylim=c(0,1), main="Pragmatic listener")#
+axis(1, 0:3)#
+lines(L1.posterior.all, type='b', lty=2, lwd=3, col='blue')#
+legend(x=0, y=.6,  c('Some', "All"), lty=c(1,2), col=c('red', 'blue'), text.col=c('red', 'blue'), cex=2)
+norm = l0.probabilities.given.all[4]+l0.probabilities.given.some[4]
+utt.some = c(1, 1, l0.probabilities.given.some[4]/norm)
+utt.all = c(0, 0, l0.probabilities.given.all[4]/norm)
+plot(utt.some, xaxt='n', type='b', pch=19, col='red', lwd=3, xlab="Number of matches Jane played in", ylab="Probability that speaker chooses utterance", ylim=c(0,1), main="Speaker")
+axis(1, 1:3)
+lines(utt.all, type='b', lty=2, lwd=3, col='blue')
+legend(x=0, y=.6, c('Some', "All"), lty=c(1,2), col=c('red', 'blue'), text.col=c('red', 'blue'), cex=2)
+ar(mfrow=c(1,3))#
+prior = table(played)/n.sims#
+l0.probabilities.given.some = c(0, prior.prob[2:4]/sum(prior.prob[2:4]))#
+l0.probabilities.given.all = c(0, 0, 0, 1)#
+plot(prior, type='b', pch=19, col='black', lwd=3, xlab="Number of matches Jane played in", ylab="Probability according to literal listener", xlim=c(0,3), ylim=c(0,1), main="Literal listener")#
+lines(0:3, l0.probabilities.given.some, type='b', lty=2, lwd=3, col='red')#
+lines(0:3, l0.probabilities.given.all, type='b', lty=3, lwd=3, col='blue')#
+legend(x=0, y=.6, c('Prior', 'Some', "All"), lty=c(1,2,3), col=c('black','red', 'blue'), text.col=c('black','red', 'blue'), cex=2)#
+#
+# S1 probs#
+norm = l0.probabilities.given.all[4]+l0.probabilities.given.some[4]#
+utt.some = c(1, 1, l0.probabilities.given.some[4]/norm)#
+utt.all = c(0, 0, l0.probabilities.given.all[4]/norm)#
+plot(0:3, utt.some, xaxt='n', type='b', pch=19, col='red', lwd=3, xlab="Number of matches Jane played in", ylab="Probability that speaker chooses utterance", ylim=c(0,1), main="Speaker")#
+axis(1, 0:3)#
+lines(utt.all, type='b', lty=2, lwd=3, col='blue')#
+legend(x=0, y=.6, c('Some', "All"), lty=c(1,2), col=c('red', 'blue'), text.col=c('red', 'blue'), cex=2)#
+#
+#L1 probs#
+L1.posterior.some = prior * c(0,utt.some)#
+L1.posterior.some = L1.posterior.some/sum(L1.posterior.some)#
+L1.posterior.all = prior * c(0,utt.all)#
+L1.posterior.all = L1.posterior.all/sum(L1.posterior.all)#
+plot(0:3, L1.posterior.some, xaxt='n', type='b', pch=19, col='red', lwd=3, xlab="Number of matches Jane played in", ylab="Probability according to reflective listener", ylim=c(0,1), main="Pragmatic listener")#
+axis(1, 0:3)#
+lines(L1.posterior.all, type='b', lty=2, lwd=3, col='blue')#
+legend(x=0, y=.6,  c('Some', "All"), lty=c(1,2), col=c('red', 'blue'), text.col=c('red', 'blue'), cex=2)
+par(mfrow=c(1,3))#
+prior = table(played)/n.sims#
+l0.probabilities.given.some = c(0, prior.prob[2:4]/sum(prior.prob[2:4]))#
+l0.probabilities.given.all = c(0, 0, 0, 1)#
+plot(prior, type='b', pch=19, col='black', lwd=3, xlab="Number of matches Jane played in", ylab="Probability according to literal listener", xlim=c(0,3), ylim=c(0,1), main="Literal listener")#
+lines(0:3, l0.probabilities.given.some, type='b', lty=2, lwd=3, col='red')#
+lines(0:3, l0.probabilities.given.all, type='b', lty=3, lwd=3, col='blue')#
+legend(x=0, y=.6, c('Prior', 'Some', "All"), lty=c(1,2,3), col=c('black','red', 'blue'), text.col=c('black','red', 'blue'), cex=2)
+S1 probs#
+norm = l0.probabilities.given.all[4]+l0.probabilities.given.some[4]#
+utt.some = c(1, 1, l0.probabilities.given.some[4]/norm)#
+utt.all = c(0, 0, l0.probabilities.given.all[4]/norm)#
+plot(0:3, utt.some, xaxt='n', type='b', pch=19, col='red', lwd=3, xlab="Number of matches Jane played in", ylab="Probability that speaker chooses utterance", ylim=c(0,1), main="Speaker")#
+axis(1, 0:3)#
+lines(utt.all, type='b', lty=2, lwd=3, col='blue')#
+legend(x=0, y=.6, c('Some', "All"), lty=c(1,2), col=c('red', 'blue'), text.col=c('red', 'blue'), cex=2)
+plot(0:3, utt.some, xaxt='n', type='b', pch=19, col='red', lwd=3, xlab="Number of matches Jane played in", ylab="Probability that speaker chooses utterance", ylim=c(0,1), main="Speaker")
+par(mfrow=c(1,3))#
+prior = table(played)/n.sims#
+l0.probabilities.given.some = c(0, prior.prob[2:4]/sum(prior.prob[2:4]))#
+l0.probabilities.given.all = c(0, 0, 0, 1)#
+plot(prior, type='b', pch=19, col='black', lwd=3, xlab="Number of matches Jane played in", ylab="Probability according to literal listener", xlim=c(0,3), ylim=c(0,1), main="Literal listener")#
+lines(0:3, l0.probabilities.given.some, type='b', lty=2, lwd=3, col='red')#
+lines(0:3, l0.probabilities.given.all, type='b', lty=3, lwd=3, col='blue')#
+legend(x=0, y=.6, c('Prior', 'Some', "All"), lty=c(1,2,3), col=c('black','red', 'blue'), text.col=c('black','red', 'blue'), cex=2)#
+#
+# S1 probs#
+norm = l0.probabilities.given.all[4]+l0.probabilities.given.some[4]#
+utt.some = c(1, 1, l0.probabilities.given.some[4]/norm)#
+utt.all = c(0, 0, l0.probabilities.given.all[4]/norm)#
+plot(1:3, utt.some, xaxt='n', type='b', pch=19, col='red', lwd=3, xlab="Number of matches Jane played in", ylab="Probability that speaker chooses utterance", ylim=c(0,1), main="Speaker")#
+axis(1, 0:3)#
+lines(utt.all, type='b', lty=2, lwd=3, col='blue')#
+legend(x=0, y=.6, c('Some', "All"), lty=c(1,2), col=c('red', 'blue'), text.col=c('red', 'blue'), cex=2)#
+#
+#L1 probs#
+L1.posterior.some = prior * c(0,utt.some)#
+L1.posterior.some = L1.posterior.some/sum(L1.posterior.some)#
+L1.posterior.all = prior * c(0,utt.all)#
+L1.posterior.all = L1.posterior.all/sum(L1.posterior.all)#
+plot(0:3, L1.posterior.some, xaxt='n', type='b', pch=19, col='red', lwd=3, xlab="Number of matches Jane played in", ylab="Probability according to reflective listener", ylim=c(0,1), main="Pragmatic listener")#
+axis(1, 0:3)#
+lines(L1.posterior.all, type='b', lty=2, lwd=3, col='blue')#
+legend(x=0, y=.6,  c('Some', "All"), lty=c(1,2), col=c('red', 'blue'), text.col=c('red', 'blue'), cex=2)
+L1.posterior.some
+L1.posterior.some = prior * c(0,utt.some)#
+L1.posterior.some = L1.posterior.some/sum(L1.posterior.some)#
+L1.posterior.all = prior * c(0,utt.all)#
+L1.posterior.all = L1.posterior.all/sum(L1.posterior.all)#
+plot(prior, type='b', pch=19, col='black', lwd=3, xlab="Number of matches Jane played in", ylab="Probability according to reflective listener", xlim=c(0,3), ylim=c(0,1), main="Pragmatic listener")#
+#plot(0:3, L1.posterior.some, xaxt='n', type='b', pch=19, col='red', lwd=3, xlab="Number of matches Jane played in", ylab="Probability according to reflective listener", ylim=c(0,1), main="Pragmatic listener")#
+axis(1, 0:3)#
+lines(L1.posterior.some, type='b', lty=2, pch=19,lwd=3, col='red')#
+lines(L1.posterior.all, type='b', lty=3, pch=19,lwd=3, col='blue')#
+legend(x=0, y=.6,  c('Prior','Some', "All"), lty=c(1,2,3), col=c('black','red', 'blue'), text.col=c('black','red', 'blue'), cex=2)
+par(mfrow=c(1,3))#
+prior = table(played)/n.sims#
+l0.probabilities.given.some = c(0, prior.prob[2:4]/sum(prior.prob[2:4]))#
+l0.probabilities.given.all = c(0, 0, 0, 1)#
+plot(prior, type='b', pch=19, col='black', lwd=3, xlab="Number of matches Jane played in", ylab="Probability according to literal listener", xlim=c(0,3), ylim=c(0,1), main="Literal listener")#
+lines(0:3, l0.probabilities.given.some, type='b', lty=2, lwd=3, col='red')#
+lines(0:3, l0.probabilities.given.all, type='b', lty=3, lwd=3, col='blue')#
+legend(x=0, y=.6, c('Prior', 'Some', "All"), lty=c(1,2,3), col=c('black','red', 'blue'), text.col=c('black','red', 'blue'), cex=2)#
+#
+# S1 probs#
+norm = l0.probabilities.given.all[4]+l0.probabilities.given.some[4]#
+utt.some = c(1, 1, l0.probabilities.given.some[4]/norm)#
+utt.all = c(0, 0, l0.probabilities.given.all[4]/norm)#
+plot(1:3, utt.some, xaxt='n', type='b', pch=19, col='red', lwd=3, xlab="Number of matches Jane played in", ylab="Probability that speaker chooses utterance", ylim=c(0,1), main="Speaker")#
+axis(1, 0:3)#
+lines(utt.all, type='b', lty=2, lwd=3, col='blue')#
+legend(x=0, y=.6, c('Some', "All"), lty=c(1,2), col=c('red', 'blue'), text.col=c('red', 'blue'), cex=2)#
+#
+#L1 probs#
+L1.posterior.some = prior * c(0,utt.some)#
+L1.posterior.some = L1.posterior.some/sum(L1.posterior.some)#
+L1.posterior.all = prior * c(0,utt.all)#
+L1.posterior.all = L1.posterior.all/sum(L1.posterior.all)#
+plot(prior, type='b', pch=19, col='black', lwd=3, xlab="Number of matches Jane played in", ylab="Probability according to reflective listener", xlim=c(0,3), ylim=c(0,1), main="Pragmatic listener")#
+#plot(0:3, L1.posterior.some, xaxt='n', type='b', pch=19, col='red', lwd=3, xlab="Number of matches Jane played in", ylab="Probability according to reflective listener", ylim=c(0,1), main="Pragmatic listener")#
+axis(1, 0:3)#
+lines(L1.posterior.some, type='b', lty=2, pch=19,lwd=3, col='red')#
+lines(L1.posterior.all, type='b', lty=3, pch=19,lwd=3, col='blue')#
+legend(x=0, y=.6,  c('Prior','Some', "All"), lty=c(1,2,3), col=c('black','red', 'blue'), text.col=c('black','red', 'blue'), cex=2)
+plot(1:3, utt.some, xaxt='n', type='b', xlim=c(0,3), pch=19, col='red', lwd=3, xlab="Number of matches Jane played in", ylab="Probability that speaker chooses utterance", ylim=c(0,1), main="Speaker")
+axis(1, 0:3)
+lines(utt.all, type='b', lty=2, lwd=3, col='blue')
+legend(x=0, y=.6, c('Some', "All"), lty=c(1,2), col=c('red', 'blue'), text.col=c('red', 'blue'), cex=2)
+par(mfrow=c(1,3))#
+prior = table(played)/n.sims#
+l0.probabilities.given.some = c(0, prior.prob[2:4]/sum(prior.prob[2:4]))#
+l0.probabilities.given.all = c(0, 0, 0, 1)#
+plot(prior, type='b', pch=19, col='black', lwd=3, xlab="Number of matches Jane played in", ylab="Probability according to literal listener", xlim=c(0,3), ylim=c(0,1), main="Literal listener")#
+lines(0:3, l0.probabilities.given.some, type='b', lty=2, lwd=3, col='red')#
+lines(0:3, l0.probabilities.given.all, type='b', lty=3, lwd=3, col='blue')#
+legend(x=0, y=.6, c('Prior', 'Some', "All"), lty=c(1,2,3), col=c('black','red', 'blue'), text.col=c('black','red', 'blue'), cex=2)#
+#
+# S1 probs#
+norm = l0.probabilities.given.all[4]+l0.probabilities.given.some[4]#
+utt.some = c(1, 1, l0.probabilities.given.some[4]/norm)#
+utt.all = c(0, 0, l0.probabilities.given.all[4]/norm)#
+plot(1:3, utt.some, xaxt='n', type='b', xlim=c(0,3), pch=19, col='red', lwd=3, xlab="Number of matches Jane played in", ylab="Probability that speaker chooses utterance", ylim=c(0,1), main="Speaker")#
+axis(1, 0:3)#
+lines(utt.all, type='b', lty=2, lwd=3, col='blue')#
+legend(x=0, y=.6, c('Some', "All"), lty=c(1,2), col=c('red', 'blue'), text.col=c('red', 'blue'), cex=2)#
+#
+#L1 probs#
+L1.posterior.some = prior * c(0,utt.some)#
+L1.posterior.some = L1.posterior.some/sum(L1.posterior.some)#
+L1.posterior.all = prior * c(0,utt.all)#
+L1.posterior.all = L1.posterior.all/sum(L1.posterior.all)#
+plot(prior, type='b', pch=19, col='black', lwd=3, xlab="Number of matches Jane played in", ylab="Probability according to reflective listener", xlim=c(0,3), ylim=c(0,1), main="Pragmatic listener")#
+#plot(0:3, L1.posterior.some, xaxt='n', type='b', pch=19, col='red', lwd=3, xlab="Number of matches Jane played in", ylab="Probability according to reflective listener", ylim=c(0,1), main="Pragmatic listener")#
+axis(1, 0:3)#
+lines(L1.posterior.some, type='b', lty=2, pch=19,lwd=3, col='red')#
+lines(L1.posterior.all, type='b', lty=3, pch=19,lwd=3, col='blue')#
+legend(x=0, y=.6,  c('Prior','Some', "All"), lty=c(1,2,3), col=c('black','red', 'blue'), text.col=c('black','red', 'blue'), cex=2)
+L1.posterior.some
+l0.probabilities.given.some
+For handbook chapter and SALT paper. The following simulates how L0 would behave if the variable weren't passed up -- inferred meaning of 'pos' is very low, since there's no speaker-driven pressure for informativity. #
+# This version, it's hard-coded to work with prior from that example. #
+literal.only = function(n.sims) {#
+  results = matrix(NA, nrow=n.sims, ncol=2)#
+  accepted = 0#
+  while (accepted < n.sims) {#
+    theta = runif(1, -100, 100) # uniform prior on thetas over sufficient interval#
+    height = rnorm(1, 0, 2.25)#
+    if (height > theta) {#
+      accepted = accepted + 1#
+      results[accepted,] = c(height, theta)#
+    }#
+  }#
+  return(results)#
+}#
+literal.only.sim = literal.only(100000)#
+par(mfrow=c(1,1))#
+curve(dnorm(x, 0, 2.25), xlim=c(-10,10), lty=1, lwd=3, col='red', xlab='Strength', ylab='Probability density')#
+abline(h=1/200, lty=4, lwd=3, col='black')#
+lines(density(literal.only.sim[,1]), col='blue', lwd=3, lty=2)#
+lines(density(literal.only.sim[,2]), col='green', lwd=3, lty=3)#
+legend('topright', c('Strength prior', 'Strength posterior', 'Degree prior', 'Degree posterior'), lty=c(1, 2, 4, 3), col=c('red', 'blue', 'black', 'green'), text.col=c('red', 'blue', 'black', 'green'), cex=.8)
+curve(dnorm(x, 0, 2.25), xlim=c(-10,10), lty=1, lwd=3, col='red', xlab='Strength', ylab='Probability density')#
+abline(h=1/200, lty=4, lwd=3, col='black')#
+lines(density(literal.only.sim[,1]), col='blue', lwd=3, lty=2)#
+lines(density(literal.only.sim[,2]), col='green', lwd=3, lty=3)#
+legend('topright', c('Strength prior', 'Strength posterior', 'Degree prior', 'Degree posterior'), lty=c(1, 2, 4, 3), col=c('red', 'blue', 'black', 'green'), text.col=c('red', 'blue', 'black', 'green'), cex=.8)
+possible.utterances = c()#
+#
+prior.prob.gtr = function(theta, polarity) {#
+  if (polarity == 'positive') {#
+      mu = 0#
+      sigma = 2.25#
+      return(1 - pnorm(theta, mu, sigma))#
+  } else {#
+    return(1 - prior.prob.gtr(theta, 'positive'))#
+  }#
+}#
+#
+set.possible.utterances = function(num.adj.pairs, mods=F) {#
+  if (num.adj.pairs == .5) {#
+    possible.utterances <<- c('no-utt', 'pos')#
+    return(T)#
+  } else if (num.adj.pairs == 1 && !mods) {#
+		possible.utterances <<- c('no-utt', 'neg', 'pos')#
+		return(T)#
+	} else if (num.adj.pairs == 2 && !mods) {#
+		possible.utterances <<- c('no-utt', 'neg2', 'neg1', 'pos1', 'pos2')#
+		return(T)#
+	} else if (num.adj.pairs == 3 && !mods) {#
+		possible.utterances <<- c('no-utt', 'neg3', 'neg2', 'neg1', 'pos1', 'pos2', 'pos3')#
+		return(T)#
+	} else if (num.adj.pairs == 1 && mods) {#
+		possible.utterances <<- c('no-utt', 'very neg', 'neg', 'pos', 'very pos')#
+		return(T)#
+	} else {#
+		print("Error at function set.possible.utterances: unknown number of pairs")#
+		return(F)#
+	}#
+}#
+#
+approx.equal = function(x,y) {return(abs(x - y) < .00001)}#
+#
+utterance.index = function(utt) {return(which(possible.utterances == utt))}#
+#
+polarity = function(utterance) {#
+	if (utterance == 'pos' || utterance == 'very pos' || utterance == 'pos1' || utterance == 'very pos1' || utterance == 'pos2' || utterance == 'pos3') {#
+		return('positive')#
+	} else if (utterance == 'neg' || utterance == 'very neg' || utterance == 'neg1' || utterance == 'very neg1' || utterance == 'neg2' || utterance == 'neg3') {#
+		return('negative')#
+	} else {#
+		print("Error in function polarity: unknown utterance")#
+	}#
+}#
+#
+relevant.theta = function(utterance) {return(which(possible.utterances[-1] == utterance))}#
+#
+is.true = function(utterance, thetas, degree) {#
+	if (utterance == 'no-utt') {#
+		return(T)#
+	} else if (polarity(utterance) == 'positive' && degree >= thetas[relevant.theta(utterance)]) {#
+		return(T)#
+	} else if (polarity(utterance) == 'negative' && degree <= thetas[relevant.theta(utterance)]) {#
+		return(T)#
+	} else {#
+		return(F)#
+	}#
+}#
+#
+listener0 = function(utterance, thetas, degree) {#
+	if (!is.true(utterance, thetas, degree)) {#
+		return(0)#
+	} else if (utterance == 'no-utt') {#
+		return(1)#
+	} else {		#
+# return the prior probability of the utterance being true, as long as it isn't 0. 	#
+		return(1/prior.prob.gtr(thetas[relevant.theta(utterance)], polarity(utterance)))  #
+	}#
+} #
+#
+mylnth = function(u) {#
+	if (u == 'no-utt') {#
+		return(0)#
+	} else if (u=='very pos' || u=='very neg') {#
+		return(2)#
+	} else {#
+		return(1)#
+	}#
+}#
+#
+speaker1 = function(thetas, degree, alpha, utt.cost) {#
+	eval.utt = function(utt) {#
+		prior = exp(-alpha * utt.cost)^mylnth(utt)#
+		likelihood = exp(alpha * log(listener0(utt, thetas, degree)))#
+		return(prior * likelihood)#
+	}#
+	utt.probs = sapply(possible.utterances, FUN=eval.utt)#
+	return(utt.probs/sum(utt.probs))#
+}#
+#
+admissible = function(vec) {#
+  if (any(vec < -6) || any(vec > 6)) {#
+    return(F)#
+  } else {#
+    return(T)#
+}#
+#
+listener1 = function(utterance, n.samples, alpha=1, utt.cost=1.5, step.size=.02, burn.in=50000) {#
+	num.adj.pairs = 1#
+  mods = F#
+  pu.check = set.possible.utterances(num.adj.pairs, mods)#
+	if (!pu.check) {#
+		print("Error in listener1: unable to set possible utterances")#
+	}#
+	flip = function(p) {return(runif(1,0,1) < p)}#
+	samples = matrix(NA, nrow=n.samples, ncol=length(possible.utterances), dimnames=list(paste('samp', 1:n.samples, sep=''), c('degree', paste('theta.', possible.utterances[-1], sep=''))))#
+  dens = function(x){return(dnorm(x, 0, 2.25))}#
+  sample.degree = 0#
+	sample.thetas = c(0,0)#
+	sample.prob.NN = 0#
+	while (approx.equal(sample.prob.NN,0) || !admissible(c(sample.degree, sample.thetas))) {#
+  	sample.degree = rnorm(1,0,2.25)#
+	  sample.degree.prior = dens(sample.degree)#
+  	#sample.thetas = runif(length(possible.utterances) - 1, -6, 6)#
+  	sample.thetas = c(0,0)#
+		sample.likelihood = speaker1(sample.thetas, sample.degree, alpha, utt.cost)[utterance.index(utterance)]#
+		sample.prob.NN = sample.degree.prior * sample.likelihood#
+	}#
+	sample.vec = c(sample.degree, sample.thetas)#
+	n.proposals.accepted = 0#
+	increment = function(n) {if (n < length(sample.vec)) {return(n+1)} else {return(1)}}#
+	switch = 0#
+	make.proposal = function(v, switch) {#
+		proposal.v = v#
+		proposal.v[switch] = sample(c(proposal.v[switch] + step.size, proposal.v[switch] - step.size), 1)#
+		return(proposal.v)#
+	}#
+	for (i in 1:(n.samples+burn.in)) {#
+		switch = increment(switch)#
+		proposal.vec = make.proposal(sample.vec, switch)#
+ 		if (admissible(proposal.vec)) {#
+			proposal.degree = proposal.vec[1]#
+			proposal.thetas = proposal.vec[2:length(proposal.vec)]#
+			proposal.degree.prior = dens(proposal.degree)#
+			proposal.likelihood = speaker1(proposal.thetas, proposal.degree, alpha, utt.cost)[utterance.index(utterance)]#
+			proposal.prob.NN = proposal.degree.prior * proposal.likelihood#
+			accept = flip(min(1, proposal.prob.NN/sample.prob.NN))#
+			if (accept && i > burn.in) {#
+				n.proposals.accepted = n.proposals.accepted + 1#
+			 	sample.vec = proposal.vec#
+			 	sample.prob.NN = proposal.prob.NN#
+			} #
+		}#
+    if (i > burn.in) {#
+  		samples[(i-burn.in),] = sample.vec#
+    }#
+  }#
+	return(list(samples=samples, prop.accepted=n.proposals.accepted/(n.samples)))#
+}#
+#
+# n.samples = 500000#
+# sq = seq(from=1, to=n.samples, by=50)#
+# chain1 = listener1('pos', n.samples, alpha=1, utt.cost=1.5)[[1]][sq,]#
+# chain2 = listener1('pos', n.samples, alpha=1, utt.cost=1.5)[[1]][sq,]#
+#   #
+# par(mfrow=c(1,2))#
+# curve(dnorm(x, 0, 2.25), xlim=c(-6,6), ylim=c(0,.5), col='blue', xlab="Strength prior", ylab="Probability density")#
+# abline(h=.05, col='black', lty=3)#
+# lines(density(chain1[,1])) # degree#
+# lines(density(chain1[,3]), col='red') #theta-pos#
+#   #
+#   curve(dnorm(x, 0, 2.25), xlim=c(-6,6), ylim=c(0,.5), col='blue', xlab="Strength prior", ylab="Probability density")#
+#   abline(h=.05, col='black', lty=3)#
+#   lines(density(chain2[,1])) # degree#
+#   lines(density(chain2[,3]), col='red') #theta-pos  #
+#   #
+#   # with thetas initialized at zero:#
+#   chain3 = listener1('pos', n.samples, alpha=1, utt.cost=1.5)[[1]][sq,]#
+#   curve(dnorm(x, 0, 2.25), xlim=c(-6,6), ylim=c(0,.5), col='blue', xlab="Strength prior", ylab="Probability density")#
+#   abline(h=.05, col='black', lty=3)#
+#   lines(density(chain3[,1])) # degree#
+#   lines(density(chain3[,3]), col='red') #theta-pos  #
+#   #
+#   chain4 = listener1('pos', n.samples=500000, alpha=2, utt.cost=1.5)[[1]][sq,]#
+#   curve(dnorm(x, 0, 2.25), xlim=c(-6,6), ylim=c(0,.5), col='blue', xlab="Strength prior", ylab="Probability density")#
+#   abline(h=.05, col='black', lty=3)#
+#   lines(density(chain4[,1])) # degree#
+#   lines(density(chain4[,3]), col='red') #theta-pos #
+#   #
+#   chain5 = listener1('pos', n.samples=1500000, alpha=2.5, utt.cost=1.5)[[1]][sq,]#
+#   par(mfrow=c(1,1))#
+#   curve(dnorm(x, 0, 2.25), xlim=c(-6,6), ylim=c(0,.5), col='blue', xlab="Strength prior", ylab="Probability density")#
+#   abline(h=.05, col='black', lty=3)#
+#   lines(density(chain5[,1])) # degree#
+#   lines(density(chain5[,3]), col='red') #theta-pos #
+#   #
+#   chain6 = listener1('pos', n.samples=1500000, alpha=2.5, utt.cost=1.5)[[1]][sq,]#
+#   #
+#   curve(dnorm(x, 0, 2.25), xlim=c(-6,6), ylim=c(0,.4), col='black', xlab="Strength prior", ylab="Probability density")#
+#   abline(h=1, col='green', lty=4, lwd=3)#
+#   lines(density(c(chain5[,1],chain6[,1])), lwd=3, col='blue', lty=2) # degree#
+#   lines(density(c(chain5[,3]), chain6[,3]), col='red', lty=3) #theta-pos #
+#   legend('topleft', c('Meaning prior', 'Meaning posterior', "QUD prior", "QUD posterior"), lty=c(4, 3, 1, 2), text.col=c('green', 'red', 'black', 'blue'), col=c('green', 'red', 'black', 'blue'))#
+#   #
+#   chain7 = listener1('pos', n.samples=5000000, alpha=2, utt.cost=1.5)[[1]][seq(from=1, to=5000000, by=50),]#
+#   curve(dnorm(x, 0, 2.25), xlim=c(-6,6), ylim=c(0,.4), col='black', xlab="Strength prior", ylab="Probability density")#
+#   abline(h=1, col='green', lty=4, lwd=3)#
+#   lines(density(chain7[,1]), lwd=3, col='blue', lty=2) # degree#
+#   lines(density(chain7[,3]), col='red', lty=3, lwd=3) #theta-pos #
+#   legend('topleft', c('Meaning prior', 'Meaning posterior', "QUD prior", "QUD posterior"), lty=c(4, 3, 1, 2), text.col=c('green', 'red', 'black', 'blue'), col=c('green', 'red', 'black', 'blue'))#
+  chain8 = listener1('pos', n.samples=10000000, alpha=2.5, utt.cost=2)[[1]][seq(from=1, to=10000000, by=50),]#
+  curve(dnorm(x, 0, 2.25), xlim=c(-6,6), ylim=c(0,.45), col='black', xlab="Strength prior", ylab="Probability density")#
+  abline(h=1/12, col='green', lty=4, lwd=3)#
+  lines(density(chain8[,1]), lwd=3, col='blue', lty=2) # degree#
+  lines(density(chain8[,3]), col='red', lty=3, lwd=3) #theta-pos #
+  legend('topleft', c('Threshold prior', 'Threshold posterior', "QUD prior", "QUD posterior"), lty=c(4, 3, 1, 2), text.col=c('green', 'red', 'black', 'blue'), cex=1.5, col=c('green', 'red', 'black', 'blue'))
+bvwuiwbwv})}}}
+listener1
+possible.utterances = c()#
+#
+prior.prob.gtr = function(theta, polarity) {#
+  if (polarity == 'positive') {#
+      mu = 0#
+      sigma = 2.25#
+      return(1 - pnorm(theta, mu, sigma))#
+  } else {#
+    return(1 - prior.prob.gtr(theta, 'positive'))#
+  }#
+}#
+#
+set.possible.utterances = function(num.adj.pairs, mods=F) {#
+  if (num.adj.pairs == .5) {#
+    possible.utterances <<- c('no-utt', 'pos')#
+    return(T)#
+  } else if (num.adj.pairs == 1 && !mods) {#
+		possible.utterances <<- c('no-utt', 'neg', 'pos')#
+		return(T)#
+	} else if (num.adj.pairs == 2 && !mods) {#
+		possible.utterances <<- c('no-utt', 'neg2', 'neg1', 'pos1', 'pos2')#
+		return(T)#
+	} else if (num.adj.pairs == 3 && !mods) {#
+		possible.utterances <<- c('no-utt', 'neg3', 'neg2', 'neg1', 'pos1', 'pos2', 'pos3')#
+		return(T)#
+	} else if (num.adj.pairs == 1 && mods) {#
+		possible.utterances <<- c('no-utt', 'very neg', 'neg', 'pos', 'very pos')#
+		return(T)#
+	} else {#
+		print("Error at function set.possible.utterances: unknown number of pairs")#
+		return(F)#
+	}#
+}
+approx.equal = function(x,y) {return(abs(x - y) < .00001)}#
+#
+utterance.index = function(utt) {return(which(possible.utterances == utt))}#
+#
+polarity = function(utterance) {#
+	if (utterance == 'pos' || utterance == 'very pos' || utterance == 'pos1' || utterance == 'very pos1' || utterance == 'pos2' || utterance == 'pos3') {#
+		return('positive')#
+	} else if (utterance == 'neg' || utterance == 'very neg' || utterance == 'neg1' || utterance == 'very neg1' || utterance == 'neg2' || utterance == 'neg3') {#
+		return('negative')#
+	} else {#
+		print("Error in function polarity: unknown utterance")#
+	}#
+}#
+#
+relevant.theta = function(utterance) {return(which(possible.utterances[-1] == utterance))}#
+#
+is.true = function(utterance, thetas, degree) {#
+	if (utterance == 'no-utt') {#
+		return(T)#
+	} else if (polarity(utterance) == 'positive' && degree >= thetas[relevant.theta(utterance)]) {#
+		return(T)#
+	} else if (polarity(utterance) == 'negative' && degree <= thetas[relevant.theta(utterance)]) {#
+		return(T)#
+	} else {#
+		return(F)#
+	}#
+}#
+#
+listener0 = function(utterance, thetas, degree) {#
+	if (!is.true(utterance, thetas, degree)) {#
+		return(0)#
+	} else if (utterance == 'no-utt') {#
+		return(1)#
+	} else {		#
+# return the prior probability of the utterance being true, as long as it isn't 0. 	#
+		return(1/prior.prob.gtr(thetas[relevant.theta(utterance)], polarity(utterance)))  #
+	}#
+}
+approx.equal = function(x,y) {return(abs(x - y) < .00001)}#
+#
+utterance.index = function(utt) {return(which(possible.utterances == utt))}#
+#
+polarity = function(utterance) {#
+	if (utterance == 'pos' || utterance == 'very pos' || utterance == 'pos1' || utterance == 'very pos1' || utterance == 'pos2' || utterance == 'pos3') {#
+		return('positive')#
+	} else if (utterance == 'neg' || utterance == 'very neg' || utterance == 'neg1' || utterance == 'very neg1' || utterance == 'neg2' || utterance == 'neg3') {#
+		return('negative')#
+	} else {#
+		print("Error in function polarity: unknown utterance")#
+	}#
+}#
+#
+relevant.theta = function(utterance) {return(which(possible.utterances[-1] == utterance))}#
+#
+is.true = function(utterance, thetas, degree) {#
+	if (utterance == 'no-utt') {#
+		return(T)#
+	} else if (polarity(utterance) == 'positive' && degree >= thetas[relevant.theta(utterance)]) {#
+		return(T)#
+	} else if (polarity(utterance) == 'negative' && degree <= thetas[relevant.theta(utterance)]) {#
+		return(T)#
+	} else {#
+		return(F)#
+	}#
+}#
+#
+listener0 = function(utterance, thetas, degree) {#
+	if (!is.true(utterance, thetas, degree)) {#
+		return(0)#
+	} else if (utterance == 'no-utt') {#
+		return(1)#
+	} else {		#
+# return the prior probability of the utterance being true, as long as it isn't 0. 	#
+		return(1/prior.prob.gtr(thetas[relevant.theta(utterance)], polarity(utterance)))  #
+	}#
+} #
+#
+mylnth = function(u) {#
+	if (u == 'no-utt') {#
+		return(0)#
+	} else if (u=='very pos' || u=='very neg') {#
+		return(2)#
+	} else {#
+		return(1)#
+	}#
+}#
+#
+speaker1 = function(thetas, degree, alpha, utt.cost) {#
+	eval.utt = function(utt) {#
+		prior = exp(-alpha * utt.cost)^mylnth(utt)#
+		likelihood = exp(alpha * log(listener0(utt, thetas, degree)))#
+		return(prior * likelihood)#
+	}#
+	utt.probs = sapply(possible.utterances, FUN=eval.utt)#
+	return(utt.probs/sum(utt.probs))#
+}#
+#
+admissible = function(vec) {#
+  if (any(vec < -6) || any(vec > 6)) {#
+    return(F)#
+  } else {#
+    return(T)#
+}
+))}}
+mylnth = function(u) {#
+	if (u == 'no-utt') {#
+		return(0)#
+	} else if (u=='very pos' || u=='very neg') {#
+		return(2)#
+	} else {#
+		return(1)#
+	}#
+}
+speaker1 = function(thetas, degree, alpha, utt.cost) {#
+	eval.utt = function(utt) {#
+		prior = exp(-alpha * utt.cost)^mylnth(utt)#
+		likelihood = exp(alpha * log(listener0(utt, thetas, degree)))#
+		return(prior * likelihood)#
+	}#
+	utt.probs = sapply(possible.utterances, FUN=eval.utt)#
+	return(utt.probs/sum(utt.probs))#
+}
+admissible = function(vec) {#
+  if (any(vec < -6) || any(vec > 6)) {#
+    return(F)#
+  } else {#
+    return(T)#
+  }#
+}
+listener1 = function(utterance, n.samples, alpha=1, utt.cost=1.5, step.size=.02, burn.in=50000) {#
+	num.adj.pairs = 1#
+  mods = F#
+  pu.check = set.possible.utterances(num.adj.pairs, mods)#
+	if (!pu.check) {#
+		print("Error in listener1: unable to set possible utterances")#
+	}#
+	flip = function(p) {return(runif(1,0,1) < p)}#
+	samples = matrix(NA, nrow=n.samples, ncol=length(possible.utterances), dimnames=list(paste('samp', 1:n.samples, sep=''), c('degree', paste('theta.', possible.utterances[-1], sep=''))))#
+  dens = function(x){return(dnorm(x, 0, 2.25))}#
+  sample.degree = 0#
+	sample.thetas = c(0,0)#
+	sample.prob.NN = 0#
+	while (approx.equal(sample.prob.NN,0) || !admissible(c(sample.degree, sample.thetas))) {#
+  	sample.degree = rnorm(1,0,2.25)#
+	  sample.degree.prior = dens(sample.degree)#
+  	#sample.thetas = runif(length(possible.utterances) - 1, -6, 6)#
+  	sample.thetas = c(0,0)#
+		sample.likelihood = speaker1(sample.thetas, sample.degree, alpha, utt.cost)[utterance.index(utterance)]#
+		sample.prob.NN = sample.degree.prior * sample.likelihood#
+	}#
+	sample.vec = c(sample.degree, sample.thetas)#
+	n.proposals.accepted = 0#
+	increment = function(n) {if (n < length(sample.vec)) {return(n+1)} else {return(1)}}#
+	switch = 0#
+	make.proposal = function(v, switch) {#
+		proposal.v = v#
+		proposal.v[switch] = sample(c(proposal.v[switch] + step.size, proposal.v[switch] - step.size), 1)#
+		return(proposal.v)#
+	}#
+	for (i in 1:(n.samples+burn.in)) {#
+		switch = increment(switch)#
+		proposal.vec = make.proposal(sample.vec, switch)#
+ 		if (admissible(proposal.vec)) {#
+			proposal.degree = proposal.vec[1]#
+			proposal.thetas = proposal.vec[2:length(proposal.vec)]#
+			proposal.degree.prior = dens(proposal.degree)#
+			proposal.likelihood = speaker1(proposal.thetas, proposal.degree, alpha, utt.cost)[utterance.index(utterance)]#
+			proposal.prob.NN = proposal.degree.prior * proposal.likelihood#
+			accept = flip(min(1, proposal.prob.NN/sample.prob.NN))#
+			if (accept && i > burn.in) {#
+				n.proposals.accepted = n.proposals.accepted + 1#
+			 	sample.vec = proposal.vec#
+			 	sample.prob.NN = proposal.prob.NN#
+			} #
+		}#
+    if (i > burn.in) {#
+  		samples[(i-burn.in),] = sample.vec#
+    }#
+  }#
+	return(list(samples=samples, prop.accepted=n.proposals.accepted/(n.samples)))#
+}
+chain8 = listener1('pos', n.samples=10000000, alpha=2.5, utt.cost=2)[[1]][seq(from=1, to=10000000, by=50),]#
+  curve(dnorm(x, 0, 2.25), xlim=c(-6,6), ylim=c(0,.45), col='black', xlab="Strength prior", ylab="Probability density")#
+  abline(h=1/12, col='green', lty=4, lwd=3)#
+  lines(density(chain8[,1]), lwd=3, col='blue', lty=2) # degree#
+  lines(density(chain8[,3]), col='red', lty=3, lwd=3) #theta-pos #
+  legend('topleft', c('Threshold prior', 'Threshold posterior', "QUD prior", "QUD posterior"), lty=c(4, 3, 1, 2), text.col=c('green', 'red', 'black', 'blue'), cex=1.5, col=c('green', 'red', 'black', 'blue'))
+chain9 = listener1('pos', n.samples=10000000, alpha=2.5, utt.cost=2)[[1]][seq(from=1, to=10000000, by=50),]
+curve(dnorm(x, 0, 2.25), xlim=c(-6,6), ylim=c(0,.45), col='black', xlab="Strength prior", ylab="Probability density")
+abline(h=1/12, col='green', lty=4, lwd=3)
+lines(density(c(chain8[,1],chain9[,1])), lwd=3, col='blue', lty=2) # degree
+lines(density(c(chain8[,3],chain9[,3])), col='red', lty=3, lwd=3) #theta-pos
+legend('topleft', c('Threshold prior', 'Threshold posterior', "Strength prior", "Strength posterior"), lty=c(4, 3, 1, 2), text.col=c('green', 'red', 'black', 'blue'), cex=1.5, col=c('green', 'red', 'black', 'blue'))
+curve(dnorm(x, 0, 2.25), xlim=c(-6,6), ylim=c(0,.45), col='black', xlab="Strength prior", ylab="Probability density")#
+  abline(h=1/12, col='green', lty=4, lwd=3)#
+  lines(density(c(chain8[,1],chain9[,1])), lwd=3, col='blue', lty=2) # degree#
+  lines(density(c(chain8[,3],chain9[,3])), col='red', lty=3, lwd=3) #theta-pos #
+  legend('topleft', c('Threshold prior', 'Threshold posterior', "Strength prior", "Strength posterior"), lty=c(4, 3, 1, 2), text.col=c('green', 'red', 'black', 'blue'), cex=1.5, col=c('green', 'red', 'black', 'blue'))
+curve(dnorm(x, 0, 2.25), xlim=c(-6,6), ylim=c(0,.45), col='black', xlab="Strength prior", ylab="Probability density")#
+  abline(h=1/12, col='green', lty=4, lwd=3)#
+  lines(density(c(chain8[,1],chain9[,1])), lwd=3, col='blue', lty=2) # degree#
+  lines(density(c(chain8[,3],chain9[,3])), col='red', lty=3, lwd=3) #theta-pos #
+  legend('topleft', c('Threshold prior', 'Threshold posterior', "Strength prior", "Strength posterior"), lty=c(4, 3, 1, 2), text.col=c('green', 'red', 'black', 'blue'), cex=1.5, col=c('green', 'red', 'black', 'blue'))
+lines(density(c(chain8[,1],chain9[,1],chain10[,1])), lwd=3, col='blue', lty=2) # degree
+small.diff = function(epsilon){return(function(v){return(v[1]-v[3] < epsilon)})}#
+  sorites.prob = function(epsilon){return(1 - mean(apply(chain8, MARGIN=1, FUN=small.diff(epsilon))))}#
+  epsilons = seq(from=0, to=1, length.out=21)#
+  sorites.prob.by.epsilon = sapply(epsilons, FUN=sorites.prob)#
+  plot(epsilons, sorites.prob.by.epsilon, col='blue', type='b', pch=19, lwd=3, xlab="Epsilon", ylab="Probability of second premise", main="Sorites probability")
+small.diff = function(epsilon){return(function(v){return(v[1]-v[3] < epsilon)})}#
+  sorites.prob = function(epsilon){return(1 - mean(apply(rbind(chain8,chain9), MARGIN=1, FUN=small.diff(epsilon))))}#
+  epsilons = seq(from=0, to=2, length.out=41)#
+  sorites.prob.by.epsilon = sapply(epsilons, FUN=sorites.prob)#
+  plot(epsilons, sorites.prob.by.epsilon, col='blue', type='b', pch=19, lwd=3, xlab="Epsilon", ylab="Probability of second premise", main="Sorites probability")
+head(chain10)
+plot(epsilons, sorites.prob.by.epsilon, col='blue', type='l', pch=19, lwd=3, xlab="Epsilon", ylab="Probability of second premise", main="Sorites probability")
+plot(epsilons, sorites.prob.by.epsilon, col='blue', type='l', pch=19, lwd=3, xlab="Epsilon", ylab="Probability of second premise", main="Sorites probability", ylim=c(0,1))
+small.diff = function(epsilon){return(function(v){return(v[1]-v[3] < epsilon)})}#
+  sorites.prob = function(epsilon){return(1 - mean(apply(rbind(chain8,chain9), MARGIN=1, FUN=small.diff(epsilon))))}#
+  epsilons = seq(from=0, to=4, length.out=161)#
+  sorites.prob.by.epsilon = sapply(epsilons, FUN=sorites.prob)#
+  plot(epsilons, sorites.prob.by.epsilon, col='blue', type='l', pch=19, lwd=3, xlab="Epsilon", ylab="Probability of second premise", main="Sorites probability", ylim=c(0,1))
+chain10 = listener1('pos', n.samples=10000000, alpha=2.5, utt.cost=2)[[1]][seq(from=1, to=10000000, by=50),]#
+  curve(dnorm(x, 0, 2.25), xlim=c(-6,6), ylim=c(0,.45), col='black', xlab="Strength prior", ylab="Probability density")#
+  abline(h=1/12, col='green', lty=4, lwd=3)#
+  lines(density(c(chain8[,1],chain9[,1],chain10[,1])), lwd=3, col='blue', lty=2) # degree#
+  lines(density(c(chain8[,3],chain9[,3],chain10[,3])), col='red', lty=3, lwd=3) #theta-pos #
+  legend('topleft', c('Threshold prior', 'Threshold posterior', "Strength prior", "Strength posterior"), lty=c(4, 3, 1, 2), text.col=c('green', 'red', 'black', 'blue'), cex=1.5, col=c('green', 'red', 'black', 'blue'))
+curve(dnorm(x, 0, 2.25), xlim=c(-6,6), ylim=c(0,.45), col='black', xlab="Strength prior", ylab="Probability density")#
+  abline(h=1/12, col='green', lty=4, lwd=3)#
+  lines(density(c(chain8[,1],chain9[,1],chain10[,1])), lwd=3, col='blue', lty=2) # degree#
+  lines(density(c(chain8[,3],chain9[,3],chain10[,3])), col='red', lty=3, lwd=3) #theta-pos #
+  legend('topleft', c('Threshold prior', 'Threshold posterior', "Strength prior", "Strength posterior"), lty=c(4, 3, 1, 2), text.col=c('green', 'red', 'black', 'blue'), cex=1.5, col=c('green', 'red', 'black', 'blue'))
+curve(dnorm(x, 0, 2.25), xlim=c(-6,6), ylim=c(0,.45), col='black', xlab="Strength prior", ylab="Probability density")#
+  abline(h=1/12, col='green', lty=4, lwd=3)#
+  lines(density(c(chain8[,1],chain9[,1],chain10[,1])), lwd=3, col='blue', lty=2) # degree#
+  lines(density(c(chain8[,3],chain9[,3],chain10[,3])), col='red', lty=3, lwd=3) #theta-pos #
+  legend('topleft', c('Threshold prior', 'Threshold posterior', "Strength prior", "Strength posterior"), lty=c(4, 3, 1, 2), text.col=c('green', 'red', 'black', 'blue'), cex=1.5, col=c('green', 'red', 'black', 'blue'))
+curve(dnorm(x, 0, 2.25), xlim=c(-6,6), ylim=c(0,.45), col='black', xlab="Strength prior", ylab="Probability density")#
+  abline(h=1/12, col='green', lty=4, lwd=3)#
+  lines(density(c(chain8[,1],chain9[,1],chain10[,1])), lwd=3, col='blue', lty=2) # degree#
+  lines(density(c(chain8[,3],chain9[,3],chain10[,3])), col='red', lty=3, lwd=3) #theta-pos #
+  legend('topleft', c('Threshold prior', 'Threshold posterior', "Strength prior", "Strength posterior"), lty=c(4, 3, 1, 2), text.col=c('green', 'red', 'black', 'blue'), cex=1.5, col=c('green', 'red', 'black', 'blue'))
+curve(dnorm(x, 0, 2.25), xlim=c(-6,6), ylim=c(0,.45), col='black', xlab="Strength prior", ylab="Probability density")#
+  abline(h=1/200, col='green', lty=4, lwd=3)#
+  lines(density(c(chain8[,1],chain9[,1],chain10[,1])), lwd=3, col='blue', lty=2) # degree#
+  lines(density(c(chain8[,3],chain9[,3],chain10[,3])), col='red', lty=3, lwd=3) #theta-pos #
+  legend('topleft', c('Threshold prior', 'Threshold posterior', "Strength prior", "Strength posterior"), lty=c(4, 3, 1, 2), text.col=c('green', 'red', 'black', 'blue'), cex=1.5, col=c('green', 'red', 'black', 'blue'))
+curve(dnorm(x, 0, 2.25), xlim=c(-6,6), ylim=c(0,.45), col='black', xlab="Strength prior", ylab="Probability density")#
+  abline(h=1/200, col='green', lty=4, lwd=3)#
+  lines(density(c(chain8[,1],chain9[,1],chain10[,1])), lwd=3, col='blue', lty=2) # degree#
+  lines(density(c(chain8[,3],chain9[,3],chain10[,3])), col='red', lty=3, lwd=3) #theta-pos #
+  legend('topleft', c('Threshold prior', 'Threshold posterior', "Strength prior", "Strength posterior"), lty=c(4, 3, 1, 2), text.col=c('green', 'red', 'black', 'blue'), cex=1.5, col=c('green', 'red', 'black', 'blue'))
+admissible = function(vec) {#
+  if (any(vec < -100) || any(vec > 100)) {#
+    return(F)#
+  } else {#
+    return(T)#
+  }#
+}
+small.diff = function(epsilon){return(function(v){return(v[1]-v[3] < epsilon)})}#
+  sorites.prob = function(epsilon){return(1 - mean(apply(rbind(chain8,chain9, chain10), MARGIN=1, FUN=small.diff(epsilon))))}#
+  epsilons = seq(from=0, to=4, length.out=161)#
+  sorites.prob.by.epsilon = sapply(epsilons, FUN=sorites.prob)#
+  plot(epsilons, sorites.prob.by.epsilon, col='blue', type='l', pch=19, lwd=3, xlab="Epsilon", ylab="Probability of second premise", main="Sorites probability", ylim=c(0,1))
+chain11 = listener1('pos', n.samples=10000000, alpha=2.5, utt.cost=2)[[1]][seq(from=1, to=10000000, by=50),]#
+  curve(dnorm(x, 0, 2.25), xlim=c(-6,6), ylim=c(0,.45), col='black', xlab="Strength prior", ylab="Probability density")#
+  abline(h=1/200, col='green', lty=4, lwd=3)#
+  lines(density(chain11[,1], lwd=3, col='blue', lty=2) # degree#
+  lines(density(chain11[,3], col='red', lty=3, lwd=3) #theta-pos #
+  legend('topleft', c('Threshold prior', 'Threshold posterior', "Strength prior", "Strength posterior"), lty=c(4, 3, 1, 2), text.col=c('green', 'red', 'black', 'blue'), cex=1.5, col=c('green', 'red', 'black', 'blue'))
+lines(density(chain11[,1]), lwd=3, col='blue', lty=2) # degree
+lines(density(chain11[,3]), col='red', lty=3, lwd=3) #theta-pos
+legend('topleft', c('Threshold prior', 'Threshold posterior', "Strength prior", "Strength posterior"), lty=c(4, 3, 1, 2), text.col=c('green', 'red', 'black', 'blue'), cex=1.5, col=c('green', 'red', 'black', 'blue'))
+chain12 = listener1('pos', n.samples=10000000, alpha=1, utt.cost=1.5)[[1]][seq(from=1, to=10000000, by=50),]#
+  curve(dnorm(x, 0, 2.25), xlim=c(-6,6), ylim=c(0,.45), col='black', xlab="Strength prior", ylab="Probability density")#
+  abline(h=1/200, col='green', lty=4, lwd=3)#
+  lines(density(chain12[,1]), lwd=3, col='blue', lty=2) # degree#
+  lines(density(chain12[,3]), col='red', lty=3, lwd=3) #theta-pos #
+  legend('topleft', c('Threshold prior', 'Threshold posterior', "Strength prior", "Strength posterior"), lty=c(4, 3, 1, 2), text.col=c('green', 'red', 'black', 'blue'), cex=1.5, col=c('green', 'red', 'black', 'blue'))
+chain13 = listener1('pos', n.samples=10000000, alpha=1, utt.cost=2)[[1]][seq(from=1, to=10000000, by=50),]#
+  curve(dnorm(x, 0, 2.25), xlim=c(-6,6), ylim=c(0,.45), col='black', xlab="Strength prior", ylab="Probability density")#
+  abline(h=1/200, col='green', lty=4, lwd=3)#
+  lines(density(chain13[,1]), lwd=3, col='blue', lty=2) # degree#
+  lines(density(chain13[,3]), col='red', lty=3, lwd=3) #theta-pos #
+  legend('topleft', c('Threshold prior', 'Threshold posterior', "Strength prior", "Strength posterior"), lty=c(4, 3, 1, 2), text.col=c('green', 'red', 'black', 'blue'), cex=1.5, col=c('green', 'red', 'black', 'blue'))
+chain14 = listener1('pos', n.samples=10000000, alpha=1.5, utt.cost=2)[[1]][seq(from=1, to=10000000, by=50),]#
+  curve(dnorm(x, 0, 2.25), xlim=c(-6,6), ylim=c(0,.45), col='black', xlab="Strength prior", ylab="Probability density")#
+  abline(h=1/200, col='green', lty=4, lwd=3)#
+  lines(density(chain14[,1]), lwd=3, col='blue', lty=2) # degree#
+  lines(density(chain14[,3]), col='red', lty=3, lwd=3) #theta-pos #
+  legend('topleft', c('Threshold prior', 'Threshold posterior', "Strength prior", "Strength posterior"), lty=c(4, 3, 1, 2), text.col=c('green', 'red', 'black', 'blue'), cex=1.5, col=c('green', 'red', 'black', 'blue'))
