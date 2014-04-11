@@ -45,7 +45,7 @@
   extendedchars=true,
   breaklines=true,
   frame=single,
-  numbers=left,
+  %numbers=left,
   numbersep=5pt,
   rulesepcolor=\color{solarized@base03},
   numberstyle=\tiny\color{solarized@base01},
@@ -83,7 +83,7 @@
 % The following turns on line numbering, which is useful for
 % reviewers, proof readers and copy editors. Comment out this line if
 % the line numbering causes problems.
-\linenumbers
+%\linenumbers
 
 \title*{Probabilistic Semantics and Pragmatics: Uncertainty in Language and Thought}
 \titlerunning{Probabilistic Semantics and Pragmatics}
@@ -104,13 +104,11 @@
 
 
 %%%stuff that helps in writing:
-%\tableofcontents
-%\pagebreak
-%\listoftodos
-%\pagebreak
+\tableofcontents
+\pagebreak
+\listoftodos
+\pagebreak
 %%%%
-
-\todo{cite benz prob pram stuff??}
 
 
 Language is used to communicate ideas. Ideas are mental tools for coping with a complex and uncertain world. Thus human conceptual structures should be key to language meaning, and probability---the mathematics of uncertainty---should be indispensable for describing both language and thought. Indeed, probabilistic models are enormously useful in modeling human cognition \citep{tenenbaumetal11}
@@ -119,12 +117,12 @@ and aspects of natural language \citep{bodetal03,chater06}. With a few early exc
 
 Flexible human cognition is derived in large part from our ability to imagine possible worlds (or situations). 
 A rich set of concepts, intuitive theories, and other mental representations support imagining and reasoning about possible worlds---together we will call these the conceptual lexicon. 
-Here we posit that this collection of concepts also forms the set of primitive elements available for lexical semantics: word meanings can be built from the pieces of conceptual structure. Larger semantic structures are then built from word meanings by composition, ultimately resulting in a sentence meaning which is a phrase in the ``language of thought'' provided by the conceptual lexicon. This expression is truth-functional in that it takes on a Boolean value for each imagined world, and it can thus be used as the basis for belief updating.
+We posit that this collection of concepts also forms the set of primitive elements available for lexical semantics: word meanings can be built from the pieces of conceptual structure. Larger semantic structures are then built from word meanings by composition, ultimately resulting in a sentence meaning which is a phrase in the ``language of thought'' provided by the conceptual lexicon. This expression is truth-functional in that it takes on a Boolean value for each imagined world, and it can thus be used as the basis for belief updating.
 However, the connection between cognition, semantics, and belief is not direct: 
 because language must flexibly adapt to the context of communication, the connection between lexical representation and interpreted meaning is mediated by pragmatic inference.
 %; second, sentence meanings act as constraints on possible worlds, via their truth-value, whereas core concepts describe generation of possible worlds.
 
-There are a number of challenges to formalizing this view of language: How can we formalize the conceptual lexicon to describe generation of possible worlds? How can we appropriately connect lexical meaning to this conceptual lexicon? How, within this system, do sentence meanings act as constraints on possible worlds and correspondingly how does composition within language relate to composition within world knowledge?  How does context affect meanings? How is pragmatic interpretation related to literal meaning?
+There are a number of challenges to formalizing this view of language: How can we formalize the conceptual lexicon to describe generation of possible worlds? How can we appropriately connect lexical meaning to this conceptual lexicon? How, within this system, do sentence meanings act as constraints on possible worlds? How does composition within language relate to composition within world knowledge?  How does context affect meanings? How is pragmatic interpretation related to literal meaning?
 
 %We can formalize the conceptual lexicon using probabilistic programming tools, viewing commonsense knowledge as a set of interrelated definitions (or concepts) in a probabilistic programming language. 
 %Probabilistic programs specify sampling procedures over possible program executions, each execution fixes (some of) the variables that describe the world, hence each collection of concepts describes how to sample from a rich space of possible worlds. 
@@ -134,9 +132,9 @@ There are a number of challenges to formalizing this view of language: How can w
 In this chapter we sketch an answer to these questions, illustrating the use of probabilistic techniques in natural language pragmatics and semantics with a concrete formal model. This model is not meant to exhaust the space of possible probabilistic models, indeed dozens of extensions are immediately apparent, but rather to show that a probabilistic framework for natural language is possible and productive.
 Our approach is similar in spirit to cognitive semantics \citep{jackendoff1983semantics,lakoff1987women}, in that we attempt to ground semantics in mental representation. However, we draw on the highly successful tools of Bayesian cognitive science to formalize these ideas. 
 Similarly, our approach draws heavily on the progress made in formal model-theoretic semantics \citep{lewis70,montague1973,gamut91,heimkratzer1998}, borrowing insights about how syntax drives semantic composition, but we compose elements of stochastic logics rather than deterministic ones.
-Finally, like game-theoretic approaches, we place an emphasis on the the refinement of meaning through interactional, pragmatic reasoning.
+Finally, like game-theoretic approaches \citep{benz,vanrooij,jaeger}, we place an emphasis on the the refinement of meaning through interactional, pragmatic reasoning.
 
-In section \ref{commonsense} we provide background on probabilistic modeling and stochastic lambda calculus, and introduce a running example scenario: the game of tug-of-war. In section \ref{literal} we provide a model of literal interpretation of natural language utterances and describe a formal fragment of english suitable for our running scenario. Using this fragment we illustrate the emergence of non-monotonic effects in interpretation and the interaction of ambiguity with background knowledge. In section \ref{pragmatics} we describe pragmatic interpretation of meaning as probabilistic reasoning about an informative speaker, who reasons about a literal listener. This extended notion of interpretation predicts a variety of quantity implicatures and connects to recent quantitative experimental results. In section \ref{indices} we discuss the role of semantic indices in this framework and show that binding these indices at the pragmatic level allows us to deal with several issues in context-sensitivity of meaning, such as the interpretation of scalar adjectives. We conclude with general comments about the role of uncertainty in pragmatics and semantics.
+In section \ref{commonsense} we provide background on probabilistic modeling and stochastic lambda calculus, and introduce a running example scenario: the game of tug-of-war. In section \ref{literal} we provide a model of literal interpretation of natural language utterances and describe a formal fragment of english suitable for our running scenario. Using this fragment we illustrate the emergence of non-monotonic effects in interpretation and the interaction of ambiguity with background knowledge. In section \ref{pragmatics} we describe pragmatic interpretation of meaning as probabilistic reasoning about an informative speaker, who reasons about a literal listener. This extended notion of interpretation predicts a variety of implicatures and connects to recent quantitative experimental results. In section \ref{indices} we discuss the role of semantic indices in this framework and show that binding these indices at the pragmatic level allows us to deal with several issues in context-sensitivity of meaning, such as the interpretation of scalar adjectives. We conclude with general comments about the role of uncertainty in pragmatics and semantics.
 
 
 
@@ -168,21 +166,19 @@ In section \ref{commonsense} we provide background on probabilistic modeling and
 Uncertainty is a key property of the world we live in, thus we should expect reasoning with uncertainty to be a key operation of our cognition. 
 At the same time our world is built from a complex web of causal and other structures, so we expect structure within our representations of uncertainty. 
 Structured knowledge of an uncertain world can be naturally captured by \emph{generative} models, which make it possible to flexibly imagine (simulate) possible worlds or situations in proportion to their likelihood. 
-The tools of structured probabilistic modeling, and particularly the stochastic lambda calculus we will use in this chapter, allow us to formalize these notions. 
+%The tools of structured probabilistic modeling, and particularly the stochastic lambda calculus we will use in this chapter, allow us to systematically construct such generative models. 
 In this section, we first introduce the basic operations for dealing with uncertainty---degrees of belief and probabilistic conditioning. 
 We then introduce formal tools for adding compositional structure to these models---the stochastic lambda calculus---and demonstrate how these tools let us build generative models of the world and capture commonsense reasoning. 
 In later sections, we demonstrate how these tools can be used to provide new insights into issues in natural language semantics and pragmatics.
 
-Probability is fundamentally a set of tools for manipulating degrees of belief. 
+Probability is fundamentally a system for manipulating degrees of belief. 
 The probability\footnote{Throughout the chapter we will presume that we are dealing with probabilities over discrete domains. Almost everything we say  applies equally well to probability densities, and more generally probability measures, but the mathematics becomes more subtle in ways that would distract from our main objectives.} of a proposition is simply a real number between $0$ and $1$ describing an agent's degree of belief in that proposition. 
-More generally, a \emph{random variable} $A$ is an assignment of a probability $P(A{=}a)$ to each of a set of exhaustive and mutually exclusive outcomes $a$, such that $\sum_a P(A{=}a)=1$. 
-The joint probability $P(A{=}a,B{=}b)$, of two random variable values is the degree of belief we assign to the proposition that both $A{=}a$ and $B{=}b$. 
+More generally, a \emph{probability distribution} over a \emph{random variable} $A$ is an assignment of a probability $P(A{=}a)$ to each of a set of exhaustive and mutually exclusive outcomes $a$, such that $\sum_a P(A{=}a)=1$. 
+The joint probability $P(A{=}a,B{=}b)$, of two random variable values is the degree of belief we assign to the proposition that both $A{=}a$ and $B{=}b$. From a joint probability distribution, $P(A{=}a,B{=}b)$, we can recover the \emph{marginal} probability distribution on $A$: $P(A{=}a) = \sum_b P(A{=}a,B{=}b)$.
 
-\todo[inline]{We should define ``distribution''  and ``marginal'' somewhere.} 
-
-The fundamental operation for incorporating new information or assumptions $B$ into prior beliefs is \emph{probabilistic conditioning}. 
-This operation takes us from the \emph{prior} probability of $A$, $P(A)$, to the \emph{posterior} probability of $A$ given $B$, written $P(A|B)$. 
-Conditional probability is standardly defined, following \citet{kolmogorov33}, by:
+The fundamental operation for incorporating new information, or assumptions, into prior beliefs is \emph{probabilistic conditioning}. 
+This operation takes us from the \emph{prior} probability of $A$, $P(A)$, to the \emph{posterior} probability of $A$ given proposition $B$, written $P(A|B)$. 
+Conditional probability can be defined, following \citet{kolmogorov33}, by:
 \begin{equation}
 \label{conditionaldef}
 P(A|B) = \frac{P(A,B)}{P(B)} 
@@ -196,47 +192,60 @@ P(H|o_1,\dots,o_N) = \frac{P(H)P(o_1,\dots,o_N|H)}{P(o_1,\dots,o_N)}.
 This useful equality is called \emph{Bayes' rule}; it follows immediately from the definition in equation \ref{conditionaldef}. 
 If we additionally assume that the observations provide no information about each other beyond what they provide about the hypothesis, that is they are \emph{conditionally independent}, then $P(o_i|o_j, H)=P(o_i|H)$ for all $i\neq j$. 
 It follows that:
-\begin{equation}
-P(H|o_1,\dots,o_N) = \frac{P(H)P(o_1|H)\cdots P(o_N|H)}{P(o_1|H)\cdots P(o_N|H)}.
-\end{equation}
-From this it is a simple calculation to verify that we can perform the conditioning operation sequentially rather than all at once: the \emph{a posteriori} degree of belief given observations $o_1,\dots,o_i$ becomes the \emph{a priori} degree of belief for incorporating observation $o_{i+1}$. Thus, when we are justified in making this conditional independence assumption, understanding the impact of a sequence of observations reduces to understanding the impact of one; we will make use of this idea below, to reduce the meaning of a stream of utterances to the meanings of each separately.
+\begin{eqnarray}
+P(H|o_1,\dots,o_N) =& \frac{P(H)P(o_1|H)\cdots P(o_N|H)}{P(o_1)\cdots P(o_N|o_1,\dots,o_{N{-}1})} \\
+=& \frac{P(H)P(o_1|H)\cdots P(o_N|H)}{\sum_{H'}P(o_1|H')P(H') \cdots \sum_{H'}P(o_N|H')P(H'|o_1,\dots,o_{N{-}1})}.
+\end{eqnarray}
+From this it is a simple calculation to verify that we can perform the conditioning operation sequentially rather than all at once: the \emph{a posteriori} degree of belief given observations $o_1,\dots,o_i$ becomes the \emph{a priori} degree of belief for incorporating observation $o_{i+1}$. Thus, when we are justified in making this conditional independence assumption, understanding the impact of a sequence of observations reduces to understanding the impact of one; we will later make use of this idea to reduce the meaning of a stream of utterances to the meanings of each separately.
 
 
 \subsection{Stochastic Lambda Calculus and Church}
 
-Probability as described so far provides a notation for indicating degrees of belief and conditional information, but requires that the actual probability distributions be specified separately (for example by writing down the numbers in a table); this quickly becomes unmanageable when we wish to describe complex knowledge---relations among many beliefs. 
-The stochastic lambda calculus (SLC) provides a formal, compositional language for describing probabilities over complex sets of interrelated beliefs. 
-We assume some familiarity with the (deterministic) lambda calculus \citep{barendregt1985lambda,hindley1986introduction}. 
-At its core SLC simply extends the lambda calculus with an expression type $(L \oplus R)$, indicating random choice between the sub-expressions $L$ and $R$, and an additional reduction rule that reduces such a choice expression to its left or right sub-expression with equal probability. 
-While this reduction process results in a single expression after any sequence of reductions, it can be viewed as a distribution over such reduction sequences, and hence a distribution over the final expression: SLC expressions denote (sub-)distributions over completely reduced SLC expressions. 
-It can be shown that this system can represent any computable distribution \cite[see for example][]{ramsey2002stochastic,freer2012computable}
+\todo[inline]{Shalom: Section 1.1-1.2. The transition from the general introduction in pp.1-4 to the detailed technical discussion of Church and its applications is too drastic. It needs to be mediated by informal clarification and illustration of the Church functions and
+other components of Church. These subsections need to be reformulated to be accessible to a readership of formal semanticists who know classical typed lambda calculus and model theory, but who are not generally familiar with sampling, probability distrubtions, and probabilistic programming.}
+
+Probability as described so far provides a notation for manipulating degrees of belief, but requires that the underlying probability distributions---the joint distribution over many non-independent propositions or variables---be specified separately (for example by writing down the numbers in a table); this quickly becomes unmanageable when we wish to describe complex knowledge---relations among many beliefs. 
+The situation is parallel to that in classical logic where we may begin by describing reasoning about truth tables (extensional models ascribing possibility to entire worlds); this is sound, but both opaque and inefficient. Propositional logic provides structured means to construct and reason about knowledge, but is still too coarse to capture many patterns of interest. First- and higher-order logics, such as lambda calculus, provide a fine-grained language for describing and reasoning about (deterministic) knowledge.
+The \emph{stochastic} lambda calculus (SLC) provides a formal, compositional language for describing probabilities about complex sets of interrelated beliefs.
+ 
+%We assume some familiarity with the (deterministic) lambda calculus \citep{barendregt1985lambda,hindley1986introduction}. 
+At its core SLC simply extends the (deterministic) lambda calculus \citep{barendregt1985lambda,hindley1986introduction} with an expression type $(L \oplus R)$, indicating random choice between the sub-expressions $L$ and $R$, and an additional reduction rule that reduces such a choice expression to its left or right sub-expression with equal probability. 
+A sequence of standard and random-choice reductions results in a new expression and some such expressions are in normal form (i.e.~irreducible in the same sense as in lambda calculus); unlike lambda calculus, the normal form is not unique.
+The reduction process can be viewed as a distribution over reduction sequences, and the subset which terminate in a normal-form expression induces a (sub-)distribution over normal-form expressions: SLC expressions denote (sub-)distributions over completely reduced SLC expressions. 
+It can be shown that this system can represent any computable distribution \cite[see, for example][]{ramsey2002stochastic,freer2012computable}.
 %{PfefferRamsey,FreeRoy}.
 
-This simple calculus is universal but cumbersome to work with. 
-\citet{goodman08} introduce Church, an enriched SLC that can be realized as a \emph{probabilistic programming language}---parallel to how the programming language LISP is an enriched lambda calculus. 
+The SLC thus provides a fine-grained compositional system for specifying probability distributions: we will use it as the core representational system for conceptual structure, for natural language meanings, and (at a meta-level) for specifying the architecture of language understanding. 
+However, while SLC is simple and universal, it can be cumbersome to work with directly. 
+\citet{goodman08} introduce Church, an enriched SLC that can be realized as a \emph{probabilistic programming language}---parallel to the way that the programming language LISP is an enriched lambda calculus. 
+In later sections we will use Church to actually specify our models of language and thought.
 Church starts with the pure subset of Scheme (which is itself essentially lambda calculus enriched with primitive data types, operators, and useful syntax) and extends it with elementary random primitives (ERPs), the inference function \lstinline{query}, and the memoization function \lstinline{mem}. 
-We next describe these key pieces of the language semantics; further details and examples of using Church for cognitive modeling can be found at \url{http://probmods.org}.
+We must take some time to describe these key, but somewhat technical, pieces of Church before turning back to model construction.
+Further details and examples of using Church for cognitive modeling can be found at \url{http://probmods.org}.
 In what follows we will assume passing familiarity with the Polish notation used in LISP-family languages (fully parenthesized and operator initial), and will occasionally build on ideas from programming languages---\cite{abelson1983structure} is an excellent background on these ideas. 
 
-Rather than restricting to the $\oplus$ uniform random choice between two options (which is sufficient, but results in extremely cumbersome representations), Church includes an interface for adding elementary random primitives (ERPs). 
-These are procedures that return random values; a sequence of evaluations of such and ERP procedure is assumed to result in independent identically distributed (i.i.d.) values. 
-Common ERPs include Bernoulli (\lstinline{flip}), \lstinline{uniform}, \lstinline{gaussian}, etc. 
-While the ERPs themselves are i.i.d., it is straightforward to construct Church procedures sing ERPs that are not i.i.d. 
-For instance \lstinline[mathescape]{(($\lambda$ (bias) ($\lambda$ () (flip bias))) (uniform 0 1))} creates a function that ``flips a coin'' of a specified but unknown \lstinline{bias}.
+Rather than restricting to the $\oplus$ operation of uniform random choice (which is sufficient, but results in extremely cumbersome representations), Church includes an interface for adding elementary random primitives (ERPs). 
+These are procedures that return random values; a sequence of evaluations of such an ERP procedure is assumed to result in independent identically distributed (i.i.d.) values. 
+Common ERPs include \lstinline{flip} (i.e.~Bernoulli), \lstinline{uniform}, and \lstinline{gaussian}. 
+While the ERPs themselves yield i.i.d. sequences, it is straightforward to construct Church procedures using ERPs that do not.
+For instance \lstinline[mathescape]{(($\lambda$ (bias) ($\lambda$ () (flip bias))) (uniform 0 1))} creates a function that ``flips a coin'' of a specific but unknown \lstinline{bias}.
 %\begin{lstlisting}[mathescape]
 %(define bias (uniform 0 1))
 %(define coin )
 %\end{lstlisting}
-Multiple calls to the function will result in a sequence of values which are not i.i.d., because they jointly depend on the unknown \lstinline{bias} (though they are exchangeable---\citet{de1993probabilita}).
-\todo{Correct citation for de finetti? Probably cite a summary, such as he one by diaconis. Original thm was 1930s, but there doesn't seem to be any cite...}
+Multiple calls to the function will result in a sequence of values which are not i.i.d., because they jointly depend on the unknown \lstinline{bias}.
+This illustrates how more complex distributions can be built by combining simple ones.
+
 
 To represent conditional probabilities in SLC and Church we introduce the \lstinline{query} function. Unlike simpler representations (such as Bayes nets) where conditioning is an operation that happens to a model from the outside, \lstinline{query} can be defined within the SLC itself as an ordinary function. One way to do this is via \emph{rejection sampling}. Imagine we have a distribution represented by the function with no arguments \lstinline{thunk}, and a predicate on return values \lstinline{condition}. We can represent the conditional distribution of return values from \lstinline{thunk} that satisfy \lstinline{condition} by:
 \begin{lstlisting}[mathescape]
 (define conditional 
-   ($\lambda$ () (($\lambda$ (val) (if (condition val) val (conditional))) (thunk))))
+  ($\lambda$ ()
+    (define val (thunk))
+    (if (condition val) val (conditional))))
 \end{lstlisting}
 where we have used a stochastic recursion (conveniently specified by the named define) to build a conditional. 
-Conceptually this recursion samples from \lstinline{thunk} until a value is returned that satisfies \lstinline{condition}; it is straightforward to show that the distribution over return values from this procedure is exactly the ratio used to define conditional probability in equation \ref{conditionaldef} (where both are defined).
+Conceptually this recursion samples from \lstinline{thunk} until a value is returned that satisfies \lstinline{condition}; it is straightforward to show that the distribution over return values from this procedure is exactly the ratio used to define conditional probability in equation \ref{conditionaldef} (when both are defined). That is, the \lstinline{conditional} procedure samples from the conditional distribution that could be notated $P(\text{\lstinline{(thunk)}}{=}\text{\lstinline{val}}|\text{\lstinline{(condition val)}}{=}\text{\lstinline{True}})$.
 For parsimony, Church uses a special syntax, \lstinline{query}, to specify such conditionals: 
 \begin{lstlisting}[mathescape]
 (query
@@ -252,10 +261,9 @@ This syntax is internally transformed into a thunk and predicate that can be use
 \end{lstlisting}
 Rejection sampling can be taken as the definition of the \lstinline{query} interface, but it is very important to note that other implementations that approximate the same distribution can be used and will often be more efficient. For instance, see \cite{wingate2011lightweight} for alternative implementations of \lstinline{query}. In this chapter we are concerned with the computational (or competence) level of description and so need not worry about the implementation of \lstinline{query} in any detail.
 
-Memoization is a higher-order function that upgrades a stochastic function to have persistent randomness---a memoized function is evaluated as usual the first time is is called with given arguments, but thereafter returns this ``stored'' value. For instance \lstinline{(equal? (flip) (flip))} will be \lstinline{true} with probability $0.5$, but if we define a memoized flip, \lstinline{(define memflip (mem flip))}, then \lstinline{(equal? (memflip) (memflip))} will always be \lstinline{true}. This property is convenient for representing probabilistic dependencies between beliefs that rely on common properties, for instance the strengths and genders of people in a game (as illustrated below).
-%
-A technical, but important, subtlety concerns the ``location'' where a memoized random choice is created: should it be at the first use, the second, ...? This becomes a troubling question where the uses are in different parts of a program (for instance one is inside a query and another outside). 
-In order to avoid an artificial symmetry breaking (and for technical reasons), the semantics of memoization is defined so that all random values that may be returned by a memoized function are created when the memoized function is \emph{created}, not where it is called. 
+Memoization is a higher-order function that upgrades a stochastic function to have persistent randomness---a memoized function is evaluated fully the first time it is called with given arguments, but thereafter returns this ``stored'' value. For instance \lstinline{(equal? (flip) (flip))} will be \lstinline{true} with probability $0.5$, but if we define a memoized flip, \lstinline{(define memflip (mem flip))}, then \lstinline{(equal? (memflip) (memflip))} will always be \lstinline{true}. This property is convenient for representing probabilistic dependencies between beliefs that rely on common properties, for instance the strengths and genders of people in a game (as illustrated below).
+\footnote{A technical, but important, subtlety concerns the ``location'' where a memoized random choice is created: should it be at the first use, the second, ...? 
+In order to avoid an artificial symmetry breaking (and for technical reasons), the semantics of memoization is defined so that all random values that may be returned by a memoized function are created when the memoized function is \emph{created}, not where it is called.}
 
 \label{eval}
 In Church, as in most LISP-like languages, source code is a first-class data type: it is represented by lists. The quote operator tells the evaluation process to treat a list as a literal list of symbols, rather than evaluating it: \lstinline{(flip)} results in a random value \lstinline{true} or \lstinline{false}, while \lstinline{`(flip)} results in the list \lstinline{(flip)} as a \emph{value}.
@@ -273,7 +281,7 @@ One consequence of dynamic typing for a probabilistic language is that expressio
 For simplicity (and utility below) we assume that when an operator is applied to values outside of its domain, for instance \lstinline{(+ 1 `a)}, it returns a special value \emph{error} which is itself outside the domain of all operators, except the equality operator \lstinline{eq?}. By allowing \lstinline{eq?} to test for error we permit very simple error handling, and allow \lstinline{query} (which relies on a simple equality test to decide whether to ``keep going'') to filter out mis-typed sub-computations.
 
 
-\todo[inline]{Do we want to give a definitional interpreter (eval) for ESLC in an appendix???}
+%\todo[inline]{Do we want to give a definitional interpreter (eval) for ESLC in an appendix???}
 
 
 
@@ -281,9 +289,12 @@ For simplicity (and utility below) we assume that when an operator is applied to
 
 \todo[inline]{Need to make sure the Church code accurately reflects the simulation setup.}
 
+\todo[inline]{Shalom: The first paragraph of subsection 1.2 is not clear. You need to explain how probability distributions over complete worlds can be derived from distributions over bounded sets of situations in a sampling space. This is a crucial point. You tend to use worlds and situations as interchageable, but they are not. Situation theory was introduced as an alternative to possible worlds semantics,
+and there are significant difference in the model theories associated with each of these approaches. Both classical and Bayesian probability theory tends to treat situations as worlds, but in fact bounded sets of situations (situation types defined over a bounded set of alternatives) are formally and computationally distinct from complete worlds. }
+
 A set of stochastic function definitions in Church can be interpreted as a distribution over possible worlds: A world consists of a value for each well-formed expression that can be made from the defined functions (in each calling position). 
 To evaluate any particular expression or query requires evaluating only a small subset of this infinitude of expressions. 
-That is, an particular query only depends on the partial world of expressions actually constructed during the evaluation process. 
+That is, a particular query only depends on the partial world of expressions actually constructed during the evaluation process. 
 The relationship between the idealized complete possible worlds and these partial worlds is coherent because taking the marginal sum over any expressions that are evaluated but that don't impact the value of the query (condition or query expressions) results in the same distribution as if we didn't evaluate them. For instance \lstinline{(first (pair (flip) (flip)))} results in the same distribution as \lstinline{(flip)} (the second \lstinline{flip} is created but then discarded, resulting in the same distribution as if it had never been created).
 %\todo{Noah: need to state this theorem more formally.} 
 For this reason we can comfortably speak interchangeably about possible worlds and partial worlds (or situations).
@@ -377,7 +388,7 @@ Now imagine that Bob wins this match:
     (equal? (teams-in-match `match1) `(team1 team2))
     (equal? (winner `match1) `team1)))
 \end{lstlisting}
-If we evaluate this query we find that Bob is inferred to be relatively strong: his mean strength after observing this match is about 1.2, much higher than his a priori mean strength of $0.0$). 
+If we evaluate this query we find that Bob is inferred to be relatively strong: his mean strength after observing this match is about 1.2, much higher than his a priori mean strength of $0.0$. 
 However, imagine that we then learned that Jim is a weak player:
  \begin{lstlisting}[mathescape]
 (query
@@ -466,7 +477,7 @@ Natural language lexical items are interpreted as Church expressions, by the \ls
 %
 The stochastic $\lambda$-calculus (implemented in Church) thus functions as our intermediate language, just as the simply-typed $\lambda$-calculus functions as an intermediate translation language in the fragment of English given by \citet{montague1973}. 
 A key difference, however, is that the intermediate level is not merely a convenience as in Montague's approach. 
-Conceptual representations and world knowledge are also represented in this language (as Church function definitions)---use of a common language to represent linguistic and non-linguistic information allows lexical semantics to ground in conceptual structure, leading to intricate interactions between these two types of knowledge. 
+Conceptual representations and world knowledge are also represented in this language (as Church function definitions)---use of a common language to represent linguistic and non-linguistic information allows lexical semantics to be grounded in conceptual structure, leading to intricate interactions between these two types of knowledge. 
 
 The \lstinline{lexicon} function maps English expressions to their interpretation in Church, and the \lstinline{meaning} function similarly maps sequences of words to meanings.
 For simplicity we write the denotations \lstinline[mathescape]{(meaning $\cdot$)} and \lstinline[mathescape]{(lexicon $\cdot$)} as \denot{\cdot}. In this section we sketch out a formal fragment of English appropriate for talking about the tug-of-war domain described earlier. The complete lexicon is given in appendix \ref{tow-lexicon}, for reference.
@@ -483,10 +494,11 @@ Similarly, transitive verbs such as \emph{won} and relational nouns such as \emp
 %
 Intensionality is implicit in these definitions because the denotations of English expressions can refer to stochastic functions in the intuitive theory, such as \lstinline{gender}.
 Thus predicates pick out functions from individuals to truth-values in any world (evaluation), but the specific function that they pick out in a world depends on the random choices (e.g., values of \lstinline{flip}) that are made in the process of constructing the world. 
+\todo{Shalom: Explian why 'player' is true of the same objects in all worlds, while other semantic constants vary in denotation across worlds.}
 In these examples, \emph{player} is true of the same individuals in every world, since \lstinline{player} is defined deterministically in the intuitive theory (appendix \ref{tow}). 
 \emph{man}, on the other hand, denotes a predicate which will be true of a given individual (say, \lstinline{`Bob}) in 50\% of partial worlds constructed on average (assuming no relevant observations have been made). 
 This is because the denotation of \emph{man} is a function which returns 1 if and only if its argument is an individual for which the \lstinline{gender} function returns \lstinline{`male}. 
-\lstinline{gender}, in turn, is defined %in figure \ref{theory} 
+The \lstinline{gender} function, in turn, is defined %in figure \ref{theory} 
 as a memoized stochastic function which takes on values \lstinline{`male} and \lstinline{`female} with equal probability for each argument in each world. 
 
 Gradable adjectives such as \emph{strong} and \emph{weak} denote relations between individuals and degrees \citep[][etc.]{cresswell76,vonstechow84}. 
@@ -504,8 +516,8 @@ These definitions are meant to be illustrative, rather than definitive: many alt
 \subsection{Example interpretations}
 
 As an example of sequential interpretation by a literal listener, consider the output of the \lstinline{literal-listener} function in a variant of our explaining-away example from the previous section. 
-Assume that the literal listener's initial belief state is as given in figure \ref{theory}, and his lexicon conforms to the definitions in this section. 
-Then the literal listener will respond to the utterances below exactly as he would if he were to make observations which are encoded using the Church expressions by which the utterances are interpreted.\footnote{The interpretations below are examples of high-probability interpretations that will be generated by the \lstinline{meaning} function as applied to these utterances; other interpretations may also be possible, depending on the parse and composition operators used.}
+Assume that the literal listener's initial belief state is as given in figure \ref{theory}, \todo{fix ref} and his lexicon conforms to the definitions in this section. 
+Then the literal listener will respond to the utterances below exactly as he would if he were to make observations which are encoded using the Church expressions by which the utterances are interpreted.\footnote{The interpretations below are examples of high-probability interpretations that will be generated by the \lstinline{meaning} function as applied to these utterances; other interpretations may also be possible, depending on the parse and composition operators used.} \todo{Shalom: Explain FA and BA in the interpretations. NDG: move some composition stuff from appendix here.}
 \begin{itemize}
 \item Utterance 1: ``Bob is on Team 1.''
 \begin{itemize}
@@ -563,9 +575,10 @@ Conditioning on the truth of this proposition about his opponent, we find that B
 Lines show the probability density of answers to this QUD after (a) utterances 1-3 (solid); (b) utterances 1-4 (long dash); (c) utterances 1-5 (short dash).}
 \end{figure}
 Note, however, that this non-monotonic effect comes about not by directly observing a low value for the strength of Bob's opponent Jim as in our earlier example, but by conditioning on the truth of an utterance which does not entail \emph{any} precise value of Jim's strength. 
-That is, because there is uncertainty about the strengths of all players, in principle Jim could be the weakest player even he is quite strong, as long as all the other players are strong as well. 
+That is, because there is uncertainty about the strengths of all players, in principle Jim could be the weakest player even if he is quite strong, as long as all the other players are strong as well. 
 However, the utterance is more likely to be true if Jim's strength falls into the lower tail of the prior distribution. 
 Conditioning via \lstinline{query} automatically integrates these two sources of uncertainty, concluding that utterance 5 favors low values of \lstinline{(strength `Jim)} and adjusting the inferred strength of his opponent Bob accordingly. 
+\todo{Shalom: Explain how this integration of different sources of uncertainty through conditioning, to update a probability value for stength, works.}
 
 \subsection{\label{ambiguity}Ambiguity}
 The \lstinline{meaning} function will frequently associate utterances with different interpretations on different evaluations. 
@@ -575,7 +588,7 @@ Ambiguities can arise due to any of the following:
 If more than one of these structures is interpretable using the composition operators available, the literal listener may entertain interpretations with different syntactic structures.
 \item Compositional: Holding the syntactic structure fixed, various choice of composition operators by the \lstinline{random-combinator} function may lead to well-typed outputs. 
 Depending on the composition operators available, this may lead to (e.g.) ambiguities of quantifier scope and in whether a pronoun is bound or free.
-\item Lexical: the \lstinline{lexicon} function may be stochastic, returning different options for a single item, or words may have intrinsically stochastic meanings (and the former may generally converted to the latter). 
+\item Lexical: the \lstinline{lexicon} function may be stochastic, returning different options for a single item, or words may have intrinsically stochastic meanings (and the former may be converted to the latter). 
 \end{itemize}
 In the literal interpretation model we have given above, \lstinline{literal-listener}, these sources of linguistic ambiguity will automatically interact with the interpreter's beliefs about the world.
  When a sentence is ambiguous in any of these ways, the listener will favor plausible interpretations over implausible ones, because the interpreter's model of the world is more likely to generate scenarios which make the sentence true under these interpretations. 
@@ -610,9 +623,7 @@ Since \lstinline{team-size} is unknown, this asymmetry leads to a preference for
 On the other hand, suppose that only one match was played: then both readings can be true only if each team has the maximum possible number of players (6). 
 The listener will thus infer that \lstinline{team-size} is equal to 6, and the two readings of the utterance are equally probable, as they were in the prior.
 
-The left panel of the figure
-%figure \ref{scope-ambiguity}
-% changed because of weird error induced by referring to this...
+The left panel of the figure \ref{scope-ambiguity}
  plots the strength of each reading as the number of matches varies. 
 The right panel shows the mean inferred team size as the number of matches varies. 
 \begin{figure}[tbh]
@@ -622,14 +633,14 @@ The right panel shows the mean inferred team size as the number of matches varie
 \label{scope-ambiguity}
 \caption{The probability of the listener interpreting the utterance \emph{Most players played in some match} according to the two possible scopal configurations depends in intricate ways on the interpreter's beliefs and observations about the number of matches and the number of players on each team (left). This, in turn, influences the total information conveyed by the utterance (right).}
 \end{figure} 
-Note that the inferred team size is insensitive to variation in the number of matches when the object wide scope reading is assigned: this is because the existence of a single match with most players in it entails that team size is 4, 5, or 6 (with equal probability) no matter how many matches were played. 
+Note that the inferred team size is insensitive to variation in the number of matches when the object wide scope reading is assigned: this is because the existence of a single match with most players in it entails that team size is 4, 5, or 6 (with equal probability), no matter how many matches were played. 
 However, when the subject wide scope reading is assigned the inferred number of players declines steadily as the number of matches increases. 
 
 This model of language understanding predicts that the resolution of quantifier scope ambiguities should be highly sensitive to background information, and that an ambiguous utterance may lead to rather different belief update effects depending on the plausibility of the various interpretations given background knowledge. 
 
 The model makes essentially the same predictions about the resolution of structural ambiguities. Let $u$ be an utterance with two equally probable parses.
 With no background information to constrain interpretation, either interpretation of this utterance might be appropriate, and a true ambiguity is felt. 
-However, one of the two possible interpretations is more likely to be true than the other, the literal listener will automatically prefer the parse which generates the more probable interpretation.
+However, if one of the two possible interpretations is more likely to be true than the other, the literal listener will automatically prefer the parse which generates the more probable interpretation.
 In the limit, if one interpretation has zero prior probability, the syntactic ambiguity will not be felt because the interpretation that it generates will always be rejected by the \lstinline{query} function embedded in the definition of the literal listener.
 The model predicts that these preferences should display continuous variation between the extremes of assigning equal probability to both and assigning probability 1 to one parse.
 Psycholinguistic research has demonstrated that background information affects the syntactic structures assigned to ambiguous sentences in this way \citep{crain1985not,altmann1988interaction,spivey2002eye}.
@@ -642,7 +653,7 @@ Intrinsically graded (e.g., prototype) meanings are most naturally thought of as
 \subsection{Compositionality}
 %\todo[inline]{Noah: discuss that compositionality in language and thought are similar but along different `directions'...}
 
-It should be clear that compositionally has played a key role in our model of language interpretation thus far. It has in fact played several key roles: expressions in SLC are built from simpler expressions, sequences of utterances are interpreted by sequential conditioning, the \lstinline{meaning} function composes SLC expressions to form sentence meanings. There are thus several, interlocking ``direction'' of compositionality at work, and they result in interactions that could appear non-compositional if only one direction was considered. Let us focus on two: compositionality of world knowledge and compositionality of linguistic meaning.
+It should be clear that compositionally has played a key role in our model of language interpretation thus far. It has in fact played several key roles: expressions in SLC are built from simpler expressions, sequences of utterances are interpreted by sequential conditioning, the \lstinline{meaning} function composes SLC expressions to form sentence meanings. There are thus several, interlocking ``directions'' of compositionality at work, and they result in interactions that could appear non-compositional if only one direction was considered. Let us focus on two: compositionality of world knowledge and compositionality of linguistic meaning.
 
 Compositionality of world knowledge refers to the way that we use SLC to build distributions over possible worlds, not by directly assigning probabilities to all possible expressions, but by an evaluation process that recursively samples values for sub-expressions. 
 That is, we have a compositional language for specifying generative models of the world.
@@ -664,7 +675,9 @@ The sentence denotes not a world probability simpliciter, but a constraint on wo
 
 \subsection{Extensions and related work}
 
-\todo[inline]{Noah: prob semantics related work.}
+\todo[inline]{Shalom: Complete Section 2.5, preferably by compressing it into a
+brief paragraph that describes related work, with references, and
+similarly for other such schematic subsections in the chapter.}
 
 \begin{itemize}
 \item Extending with noisy channels, alternative logics.
@@ -730,7 +743,8 @@ It is clarifying to write the distribution implied by the \lstinline{speaker} fu
 P(\texttt{ut} | \texttt{val}, \texttt{QUD}) &\propto P(\texttt{ut}) P_{\texttt{listener}}(\texttt{val} | \texttt{ut}, \texttt{QUD}) \\
 &\propto e^{\ln(P_{\texttt{listener}}(\texttt{val} | \texttt{ut}, \texttt{QUD})) + \ln{P(\texttt{ut})}}
 \end{align}
-Thus, the \lstinline{speaker} function describes a speaker who uses a soft-max rule \citep{luce59,suttonbarto98} to choose utterances according to a utility function which is the sum of utterance cost and informativity of the utterance about the \lstinline{QUD} (formalized as negative surprisal of the intended value)\footnote{This formulation is soft-max with parameter $1$, it can be modified to give an arbitrary parameter.}.
+\todo{Shalom: Explain the convergence formulas in (4) and (5). (NDG: what does this mean??)}
+Thus, the \lstinline{speaker} function describes a speaker who uses a soft-max rule \citep{luce59,suttonbarto98} to choose utterances according to a utility function which is the sum of utterance cost and informativity of the utterance about the \lstinline{QUD} (formalized as negative surprisal of the intended value)\footnote{This formulation is soft-max with parameter $1$. It can be modified to give an arbitrary parameter.}.
 
 A more sophisticated, pragmatic, listener can now be modeled as a Bayesian agent updating her belief about the value of the question under discussion given the observation that the speaker has bothered to make a particular speech act:
 \begin{lstlisting}
@@ -742,7 +756,7 @@ A more sophisticated, pragmatic, listener can now be modeled as a Bayesian agent
     (equal? utterance (speaker val QUD))))
 \end{lstlisting}
 Notice that the prior over \lstinline{val} comes from evaluating the \lstinline{QUD} expression given the \lstinline{theory}, and the posterior comes from updating this prior given that the speaker has chosen \lstinline{utterance} to convey \lstinline{val}.
-The force of this model comes from the ability to call the \lstinline{query} function within itself \citep{Stuhlmueller2013}---each query models the inference made by one (imagined) communicator and together they capture sophisticated pragmatic reasoning. 
+The force of this model comes from the ability to call the \lstinline{query} function within itself \citep{Stuhlmueller2013}---each query models the inference made by one (imagined) communicator, and together they capture sophisticated pragmatic reasoning. 
 Several observations are worth making: First, alternative utterances will enter into the computation in sampling (or determining the probability of) the actual utterance from \lstinline{speaker}. 
 Similarly, alternative values are considered in the listener functions.
 Second, the notion of informativity captured in the \lstinline{speaker} model is not simply information transmitted by \lstinline{utterance}, but is \emph{new} information conveyed to the listener \emph{about} the \lstinline{QUD}. 
@@ -750,7 +764,7 @@ Information which is not new to the listener or which is not relevant to the \ls
 
 We illustrate by considering quantity implicatures. 
 Take as an example the sentence ``Jane played in some match''. 
-This entails that Jane is did not play in zero matches. 
+This entails that Jane did not play in zero matches. 
 In many contexts, it would also be taken to suggest that Jane did not play in all of the matches. 
 However, there are many good reasons for thinking that the latter inference is not part of the basic, literal meaning of the sentence\citep{grice89,geurts2010quantity}. 
 Why then does it arise?
@@ -801,7 +815,7 @@ In this way, our model yields a broadly Gricean explanation of quantity implicat
 \item Representing speaker knowledge \cite{Goodman2013}.
 \item Obvious directions: inferring QUD, more general goals.
 \item Frank and Goodman 2012, ref exprs. Reference via joint inference (effect of prior); salience. (Cf. Lewis "the cat".)
-\item Relation to IBR and game-theoretic pragmatics.
+\item Relation to IBR and game-theoretic pragmatics. (Franke, Jaeger, Benz.)
 \end{itemize}
 %how about a match between '(bob sue) and '(dude alice), where 'dude is male with unknown name, and the utterance is "he's strong!"... "he" should be interpreted as 'dude since otherwise could have used "Bob". this is just like the FG setup.
 %then do a version where there are two unnamed males, but only one of them was in the match... salience should enter to set "he" to guy just in a match.
@@ -813,7 +827,7 @@ In this way, our model yields a broadly Gricean explanation of quantity implicat
 \section{Semantic indices}
 \label{indices}
 
-In formal semantics \citep{lewis70,montague1973} sentence meanings are often treated as intensions: functions from semantic indices to truth functions. The semantic theory has nothing to say about how to set these indices, only that they matter and (probably) depend on context. Yet we have already seen that a probabilistic theory of pragmatic interpretation can be used to describe the ways that context influences interpretation. Can we similarly use probabilistic tools to describe the ways that semantic indices are set based on context?
+In formal semantics \citep{lewis70,montague1973} sentence meanings are often treated as intensions: functions from semantic indices to truth functions. \todo{check: truth functions or truth values?} The semantic theory has nothing to say about how to set these indices, only that they matter and (probably) depend on context. Yet we have already seen that a probabilistic theory of pragmatic interpretation can be used to describe the ways that context influences interpretation. Can we similarly use probabilistic tools to describe the ways that semantic indices are set based on context?
 We must first decide how semantic indices should enter into the probabilistic framework presented above (where we have so far treated meanings simply as truth functions). The simplest assumption would be that they are random variables that occur (unbound) in the meaning expression and are reasoned about by the literal listener:
 \begin{lstlisting}
 (define (literal-listener utterance QUD)
@@ -828,7 +842,7 @@ Here we assume that a lexical item may contain an unbound occurrence of \lstinli
 Because there is now a joint inference over \lstinline{val} and \lstinline{index}, the index will tend to be set such that the utterance is most likely to be true. 
 To be concrete, consider the case of gradable adjectives like \emph{strong}. In section \ref{lexicon} we have defined \sv{\mathit{strong}} = \lstinline[mathescape]{($\lambda$ (x) ($\lambda$ ($\theta$) (>= (strength x) $\theta$)))}, without specifying how \lstinline[mathescape]{$\theta$} is bound in sentences such as \emph{Bob is strong}.
 We could instead define \sv{strong} = \lstinline[mathescape]{($\lambda$ (x) (>= (strength x) $\theta$))}, allowing \lstinline[mathescape]{$\theta$} to be a free semantic index variable.\footnote{We would then have to make a corresponding change
-to the meaning of \emph{-est}: it would first bind the threshold variable locally, then proceeded as above to saturate the threshold.}
+to the meaning of \emph{-est}: it would first bind the threshold variable locally, then proceed as above to saturate the threshold.}
  After applying the \lstinline{meaning} function (and simplifying composition) the utterance ``Bob is strong'' (with \lstinline{QUD} ``how strong is Bob?'') would be interpreted via:
 \begin{lstlisting}
 (query
@@ -838,6 +852,8 @@ to the meaning of \emph{-est}: it would first bind the threshold variable locall
   val
   (>= (strength `Bob) $\theta$))
 \end{lstlisting}
+
+\todo[inline]{Need an extended discussion of why and when to lift a free variable. Show the scaling properties of level-0 and level-1 variable inference...}
 
 To understand this distribution, we can look at 
 %figure \ref{strong-L0}, which plots 
@@ -854,8 +870,8 @@ This listener's exclusive preference for true interpretations leads to a tendenc
 %
 The interpretation of the free threshold variable has indeed been influenced by context: it changes from its uniform prior to a posterior that makes the utterance likely to be true (i.e. peaked at the bottom of the domain---set here to -100). 
 However, this gives the wrong interpretation of \emph{Bob is strong}. Intuitively, what the listener ought to do is to adjust the estimate of Bob's strength to a fairly high value, relative to the prior estimate. 
-Instead, our literal listener maximizes the probability of the utterance's truth by setting the free variable in its meaning to a value so low that the utterance will be true for virtually any height that Bob might plausibly have. 
-Thus the listener learns nothing at all about the variable of interest from the utterance: the posterior distribution on Bob's height is the same as the prior.
+Instead, our literal listener maximizes the probability of the utterance's truth by setting the free variable in its meaning to a value so low that the utterance will be true for virtually any degree of strength that Bob might plausibly have. 
+Thus the listener learns nothing at all about the variable of interest from the utterance: the posterior distribution on Bob's strength is the same as the prior.
 
 What is missing is the pressure to adjust $\theta$ so that the sentence is not only true, but also \emph{informative}. 
 Simply including the informative speaker and pragmatic listener models as defined above is not enough: without additional changes the index variables will still be inferred at the level of literal listener with no pragmatic pressures. 
@@ -910,6 +926,7 @@ We can motivate from this example a general treatment of semantic indices: lift 
 When we don't know ahead of time which index variables will occur in the utterance considered by the literal-listener we need to generalize the above. 
 One way is to treat \lstinline{index} as a memoized function mapping variable names to (random) values appropriate for their types.\footnote{The semantics of a memoized function is such that its value on all inputs is formally (if not actually) fixed when the function is created. Thus a memoized \lstinline{index} function would result in index variables that are reasoned about at the pragmatic listener level, although they are made only as needed in the literal listener.} 
 Then either the lexical entires should change from free variables to lookups (e.g. \lstinline[mathescape]{$\theta$} to \lstinline[mathescape]{(index $\theta$)}) or the meaning function is responsible for detecting unbound variables and decorating them with \lstinline[mathescape]{(index ...)}.
+\todo[inline]{Shalom: The paragraph immediately preceeding Section 4.1 is unclear. Please reformulate it. Shalom: FN 9 needs to be reformulated, as it is unclear.}
 
 \subsection{\label{vagueness}Vagueness and indeterminate boundaries}
 The model of gradable adjective interpretation introduced by \citet{lassitergoodman13} and described briefly in section \ref{indices} above suggests a broader lesson. 
@@ -917,8 +934,8 @@ Probabilistic models of the type described here make it possible to maintain the
 There is considerable evidence from both psychological \citep[e.g.][]{rosch78,murphy02,hampton07} and linguistic \citep{taylor2003linguistic} research that a lack of sharp boundaries is a pervasive features of lexical meaning and conceptual representation. 
 
 Linguistic indeterminacy and vagueness---our primary objects of interest here---can be understood as uncertainty about the precise interpretation of expressions in context, modeled in probabilistic terms. 
-Our model predicts that uncertainty should be able to enter into the interpretation process in a variety of ways, as we discussed already in section \ref{ambiguity} above. 
- the case of lexical meaning, there are at least four possible sources of uncertainty:
+Our model predicts that uncertainty should be able to enter into the interpretation process in a variety of ways, as we discussed in section \ref{ambiguity} above. 
+In the case of lexical meaning, there are at least four possible sources of uncertainty:
 \begin{itemize}
 \item Reference to a non-deterministic concept: A word is defined as referring (deterministically) to a conceptual representation which incorporates a stochastic element. E.g., 
 \begin{itemize}
@@ -937,7 +954,7 @@ Our model predicts that uncertainty should be able to enter into the interpretat
 Note that the first two sources of indeterminacy are intrinsic to the definitions of words/concepts, while the third and fourth will generally invoke context-sensitive pragmatic processes. 
 
 As we pointed out above, gradable adjectives are generally interpreted as including a free ``threshold'' or ``standard'' variable. In order to derive an appropriate context-sensitive meaning for adjectives such as ``strong'', we lift this variable to the pragmatic listener. 
-When we do so, the uniform prior distribution on interpretations of this variable changes to a decidedly non-uniform posterior distribution (figure \ref{L1-adjective-interp}, dotted line). 
+When we do so, the uniform prior distribution on interpretations of this variable changes to a decidedly non-uniform posterior distribution (figure \ref{L1-adjective-interp}, dotted line). \todo{Shalom: Are you sure that you mean figure 4 here? If so, which dotted line in that figure are referring to?}
 This interpretation process makes it possible for the utterance to convey a considerable amount of information about both the answer to the QUD and the contextual meaning of ``strong''. 
 However, the interpretation is still uncertain, leaving open the possibility that the boundary between ``strong'' and ``not strong'' could fall reasonably lie anywhere between 1 and 5.
 
@@ -945,16 +962,16 @@ This model of adjective interpretation predicts a number of important features o
 (For more discussion of vagueness and an overview of theories see Lassiter, this volume).
 
 \textbf{Borderline cases}. An individual whose degree of strength falls in the middle of the posterior distribution on interpretations of ``strong'' will be a borderline case of ``strong''. 
-That is, an individual with strength 3 will have a roughly equal chance of counting as ``tall'' and as ``not tall''.  
+That is, an individual with strength 3 will have a roughly equal chance of counting as ``strong'' and as ``not strong''.  
  
-\textbf{Tolerance principles}. Suppose Bill has strength 4.5 and Mary has strength 4.4. It would be odd for someone to confidently agree to the claim that Sam is strong, but to deny confidently that Mary is strong. 
+\textbf{Tolerance principles}. Suppose Bill has strength 4.5 and Mary has strength 4.4. It would be odd for someone to confidently agree to the claim that Bill is strong, but to deny confidently that Mary is strong. 
 Our model explains this intuition: when two individuals' strength is separated by a small gap, it will never be the case that one counts as ``strong'' with high probability and the other with low probability. 
 This could happen only if the gap were larger, or if the posterior distribution on interpretations of ``strong'' had sharp discontinuities or very low variance \citep{lassitergoodman13}. 
 
 \textbf{The sorites paradox}. The following is an instance of a famous puzzle:
 \begin{itemize}
 \item Bill is strong.
-\item Anyone who is just a tiny but less strong than a strong person is also strong.
+\item Anyone who is just a tiny bit less strong than a strong person is also strong.
 \item Therefore, everyone is strong, no matter how weak.
 \end{itemize}
 People generally find the premises plausible, but the conclusion (which follows logically) is not at all plausible. Evidently something is wrong with the second premise, but what? 
@@ -980,7 +997,9 @@ We can also explore the effects of varying the gap size; the probability of the 
 \end{figure}
 
 Thus, the second premise is felt as strong because it is extremely likely to be true in a given scenario, even though---in its strict universally quantified reading---it is false.
-Note that psychological research supports the suggestion that people are willing to judge a universally quantified sentence true even if in the presence of exceptions, as long it has sufficiently high probability of being true of a randomly chosen example \citep{sloman98}. This account builds on previous probabilistic approaches to the vagueness and the sorites \citep{borel07,black37,edgington97,lawry08,frazeebeaver10,egre11,lassiter11}, but is the first to offer a specific account of why vague adjectives should have context-sensitive probabilistic interpretations and of how the distribution is determined in a particular context of utterance.
+Note that psychological research supports the suggestion that people are willing to judge a universally quantified sentence true even in the presence of exceptions, as long it has sufficiently high probability of being true of a randomly chosen example \citep{sloman98}. This account builds on previous probabilistic approaches to the vagueness and the sorites \citep{borel07,black37,edgington97,lawry08,frazeebeaver10,egre11,lassiter11}, but is the first to offer a specific account of why vague adjectives should have context-sensitive probabilistic interpretations, and of how the distribution is determined in a particular context of utterance.
+
+\todo[inline]{Shalom: You may want to refer to Peter Sutton's work on vagueness and the Sorities paradox here. He proposes a similar approach.}
 
 %Our approach to adjective interpretation offers a new account of the sorites paradox. The argument is logically unsound because the second premise \ref{e2b} is not \emph{strictly true}: if $x$'s height is very close to the cutoff, $\theta$, then $x$ may count as ``tall'' while someone just slightly shorter does not. However, the second premise is  \emph{highly plausible} because the probability that $\theta$ and $x$'s height will be so close is small. 
 %%In other words, the posterior distribution on $\theta$ describes the inferred meaning of ``tall'' in a particular context; the distribution on $w$ described the height of someone known to be ``tall'' given this distribution on meanings. 
@@ -1005,12 +1024,12 @@ Note that psychological research supports the suggestion that people are willing
 \todo{point out that index version is easily compositional. mention roses and flowers paper.}
 
 Another interpretation of the above modeling approach (indeed, the original interpretation, introduced in \cite{bergen12}) is as the result of \emph{lexical uncertainty}: each index represents a lingering uncertainty about word meaning (in context) which the listener must incorporate in the interpretation process. 
-This interpretation is appealing in that it connects naturally to language acquisition and change \cite{SmithFrankGoodman}. 
-For instance, upon hearing a new word a learner would initially treat it as underdetermined (essentially an index variables ranging over all expressions of the appropriate type), inferring its meaning on each usage from contextual cues. 
+This interpretation is appealing in that it connects naturally to language acquisition and change \citep{SmithFrankGoodman}. 
+For instance, upon hearing a new word a learner would initially treat it as underdetermined (essentially an index variable ranging over all expressions of the appropriate type), inferring its meaning on each usage from contextual cues. 
 Over time the prior over this `index' would tighten until only the correct meaning remained, and no contextual flexibility was left. 
 A difficulty with the lexical uncertainty interpretation is explaining why certain aspects of a word's meaning are so much more flexible than others. 
-This is natural from the free-index interpretation since the dimensions of flexibility are explicitly represented as unbound variables in lexical entries. 
-A more structured (e.g. hierarchical) notion of lexical uncertainty may be able to reconcile these interpretations, which are essential equivalent.
+This is natural from the free-index interpretation because the dimensions of flexibility are explicitly represented as unbound variables in lexical entries. 
+A more structured (e.g. hierarchical) notion of lexical uncertainty may be able to reconcile these interpretations, which are essentialy equivalent.
 
 
 
@@ -1030,15 +1049,16 @@ A more structured (e.g. hierarchical) notion of lexical uncertainty may be able 
 
 \section{Conclusion}
 
-In this chapter we have illustrated the use of probabilistic modeling to study natural language semantics and pragmatics. On the one hand we have argued that uncertainty, formalized via probability, is a key organizing principle throughout language and cognition. On the other hand we have argued, by example, that we must still build detailed models of natural language architecture and structure. That is, probability provides a tool for better language modeling, which allows us to naturally capture many expects of the flexibility and power of language, but like any tool probabilistic modeling is only as good as the models it is used to create.
+In this chapter we have illustrated the use of probabilistic modeling to study natural language semantics and pragmatics. On the one hand we have argued that uncertainty, formalized via probability, is a key organizing principle throughout language and cognition. On the other hand we have argued, by example, that we must still build detailed models of natural language architecture and structure. That is, probability provides a tool for better language modeling, which allows us to naturally capture many aspects of the flexibility and power of language. But like any tool probabilistic modeling is only as good as the models it is used to create.
 
 There are both a number of kinds of uncertainty and a number of roles for uncertainty in the architecture we have described.
-While the fundamental mechanisms for representing and updating beliefs are the same for discrete variables (such as those that led to scope ambiguity for quantifiers) and continuous variables (such as the threshold variable we used within scalar adjectives), there are likely to be phenomenological differences as well similarities: for instance continuous variables lend themselves to borderline cases in a way that discrete variables don't, while both support graded judgements. Similarly, the locus of creation of a random variable---within the literal listener, in the pragmatic listener, separately or tied as and index---can have profound effects on its role in language understanding. Variables restricted to the literal listener show plausibility but not informativity effects; variables in the pragmatic listener that are not indices show informativity but limited context sensitivity; etc. Overall then, uniform mechanisms of uncertainty can lead to heterogeneous phenomenology of language understudying, depending on the structure of the language understanding model. 
+While the fundamental mechanisms for representing and updating beliefs are the same for discrete variables (such as those that lead to scope ambiguity for quantifiers) and continuous variables (such as the threshold variable we used within scalar adjectives), there are likely to be phenomenological differences as well similarities: for instance continuous variables lend themselves to borderline cases in a way that discrete variables don't, while both support graded judgements. Similarly, the locus of creation for a random variable---within the literal listener, in the pragmatic listener, separately or tied as an index---can have profound effects on its role in language understanding. Variables restricted to the literal listener show plausibility but not informativity effects; variables in the pragmatic listener that are not indices show informativity but limited context sensitivity; etc. Overall then, uniform mechanisms of uncertainty can lead to heterogeneous phenomenology of language understanding, depending on the structure of the language understanding model. 
 
 In the architecture we have described, uncertainty is pervasive through all aspects of language understanding. Pervasive uncertainty leads to complex interactions that can be described by joint inference of the many random choices involved in understanding. Joint inference in turn leads to a great deal of flexibility, from non-monotonic effects of explaining away (section \ref{literal}), through ambiguous compositional structure and pragmatic strengthening, to vagueness and context-specificity of indices. It is particularly important to note that even when the architecture specification is relatively modular, for instance separate specification of world knowledge (the \lstinline{...theory...}) and meaning interpretation (the \lstinline{meaning} function), the inferential effects in sentence interpretation will have complex, bi-directional interactions (as in the interaction of background knowledge and quantifier scope ambiguity in section \ref{literal}). That is, language understanding is analyzable but not modular.
 
 
 
+\todo[inline]{Shalom: it seems to me that you can dispense with the appendices A-C, and replace them with references to published work. They do not really contribute to the clarification of the points that you make in the chapter, and omitting them will leave more room for additional explanation and illustration of the technical material in the body of the text.}
 
 \appendix
 
