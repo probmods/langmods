@@ -9,4 +9,7 @@
 .dropbox
 TSWLatexianTemp*
 *.tdo
-
+.DS_Store
+.RData
+.Rapp.history
+.Rhistory
