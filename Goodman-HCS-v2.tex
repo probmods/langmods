@@ -21,7 +21,7 @@
 \usepackage{listings} 
 \usepackage{inconsolata}
 \usepackage{colonequals}
-\usepackage[disable]{todonotes}
+\usepackage{todonotes}
 \usepackage{gb4e}
 
  \usepackage{hyperref}
@@ -110,6 +110,7 @@
 \pagebreak
 %%%%
 
+\todo[inline]{Extract code, make probmods page, make sure it runs! (Erin and Julius to help.)}
 
 Language is used to communicate ideas. Ideas are mental tools for coping with a complex and uncertain world. Thus human conceptual structures should be key to language meaning, and probability---the mathematics of uncertainty---should be indispensable for describing both language and thought. Indeed, probabilistic models are enormously useful in modeling human cognition \citep{tenenbaumetal11}
 %Tenenbaum, etc}, 
@@ -359,7 +360,40 @@ In addition to players and teams, we have matches: events that have two teams an
 \end{lstlisting}
 Notice that the team pulling is simply the sum of how hard each member is pulling; each player pulls with their intrinsic strength, plus a random amount that indicates their effort on this match. 
  
-The conceptual lexicon of functions for the tug-of-war domain is given altogether in Appendix \ref{tow}.
+ \begin{figure}[htbp]
+\begin{center}
+ \begin{lstlisting}[mathescape]
+(define players `(Bob Jim Mary Sue Bill Evan Sally Tim Joe Jane Terrence Kate))
+(define teams `(team1 team2 team3))
+(define matches `(match1 match2 match3 match4))
+
+(define gender (mem ($\lambda$ (p) (if (flip) `male `female))))
+(define gender-mean-strength (mem ($\lambda$ (g) (gaussian 0 2))))
+(define strength (mem ($\lambda$ (p) (gaussian (gender-mean-strength (gender p)) 1))))
+
+(define team-size (uniform-draw '(1 2 3 4 5 6)))
+(define players-on-team (mem ($\lambda$ (team) (draw-n team-size players))))
+(define captain (mem ($\lambda$ (team) (uniform-draw (players-on-team team)))))
+
+(define teams-in-match (mem ($\lambda$ (match) (draw-n 2 teams))))
+(define pulling (mem ($\lambda$ (player match) (+ (strength player) (gaussian 0 0.5)))))
+(define team-pulling (mem ($\lambda$ (team match) 
+                          (sum (map ($\lambda$  (x) (pulling x match)) (players-on-team team))))))
+(define (winner match) 
+  (let ([teamA (first (teams-in-match match))]
+        [teamB (second (teams-in-match match))])
+    (if (> (team-pulling teamA match) (team-pulling teamB match))
+        teamA
+        teamB)))
+\end{lstlisting}
+
+\caption{The collected Church definitions forming our simple intuitive theory (or conceptual lexicon) for the tug-of-war domain.}
+\label{tow}
+\end{center}
+\end{figure}
+
+ 
+The conceptual lexicon of functions for the tug-of-war domain is given altogether in Figure \ref{tow}.
 A conceptual lexicon like this one describes generative knowledge about the world---interrelated concepts that can be used to describe the causal story of how various observations come to be. 
 %
 We can use this knowledge to reason from observations to predictions or latent states by conditioning (i.e. \lstinline{query}). 
@@ -374,7 +408,7 @@ Imagine that Bob is playing Jim in match 1; we can infer Bob's strength before o
     (equal? (players-on-team `team2) `(Jim))
     (equal? (teams-in-match `match1) `(team1 team2))))
 \end{lstlisting}
-In this and all that follows \lstinline{...ToW theory...} is an abbreviation for the definitions in appendix \ref{tow}. 
+In this and all that follows \lstinline{...ToW theory...} is an abbreviation for the definitions in Figure \ref{tow}. 
 The result of this strength is simply the prior belief about Bob's strength: a distribution with mean 0.0.
 
 Now imagine that Bob wins this match:
@@ -423,7 +457,6 @@ There are a number of other patterns of reasoning that are common results of pro
 For instance, \emph{screening off} describes the situation when two variables that were a priori dependent become independent after an observation (in some sense the opposite of explaining away).
 Other patterns include Occam's razor (complexity of hypotheses is automatically penalized), transfer learning (an inductive bias learned from one domain constrains interpretation of evidence in a new domain), and the blessing of abstraction (abstract knowledge can be learned faster than concrete knowledge). 
 These will be less important in what follows, but we note that they are potentially important for the question of language learning---when we view learning as an inference, the dynamics of probabilistic inference come to bear on the learning problem. For detailed examples of these patterns, using Church representation, see \url{http://probmods.org}.
-
  
 \section{Meaning as condition}
 \label{literal}
@@ -431,9 +464,9 @@ These will be less important in what follows, but we note that they are potentia
 
 Following a productive tradition in semantics and pragmatics \citep[][etc.]{stalnaker78,lewis79,heim82}, we view the basic function of language understanding as belief update: moving from a prior belief distribution over worlds (or situations) to a posterior belief distribution given the \emph{literal meaning} of a sentence. 
 
-Probabilistic conditioning (or \lstinline{query}) is a very general way to describe updating of degrees of belief. Indeed, any transition from distribution $P_{\text{before}}$ to distribution $P_{\text{after}}$ such that the support (i.e.\ region of non-zero probability) of $P_{\text{after}}$ is a subset of the support of $P_{\text{before}}$ can be written as multiplying by a non-negative, real-valued function and then renormalizing. From this observation it is easy to show that any belief update can be written as the result of conditioning on some (stochastic) predicate.
+Probabilistic conditioning (or \lstinline{query}) is a very general way to describe updating of degrees of belief. Note that any transition from distribution $P_{\text{before}}$ to distribution $P_{\text{after}}$, such that the support (i.e.\ region of non-zero probability) of $P_{\text{after}}$ is a subset of the support of $P_{\text{before}}$, can be written as multiplying by a non-negative, real-valued function and then renormalizing. From this observation it is easy to show that any belief update which preserves (im)possibility can be written as the result of conditioning on some (stochastic) predicate.
 
-We next assume that each sentence provides information which is independent of other sentences given the state of the world (which may include discourse properties). From this it follows, parallel to the discussion of multiple observations as sequential conditioning above, that a sequence of sentences can be treated as sequentially updating beliefs by conditioning---so we can focus on the literal meaning of a single sentence. This independence assumption can be seen as the most basic, and most important, \emph{compositionality} assumption, which allows language understanding to proceed incrementally by utterance. (When we add pragmatic inference, in section \ref{pragmatics}, this independence assumption will weaken, but it remains essential to the basic semantic function of utterances.)
+Assume for now that each sentence provides information which is independent of other sentences given the state of the world (which may include discourse properties). From this it follows, parallel to the discussion of multiple observations as sequential conditioning above, that a sequence of sentences can be treated as sequentially updating beliefs by conditioning---so we can focus on the literal meaning of a single sentence. This independence assumption can be seen as the most basic and important \emph{compositionality} assumption, which allows language understanding to proceed incrementally by utterance. (When we add pragmatic inference, in section \ref{pragmatics}, this independence assumption will weaken, but it remains essential to the basic semantic function of utterances.)
 
 How does an utterance specify which belief update to perform? We formalize the literal listener as:
 \begin{lstlisting}
@@ -443,33 +476,106 @@ How does an utterance specify which belief update to perform? We formalize the l
     (eval QUD)
     (eval (meaning utterance))))
 \end{lstlisting}
-This function specifies the posterior distribution over answers to the Question Under Discussion (\lstinline{QUD}) given that the literal meaning of the utterance is true.\footnote{On QUD models, see \citealt{ginzburg95a,van1995discourse,roberts96,beaverclark08} among many others.} 
+This function specifies the posterior distribution over answers to the Question Under Discussion (\lstinline{QUD}) given that the literal meaning of the utterance is true.\footnote{On the importance of QUD for natural language see \citealt{ginzburg95a,van1995discourse,roberts96,beaverclark08} among many others.} 
 Notice that the prior distribution for the literal listener is specified by a conceptual lexicon---the \lstinline{...theory...}---and the \lstinline{QUD} will be evaluated in the local environment where all functions defined by this theory are in scope. That is, the question of interest is determined by the \emph{expression} \lstinline{QUD} while its answer is determined by the \emph{value} of this expression in the local context of reasoning by the literal listener: the value of \lstinline{(eval QUD)}. (For a description of the \lstinline{eval} operator see section \ref{eval} above.)
-Hence the semantic effect of an utterance is a function from \lstinline{QUD}s to posteriors, rather than directly a posterior over worlds. Using the \lstinline{QUD} in this way has two beneficial consequences: first, it limits the holism of belief update, triggering representation of only a large enough situation to capture the sentence meaning (described below) about the question of current interest; second, it has important effects on the informative speaker described below (which will only be informative about the \lstinline{QUD}, not about the world in general).
+Hence the semantic effect of an utterance is a function from \lstinline{QUD}s to posteriors, rather than directly a posterior over worlds. Using the \lstinline{QUD} in this way has two beneficial consequences: first, it limits the holism of belief update, triggering representation of only a large enough situation to capture the sentence meaning (described below) about the question of current interest; second, when we construct a speaker model it will capture a pressure to be informative about the \lstinline{QUD}, not about the world in general.
 
-The \lstinline{meaning} function is a map from strings (surface forms) to Church expressions (logical forms, which include functions defined in \lstinline{...theory...}).
+The \lstinline{meaning} function is a map from strings (surface forms) to Church expressions (logical forms, which may include functions defined in \lstinline{...theory...}).
 Many theories of syntactic and semantic composition could be used to provide this mapping. 
-For concreteness, we consider a simple system in which a string is recursively split into left and right portions, and the meanings of these portions are combined with a random combinator:
+For concreteness, we consider a simple system in which a string is recursively split into left and right portions, and the meanings of these portions are combined with a random combinator. The first step is to check whether the (remaining) utterance is atomic, and if so look it up in the lexicon:
+%\begin{lstlisting}
+%(define (meaning utterance)
+%  (if (lexical-item? utterance)
+%      (lexicon utterance)
+%      (let ([subs (random-split utterance)])
+%         ((random-combinator) (meaning (first subs)) (meaning (second subs))))))
+%\end{lstlisting}
 \begin{lstlisting}
 (define (meaning utterance)
   (if (lexical-item? utterance)
       (lexicon utterance)
-      (let ([subs (random-split utterance)])
-         ((random-combinator) (meaning (first subs)) (meaning (second subs))))))
+      (compose utterance)))
 \end{lstlisting}
-Here the predicate \lstinline{lexical-item?} determines if the (remaining) utterance is a single lexical item (entry in the lexicon), if so it is looked up with the \lstinline{lexicon} function.
-The function \lstinline{random-split} takes a string and returns the list of two substrings that result from splitting at a random position in the length of the string.
-The function \lstinline{random-combinator} chooses a random composition operator, such as left application or right composition. 
-We assume that the set of possible compositions is sufficient to perform any syntactic operations needed (see appendix \ref{composition} for details).
-Critically, if type errors are interpreted as the non-\lstinline{true} value \emph{error} (as described in section \ref{bottom-val}), then mis-typed compositions will not satisfy the condition of the \lstinline{query} in the \lstinline{literal-listener} function---though many ill-typed compositions can be generated by this procedure, they will be eliminated from the posterior, leaving only well-typed interpretations.
-Thus the \lstinline{meaning} function is a stochastic mapping from strings to Church expressions; the random choices made in this mapping will be reasoned about jointly with world states while interpreting the utterance, as discussed in section \ref{ambiguity} below.
+Here the predicate \lstinline{lexical-item?} determines if the (remaining) utterance is a single lexical item (entry in the lexicon), if so it is looked up with the \lstinline{lexicon} function. If the utterance is not atomic, we randomly split it and then combine the sub-meanings into a list:
+\begin{lstlisting}
+(define (compose utterance)
+  (define subs (random-split utterance))
+  (list (meaning (first subs)) (meaning (second subs))))
+\end{lstlisting}
+The function \lstinline{random-split} takes a string and returns the list of two substrings that result from splitting at a random position in the length of the string.\footnote{While it is beyond the scope of this chapter, a sufficient treatment of the syntactic system implied by \lstinline{random-split} would require language-specific biases over which splits to make: we would like to split the head of a phrase off last.}
+The \lstinline{meaning} function is a stochastic mapping from strings to Church expressions; in \lstinline{literal-listener} we \lstinline{eval} the constructed meaning in the same environment as the \lstinline{QUD}. Because we have formed a list of the sub-meanings, evaluation will result in forward application of the left sub-meaning to the right. Many different meanings can get constructed and evaluated in this way, and many of them will be mis-typed.
+%For the moment the meanings of the two sub-strings are combined by applying the left to the right---in a moment we will extend the possible composition methods. 
+%The function \lstinline{random-combinator} chooses a random composition operator, such as left application or right composition. 
+Critically, if type errors are interpreted as the non-\lstinline{true} value \emph{error} (as described in section \ref{bottom-val}), then mis-typed compositions will not satisfy the condition of the \lstinline{query} in the \lstinline{literal-listener} function---though many ill-typed compositions can be generated by \lstinline{meaning}, they will be eliminated from the posterior, leaving only well-typed interpretations.
 
-\todo{As Henk Zeevat pointed out, this system doesn't prefer the correct interpretation of "bob loves mary"... emphasize that one can put in more syntax if one wants.}
+To understand what the \lstinline{literal-listener} does overall, consider rejection sampling: we evaluate both the \lstinline{QUD} and meaning expressions, constructing whatever intermediate expressions are required; if the meaning expression has value \lstinline{true}, then we return the value of \lstinline{QUD}, otherwise we try again. 
+Random choices made to construct and evaluate the meaning will be reasoned about jointly with world states while interpreting the utterance; the complexity of interpretation is thus an interaction between the domain theory, the meaning function, and the lexicon.
 
-To understand what the \lstinline{literal-listener} does, consider rejection sampling: we evaluate both the \lstinline{QUD} and meaning expressions, constructing whatever intermediate expressions are required; if the meaning expression has value \lstinline{true}, then we return the value of \lstinline{QUD}, otherwise we try again. 
-%\todo[inline]{Dan: something about hyper intentionality? point out that the intention is a computation that can be run in a given intuitive theory environment. cite shalom ..}
-It is apparent that the complexity of interpretation is an interaction between the domain theory, the meaning function, and the lexicon. 
-To make this more concrete, we return to the tug-of-war example from the previous section and begin to build a lexicon for talking about this domain in natural language. 
+\todo{Acknowledge Henk Zeevat for pointing out that this system doesn't prefer the correct interpretation of "bob loves mary" without an additional syntactic bias.}
+
+%To make this more concrete, we first extend the possible compositions to account for complex binding, 
+%we then return to the tug-of-war example from the previous section and begin to build a lexicon for talking about this domain in natural language. 
+
+\subsection{Random type shifting}
+
+The above definition for \lstinline{meaning} always results in composition by forward application; this is too limited to generate potential meanings for many sentences. For instance ``Bob runs.'' requires a \emph{backward} application to apply the meaning of ``runs'' to that of ``Bob''. We extend the possible composition methods by allowing the meanings to be type-shifted as they are computed. See  \citep{jacobson99,steedman01,barker05} for discussion of such approaches.
+\begin{lstlisting}
+(define (meaning utterance)
+  (if (lexical-item? utterance)
+      (lexicon utterance)
+      (shift (compose utterance))))
+      
+(define (shift m)
+  (if (flip)
+      m
+      (list (uniform-draw type-shifters) (shift m))))
+  
+(define type-shifters `(R S AR1 AR2 ...))
+\end{lstlisting}
+Each intermediate meaning will be shifted zero or more times by a randomly chosen type-shifter; because the number of shifts is determined by a stochastic recursion, fewer shifts are \emph{a priori} more likely (with none being most likely). 
+Note that each lexical item has the potential to be interpreted in any of an infinite number of (static) types; however, the probability of associating an item with an interpretation in some type declines exponentially with the the number of type-raising operations required to construct this interpretation. 
+The use of a stochastic recursion to generate type ambiguities thus automatically enforces the preference for interpretation in lower types, a feature which is often stipulated in discussions of type-shifting \citep{partee1983generalized,partee1987noun}.
+
+We choose a small set of type shifters which is sufficient for the examples of this chapter:
+\begin{itemize}
+\item \textbf{R}: \lstinline[mathescape]{($\lambda$ (x) ($\lambda$ (y) (y x)))}
+\item \textbf{S}: \lstinline[mathescape]{($\lambda$ (x) ($\lambda$ (y) ($\lambda$ (z) (x (y z)))))}
+\item \textbf{AR1}: \lstinline[mathescape]{($\lambda$ (f) ($\lambda$ (x) ($\lambda$ (y) (x ($\lambda$ (z) ((f z) y))))))}
+\item \textbf{AR2}: \lstinline[mathescape]{($\lambda$ (f) ($\lambda$ (x) ($\lambda$ (y) (y ($\lambda$ (z) ((f x) z))))))}
+\end{itemize}
+Among other ways they can be used, the shifter \textbf{R} enables backward application and \textbf{S} enables composition.
+Type shifters \textbf{AR1} and \textbf{AR2} allow flexible quantifier scope as described in \citet{hendriks93,barker05} (the specific choice here follows \citet[][pp.453ff.]{barker05}). (This treatment of quantifier scope is convenient, but others could be implemented by complicating the syntactic or semantic mechanisms in various ways: see e.g.~\citet{may77,steedman2012taking}.)
+
+%The purpose of this chapter is not to give a systematic treatment of compositional semantics, but we do want a system of composition which is sufficient to expose the interaction between probabilistic interpretation and compositional phenomena such as quantifier scope.
+%Coping with complex linguistic phenomena requires us to complicate either or both of the syntactic (\lstinline{random-split}) or semantic (\lstinline{random-combinator}) operations. We choose to complicate the semantic component; \lstinline{random-split} is merely a device for creating binary trees from strings, and does not insert silent elements (such as indices or PRO). 
+%Coping with (for example) gaps and binding will thus require additional combinatorial operations in \lstinline{random-combinator}. 
+%Alternatively, it would a richer parsing mechanisms could create and interpret structures with silent elements and movement operations.
+
+
+%Section \ref{ambiguity} discussed the process of selecting among the readings of a sentence with ambiguous quantifier scope. 
+%We can generate scope ambiguities by including among the composition operations which may be selected by the \lstinline{random-combinator} function all combinations of application and composition with the type-shifting mechanisms described in \citet{hendriks93,barker05}. (This treatment of quantifier scope is convenient, but others could be implemented by complicating the syntactic or semantic mechanisms in various ways: see e.g.\ \citet{may77,steedman2012taking}.)
+%Formally, this means that \lstinline{random-combinator} is defined as a a function which selects a composition operator $\mathit{Op}$ and then performs a stochastic recursion: depending on the outcome of a coin flip, \lstinline{random-combinator} will either output $\mathit{Op}$ or select a type-shifter $\mathcal{T}$, apply $\mathcal{T}$ to one of the arguments of $\mathit{Op}$ at random, and flip another coin to determine whether to output the result or select another type-shifter and repeat.
+%\begin{lstlisting}[mathescape]
+%(define (random-combinator)
+%  (let ([Op (uniform-draw `(FA BA FC BC ...))])
+%    (if (flip) Op
+%      (random-shift Op (random-type-shifter)))))
+%(define (random-type-shifter) (uniform-draw `(AR1 AR2 ...)))
+%(define (random-shift Op type-shifter)
+%  (let ([shifted (if (flip)
+%    ($\lambda$ (arg1 arg2) (Op (type-shifter arg1) arg2))
+%    ($\lambda$ (arg1 arg2) (Op arg1 (type-shifter arg2))))])
+%      (if (flip) shifted
+%        (random-shift shifted (random-type-shifter)))))
+%(define AR1 ($\lambda$ (f) ($\lambda$ (x) ($\lambda$ (y) (x ($\lambda$ (z) ((f z) y)))))))
+%(define AR2 ($\lambda$ (f) ($\lambda$ (x) ($\lambda$ (y) (y ($\lambda$ (z) ((f x) z)))))))
+%\end{lstlisting}
+
+
+
+
+
+
 
 \subsection{Interpreting English in Church: the Lexicon}
 \label{lexicon}
@@ -495,7 +601,7 @@ Similarly, transitive verbs such as \emph{won} and relational nouns such as \emp
 Intensionality is implicit in these definitions because the denotations of English expressions can refer to stochastic functions in the intuitive theory, such as \lstinline{gender}.
 Thus predicates pick out functions from individuals to truth-values in any world (evaluation), but the specific function that they pick out in a world depends on the random choices (e.g., values of \lstinline{flip}) that are made in the process of constructing the world. 
 \todo{Shalom: Explian why 'player' is true of the same objects in all worlds, while other semantic constants vary in denotation across worlds.}
-In these examples, \emph{player} is true of the same individuals in every world, since \lstinline{player} is defined deterministically in the intuitive theory (appendix \ref{tow}). 
+In these examples, \emph{player} is true of the same individuals in every world, since \lstinline{player} is defined deterministically in the intuitive theory (Figure \ref{tow}). 
 \emph{man}, on the other hand, denotes a predicate which will be true of a given individual (say, \lstinline{`Bob}) in 50\% of partial worlds constructed on average (assuming no relevant observations have been made). 
 This is because the denotation of \emph{man} is a function which returns 1 if and only if its argument is an individual for which the \lstinline{gender} function returns \lstinline{`male}. 
 The \lstinline{gender} function, in turn, is defined %in figure \ref{theory} 
@@ -600,6 +706,23 @@ Depending on the composition operators used by the \lstinline{meaning} function 
 \item ``For most players $x$, there was a match $y$ such that $x$ played in $y$.'' 
 \item ``For some match $y$, most players played in $y$.''
 \end{itemize}
+With \lstinline{random-combinator} defined as above, we predict the two readings of of \emph{Most players played in some match} as follows:
+\begin{itemize}
+\item The subject wide scope reading obtains when the meaning function constructs the interpretation
+$$
+\mathbf{BA}(\mathbf{FA}(\sv{most})(\sv{players})
+(\mathbf{FA}(\mathbf{AR}_2(\mathbf{AR}_1(\sv{played\ in})))
+(\mathbf{FA}(\sv{some})(\sv{match})))),
+$$  
+\item The object wide scope reading obtains when the meaning function constructs the interpretation
+$$
+\mathbf{BA}(\mathbf{FA}(\sv{most})(\sv{players})
+(\mathbf{FA}(\mathbf{AR}_1(\mathbf{AR}_2(\sv{played\ in})))
+(\mathbf{FA}(\sv{some})(\sv{match})))).
+$$  
+\end{itemize}
+
+
 %\todo{Give the (reduced) church expressions for each of these meanings, too.}
 On current assumptions, both readings are generated equally often by the \lstinline{meaning} function. 
 However, a listener will actually make use of a given reading to update her beliefs only when it is possible to condition on the reading's truth. 
@@ -826,6 +949,8 @@ In this way, our model yields a broadly Gricean explanation of quantity implicat
 
 \section{Semantic indices}
 \label{indices}
+
+\todo[inline]{semantic indices as the result of combinators? eg. maybe we should embrace POS insertion as necessary to convert from e->d to e->t...}
 
 In formal semantics \citep{lewis70,montague1973} sentence meanings are often treated as intensions: functions from semantic indices to truth functions. \todo{check: truth functions or truth values?} The semantic theory has nothing to say about how to set these indices, only that they matter and (probably) depend on context. Yet we have already seen that a probabilistic theory of pragmatic interpretation can be used to describe the ways that context influences interpretation. Can we similarly use probabilistic tools to describe the ways that semantic indices are set based on context?
 We must first decide how semantic indices should enter into the probabilistic framework presented above (where we have so far treated meanings simply as truth functions). The simplest assumption would be that they are random variables that occur (unbound) in the meaning expression and are reasoned about by the literal listener:
@@ -1062,34 +1187,6 @@ In the architecture we have described, uncertainty is pervasive through all aspe
 
 \appendix
 
-\section{An intuitive theory of Tug-of-War}
-\label{tow}
-Here we collect together the Church definitions forming our simple intuitive theory (or conceptual lexicon) for the tug-of-war domain.
- \begin{lstlisting}[mathescape]
-(define players `(Bob Jim Mary Sue Bill Evan Sally Tim Joe Jane Terrence Kate))
-(define teams `(team1 team2 team3))
-(define matches `(match1 match2 match3 match4))
-
-(define gender (mem ($\lambda$ (p) (if (flip) `male `female))))
-(define gender-mean-strength (mem ($\lambda$ (g) (gaussian 0 2))))
-(define strength (mem ($\lambda$ (p) (gaussian (gender-mean-strength (gender p)) 1))))
-
-(define team-size (uniform-draw '(1 2 3 4 5 6)))
-(define players-on-team (mem ($\lambda$ (team) (draw-n team-size players))))
-(define captain (mem ($\lambda$ (team) (uniform-draw (players-on-team team)))))
-
-(define teams-in-match (mem ($\lambda$ (match) (draw-n 2 teams))))
-(define pulling (mem ($\lambda$ (player match) (+ (strength player) (gaussian 0 0.5)))))
-(define team-pulling (mem ($\lambda$ (team match) 
-                          (sum (map ($\lambda$  (x) (pulling x match)) (players-on-team team))))))
-(define (winner match) 
-  (let ([teamA (first (teams-in-match match))]
-        [teamB (second (teams-in-match match))])
-    (if (> (team-pulling teamA match) (team-pulling teamB match))
-        teamA
-        teamB)))
-\end{lstlisting}
-
 \section{A Fragment of English for Discussing Tug-of-War}
 \label{tow-lexicon}
 
@@ -1142,41 +1239,6 @@ We have had to extend the intuitive theory with a domain of discourse capturing 
 
 \section{Random Composition}
 \label{composition}
-The \lstinline{meaning} function defined in section \ref{literal-listener} makes crucial use of two operations for interpreting utterances: \lstinline{random-split} and \lstinline{random-combinator}. 
-As usual, coping with complex linguistic phenomena require us to complicate either or both of these components.
-For current purposes, we have chosen to keep the syntactic component simple and complicate the semantic component: \lstinline{random-split} is merely a device for creating binary trees from strings, and does not insert silent elements such as indices and PRO. 
-Coping with (e.g.) gaps and binding will thus require additional combinatorial operations: see  \citep{jacobson99,steedman01,barker05} for discussion.
-Alternatively, it would a richer parsing mechanisms could create and interpret structures with silent elements and movement operations.
-
-Some obvious choices for inclusion in the set of composition operators are forward and backward function application and composition. 
-\begin{itemize}
-\item \textbf{FA}: \lstinline{(lambda (A) (lambda (B) (A B)))}
-\item \textbf{BA}: \lstinline{(lambda (A) (lambda (B) (B A)))}
-\item \textbf{FC}: \lstinline{(lambda (A) (lambda (B) (lambda (x) (A (B x)))))}
-\item \textbf{BC}: \lstinline{(lambda (A) (lambda (B) (lambda (x) (B (A x)))))}
-\end{itemize}
-
-Section \ref{ambiguity} discussed the process of selecting among the readings of a sentence with ambiguous quantifier scope. 
-We can generate scope ambiguities by including among the composition operations which may be selected by the \lstinline{random-combinator} function all combinations of application and composition with the type-shifting mechanisms described in \citet{hendriks93,barker05}. (This treatment of quantifier scope is convenient, but others could be implemented by complicating the syntactic or semantic mechanisms in various ways: see e.g.\ \citet{may77,steedman2012taking}.)
-Formally, this means that \lstinline{random-combinator} is defined as a a function which selects a composition operator $\mathit{Op}$ and then performs a stochastic recursion: depending on the outcome of a coin flip, \lstinline{random-combinator} will either output $\mathit{Op}$ or select a type-shifter $\mathcal{T}$, apply $\mathcal{T}$ to one of the arguments of $\mathit{Op}$ at random, and flip another coin to determine whether to output the result or select another type-shifter and repeat.
-\begin{lstlisting}[mathescape]
-(define (random-combinator)}
-  (let ([Op (uniform-draw `(FA BA FC BC ...))])
-    (if (flip) Op
-      (random-shift Op (random-type-shifter)))))
-(define (random-type-shifter) (uniform-draw `(AR1 AR2 ...)))
-(define (random-shift Op type-shifter)
-  (let ([shifted (if (flip)
-    ($\lambda$ (arg1 arg2) (Op (type-shifter arg1) arg2))
-    ($\lambda$ (arg1 arg2) (Op arg1 (type-shifter arg2))))])
-      (if (flip) shifted
-        (random-shift shifted (random-type-shifter)))))
-(define AR1 ($\lambda$ (f) ($\lambda$ (x) ($\lambda$ (y) (x ($\lambda$ (z) ((f z) y)))))))
-(define AR2 ($\lambda$ (f) ($\lambda$ (x) ($\lambda$ (y) (y ($\lambda$ (z) ((f x) z)))))))
-\end{lstlisting}
-The choice of type-shifters here follows \citet[][pp.453ff.]{barker05}. 
-Note that each lexical item has the potential to be interpreted in any of an infinite number of (static) types; however, the probability of associating an item with an interpretation in some type declines exponentially with the the number of type-raising operations required to construct this interpretation. 
-The use of a stochastic recursion to generate type ambiguities thus automatically enforces the preference for interpretation in lower types, a feature which is often stipulated in discussions of type-shifting \citep{partee1983generalized,partee1987noun}.
 
 With \lstinline{random-combinator} defined in this way, we predict the two readings of of \emph{Most players played in some match} as follows:
 \begin{itemize}
