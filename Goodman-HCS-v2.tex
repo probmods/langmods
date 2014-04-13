@@ -366,7 +366,7 @@ Notice that the team pulling is simply the sum of how hard each member is pullin
 (define players `(Bob Jim Mary Sue Bill Evan Sally Tim Joe Jane Terrence Kate))
 (define teams `(team1 team2 team3))
 (define matches `(match1 match2 match3 match4))
-(define domain-of-individuals (union players teams matches))
+(define individuals (union players teams matches))
 
 (define gender (mem ($\lambda$ (p) (if (flip) `male `female))))
 (define gender-mean-strength (mem ($\lambda$ (g) (gaussian 0 2))))
@@ -598,26 +598,36 @@ Similarly, transitive verbs such as \emph{won} and relational nouns such as \emp
 %
 Intensionality is implicit in these definitions because the denotations of English expressions can refer to stochastic functions in the intuitive theory, such as \lstinline{gender}.
 Thus predicates pick out functions from individuals to truth-values in any world, but the specific function that they pick out in a world can depend on random choices (e.g., values of \lstinline{flip}) that are made in the process of constructing the world. 
-For instance, \emph{player} is true of the same individuals in every world, because \lstinline{players} is defined deterministically in the intuitive theory (Figure \ref{tow}) and \lstinline{element?} is the deterministic membership function. 
-\todo{this description of man is super wordy.. simplify}
-\emph{man}, on the other hand, denotes a predicate which will be true of a given individual (say, \lstinline{`Bob}) in 50\% of worlds (assuming no relevant observations have been made). 
-This is because the denotation of \emph{man} is a function which returns true if and only if its argument is an individual for which the \lstinline{gender} function returns \lstinline{`male}. 
-The \lstinline{gender} function, in turn, is defined %in figure \ref{theory} 
-as a memoized stochastic function which takes on values \lstinline{`male} and \lstinline{`female} with equal probability for each argument in each world. 
+For instance, \emph{player} is true of the same individuals in every world, because \lstinline{players} is a fixed list (see Figure \ref{tow}) and \lstinline{element?} is the deterministic membership function. 
+On the other hand, \emph{man} denotes a predicate which will be \emph{a priori} true of a given individual (say, \lstinline{`Bob}) in 50\% of worlds---because \lstinline{gender} returns \lstinline{`male} in half of the possible worlds.
+%This is because the denotation of \emph{man} is a function which returns true if and only if its argument is an individual for which the \lstinline{gender} function returns \lstinline{`male}. 
+%The \lstinline{gender} function, in turn, is defined %in figure \ref{theory} 
+%as a memoized stochastic function which takes on values \lstinline{`male} and \lstinline{`female} with equal probability for each argument in each world. 
 
-\todo[inline]{i think GAs can be simplified if we allow a type-shifter Atheta = (lambda (f) (lambda (x) (> (f x) theta))), which can bind the degree. est can then also be simplified into a simple argmax over a set...}
+We can adopt standard meanings for functional vocabulary, such as quantifiers: 
+\sv{every} = \lstinline[mathescape]{($\lambda$ (P) ($\lambda$ (Q) (subset? P Q)))}.
+(The function \lstinline{subset?} can be defined in the standard way given a domain of discourse: \lstinline{(define (subset? P Q) (null? (filter (not Q) (filter P domain))))}. The \lstinline{domain} is defined in the background knowledge, Figure \ref{tow}.)
+%\sv{every} = \lstinline[mathescape]{($\lambda$ (P) ($\lambda$ (Q) (all (map ($\lambda$ (x) (not (and (P x) (not Q x)))) individuals))))}.
+These definitions are meant to be illustrative, rather than definitive: many alternative definitions of these items could have been used instead to illustrate the theory of language understanding described here.
 
-Gradable adjectives such as \emph{strong} and \emph{weak} denote relations between individuals and degrees \citep[][etc.]{cresswell76,vonstechow84}. 
-For instance, \sv{strong} = \lstinline[mathescape]{($\lambda$ (x) ($\lambda$ ($\theta$) (>= (strength x) $\theta$)))}, where $\theta$ is a variable over degrees (or ``thresholds'').
-The interpretation of \emph{strong} and \emph{weak} as predicates requires pragmatic inference of the value of the vague threshold value: see section \ref{indices} below.
-The relative and superlative forms are more straightforward, as the threshold is bound locally. For instance, the superlative morpheme \emph{-est} is defined so that, for example, \emph{strongest player} will denote a property that is true of Bill if and only if the greatest degree of strength that Bill possesses is equal to the greatest degree of strength that any player possesses: \\
- \sv{\text{-}est} = \lstinline[mathescape]{($\lambda$ (A) ($\lambda$ (N) ($\lambda$ ($\theta$) (= (argmax A x) (argmax ($\lambda$ ($\theta$) (some (map ($\lambda$ (x) ((A x) $\theta$)) N))))))))}.
+%\todo[inline]{i think GAs can be simplified if we allow a type-shifter Atheta = (lambda (f) (lambda (x) (> (f x) theta))), which can bind the degree. est can then also be simplified into a simple argmax over a set...}
+
+%Gradable adjectives such as \emph{strong} and \emph{weak} denote relations between individuals and degrees \citep[][etc.]{cresswell76,vonstechow84}. 
+%For instance, \sv{strong} = \lstinline[mathescape]{($\lambda$ (x) ($\lambda$ ($\theta$) (>= (strength x) $\theta$)))}, where $\theta$ is a variable over degrees (or ``thresholds'').
+%The interpretation of \emph{strong} and \emph{weak} as predicates requires pragmatic inference of the value of the vague threshold value: see section \ref{indices} below.
+
+We take gradeable adjectives, such as \emph{strong} and \emph{weak}, to denote simply functions from individuals to degrees. For instance, \sv{strong} = \lstinline[mathescape]{($\lambda$ (x) (strength x))}. 
+This denotation will require an operator to bind the degree in any sentence interpretation. In the case of the relative and superlative forms this operator will be indicated by the corresponding morpheme.
+For instance, the superlative morpheme \emph{-est} is defined so that, for example, \emph{strongest player} will denote a property that is true of an individual if and only if that individuals strength is equal to the maximum strength of all players: 
+\sv{\text{-}est} = \lstinline[mathescape]{($\lambda$ (A) ($\lambda$ (N) ($\lambda$ (x) (= (A x) (max A N)))))}.
+For the positive form, \emph{strong}, we will employ in section \ref{indices} a type shifting operator which introduces a degree variable.
+
+%The relative and superlative forms are more straightforward, as the threshold is bound locally. For instance, the superlative morpheme \emph{-est} is defined so that, for example, \emph{strongest player} will denote a property that is true of Bill if and only if the greatest degree of strength that Bill possesses is equal to the greatest degree of strength that any player possesses: \\
+% \sv{\text{-}est} = \lstinline[mathescape]{($\lambda$ (A) ($\lambda$ (N) ($\lambda$ ($\theta$) (= (argmax A x) (argmax ($\lambda$ ($\theta$) (some (map ($\lambda$ (x) ((A x) $\theta$)) N))))))))}.
 
 %\todo[inline]{Leave the threshold as an unbound variable, and define -est to bind this variable before doing its work. discuss with dan... }
 
-Finally, we can adopt standard meanings for functional vocabulary, such as quantifiers: \\
-\sv{every} = \lstinline[mathescape]{($\lambda$ (P) ($\lambda$ (Q) (all (map ($\lambda$ (x) (not (and (P x) (not Q x)))) domain-of-individuals))))}.
-These definitions are meant to be illustrative, rather than definitive: many alternative definitions of these items could have been used instead to illustrate the theory of language understanding described here.
+
 
 
 \begin{figure}[htbp]
@@ -658,10 +668,11 @@ Gradable adjectives:\\
 
 \begin{minipage}{1.0 \textwidth}
 Quantifiers and the superlative morpheme: \\
- \sv{every} = \lstinline[mathescape]{($\lambda$ (P) ($\lambda$ (Q) (all (map ($\lambda$ (x) (not (and (P x) (not Q x)))) domain-of-individuals))))}\\
- \sv{some} = \lstinline[mathescape]{($\lambda$ (P) ($\lambda$ (Q) (some (map ($\lambda$ (x) (and (P x) (Q x))) domain-of-individuals))))}\\
- \sv{most} = \lstinline[mathescape]{($\lambda$ (P) ($\lambda$ (Q) (> (proportion-true (map ($\lambda$ (x) (and (P x) (Q x))) domain-of-individuals)) .5)))}\\
- \sv{\text{-}est} = \lstinline[mathescape]{($\lambda$ (A) ($\lambda$ (N) ($\lambda$ (x) (= (argmax A x) (argmax ($\lambda$ ($\theta$) (some (map ($\lambda$ (x) (>= (A x) $\theta$)) N))))))))}\\
+ \sv{every} = \lstinline[mathescape]{($\lambda$ (P) ($\lambda$ (Q) (all (map ($\lambda$ (x) (not (and (P x) (not Q x)))) individuals))))}\\
+ \sv{some} = \lstinline[mathescape]{($\lambda$ (P) ($\lambda$ (Q) (some (map ($\lambda$ (x) (and (P x) (Q x))) individuals))))}\\
+ \sv{most} = \lstinline[mathescape]{($\lambda$ (P) ($\lambda$ (Q) (> (proportion-true (map ($\lambda$ (x) (and (P x) (Q x))) individuals)) .5)))}\\
+ %\sv{\text{-}est} = \lstinline[mathescape]{($\lambda$ (A) ($\lambda$ (N) ($\lambda$ (x) (= (argmax A x) (argmax ($\lambda$ ($\theta$) (some (map ($\lambda$ (x) (>= (A x) $\theta$)) N))))))))}\\
+ \sv{\text{-}est} = \lstinline[mathescape]{($\lambda$ (A) ($\lambda$ (N) ($\lambda$ (x) (= (A x) (max A N)))))}
 %\item \sv{the} = \lstinline[mathescape]{($\lambda$ (P) ($\lambda$ (x) (P x)))} 
 \end{minipage}
 %We have had to extend the intuitive theory with a domain of discourse capturing all the entities constructed.
@@ -670,7 +681,7 @@ Quantifiers and the superlative morpheme: \\
 \label{tow-lexicon}
 \end{figure}
 
-
+\todo{simplify quantifier denotations...}
 
 \subsection{Example interpretations}
 
@@ -1016,12 +1027,25 @@ We must first decide how semantic indices should enter into the probabilistic fr
     val
     (eval (meaning utterance))))
 \end{lstlisting}
-Here we assume that a lexical item may contain an unbound occurrence of \lstinline{index} which is then bound during interpretation by  the \lstinline{(define index ...)} definition.
+Here we assume that the meaning may contain an unbound occurrence of \lstinline{index} which is then bound during interpretation by  the \lstinline{(define index ...)} definition.
 Because there is now a joint inference over \lstinline{val} and \lstinline{index}, the index will tend to be set such that the utterance is most likely to be true. 
-To be concrete, consider the case of gradable adjectives like \emph{strong}. In section \ref{lexicon} we have defined \sv{\mathit{strong}} = \lstinline[mathescape]{($\lambda$ (x) ($\lambda$ ($\theta$) (>= (strength x) $\theta$)))}, without specifying how \lstinline[mathescape]{$\theta$} is bound in sentences such as \emph{Bob is strong}.
-We could instead define \sv{strong} = \lstinline[mathescape]{($\lambda$ (x) (>= (strength x) $\theta$))}, allowing \lstinline[mathescape]{$\theta$} to be a free semantic index variable.\footnote{We would then have to make a corresponding change
-to the meaning of \emph{-est}: it would first bind the threshold variable locally, then proceed as above to saturate the threshold.}
- After applying the \lstinline{meaning} function (and simplifying composition) the utterance ``Bob is strong'' (with \lstinline{QUD} ``how strong is Bob?'') would be interpreted via:
+To be concrete, consider the case of gradable adjectives like \emph{strong}. In section \ref{lexicon} we have defined \sv{\mathit{strong}} = \lstinline[mathescape]{($\lambda$ (x) (strength x))}; to form a property out of a positive form in a sentence like \emph{Bob is strong.} we must bind the degree in some way.
+A simple way to do this is to add a ``type-shifter'' that introduces a free threshold variable $\theta$:
+\lstinline[mathescape]{(define type-shifters `(R S AR1 AR2  T...))}, with:
+\begin{itemize}
+\item \textbf{T}:  \lstinline[mathescape]{($\lambda$ (A) ($\lambda$ (x) (> (A x) theta)))}
+\end{itemize}
+Now consider possible denotations that can be generated by \lstinline{meaning}.
+\begin{itemize}
+\item \sv{Bob\ strong}=\lstinline[mathescape]{(`Bob ($\lambda$ (x) (strength x)))}
+\item \sv{Bob\ strong}=\lstinline[mathescape]{((R `Bob) ($\lambda$ (x) (strength x)))}
+\item \sv{Bob\ strong}=\lstinline[mathescape]{((R `Bob) (T ($\lambda$ (x) (strength x))))}
+\end{itemize}
+The first of these returns \emph{error} because \lstinline{`Bob} is not a function; the second applies \lstinline{strength} to \lstinline{`Bob} and returns a degree. Both of these meanings will be removed in the \lstinline{query} of \lstinline{literal-listener} because they cannot be equal to true. The third meaning tests whether Bob is stronger than a threshold variable and returns Boolean---it is the simplest well-typed meaning.
+%, without specifying how \lstinline[mathescape]{$\theta$} is bound in sentences such as \emph{Bob is strong}.
+%We could instead define \sv{strong} = \lstinline[mathescape]{($\lambda$ (x) (>= (strength x) $\theta$))}, allowing \lstinline[mathescape]{$\theta$} to be a free semantic index variable.\footnote{We would then have to make a corresponding change
+%to the meaning of \emph{-est}: it would first bind the threshold variable locally, then proceed as above to saturate the threshold.}
+Taking this simplest well-typed meaning, the utterance ``Bob is strong'' (with \lstinline{QUD} ``how strong is Bob?'') would be interpreted via:
 \begin{lstlisting}
 (query
   ...theory...
@@ -1281,10 +1305,10 @@ The weakness scale is simply the strength scale with the sign reversed.
 
 Quantifiers and the superlative morpheme:
 \begin{itemize}
-\item \lstinline{(define domain-of-individuals (union player team match))}
-\item \sv{every} = \lstinline[mathescape]{($\lambda$ (P) ($\lambda$ (Q) (all (map ($\lambda$ (x) (not (and (P x) (not Q x)))) domain-of-individuals))))}
-\item \sv{some} = \lstinline[mathescape]{($\lambda$ (P) ($\lambda$ (Q) (some (map ($\lambda$ (x) (and (P x) (Q x))) domain-of-individuals))))}
-\item \sv{most} = \lstinline[mathescape]{($\lambda$ (P) ($\lambda$ (Q) (> (proportion-true (map ($\lambda$ (x) (and (P x) (Q x))) domain-of-individuals)) .5)))}
+\item \lstinline{(define individuals (union player team match))}
+\item \sv{every} = \lstinline[mathescape]{($\lambda$ (P) ($\lambda$ (Q) (all (map ($\lambda$ (x) (not (and (P x) (not Q x)))) individuals))))}
+\item \sv{some} = \lstinline[mathescape]{($\lambda$ (P) ($\lambda$ (Q) (some (map ($\lambda$ (x) (and (P x) (Q x))) individuals))))}
+\item \sv{most} = \lstinline[mathescape]{($\lambda$ (P) ($\lambda$ (Q) (> (proportion-true (map ($\lambda$ (x) (and (P x) (Q x))) individuals)) .5)))}
 \item \sv{\text{-}est} = \lstinline[mathescape]{($\lambda$ (A) ($\lambda$ (N) ($\lambda$ (x) (= (argmax A x) (argmax ($\lambda$ ($\theta$) (some (map ($\lambda$ (x) (>= (A x) $\theta$)) N))))))))}
 %\item \sv{the} = \lstinline[mathescape]{($\lambda$ (P) ($\lambda$ (x) (P x)))} 
 \end{itemize}
