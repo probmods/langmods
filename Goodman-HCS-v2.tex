@@ -830,66 +830,35 @@ Lines show the probability density of answers to this QUD after (a) utterances 1
 \subsection{Ambiguity}
 \label{ambiguity}
 
-The \lstinline{meaning} function will frequently associate utterances with different interpretations on different evaluations. 
+The \lstinline{meaning} function is stochastic, and will often associate utterances with several well-typed meanings. 
 Ambiguities can arise due to any of the following:
 \begin{itemize}
-\item Syntactic: \lstinline{random-split} will generate possibly different syntactic structures for an utterance on each evaluation. 
-If more than one of these structures is interpretable using the composition operators available, the literal listener may entertain interpretations with different syntactic structures.
-\item Compositional: Holding the syntactic structure fixed, various choice of composition operators by the \lstinline{random-combinator} function may lead to well-typed outputs. 
-Depending on the composition operators available, this may lead to (e.g.) ambiguities of quantifier scope and in whether a pronoun is bound or free.
-\item Lexical: the \lstinline{lexicon} function may be stochastic, returning different options for a single item, or words may have intrinsically stochastic meanings (and the former may be converted to the latter). 
+\item Syntactic: \lstinline{random-split} can generate different syntactic structures for an utterance. 
+If more than one of these structures is interpretable (using the type-shifting operators available), the literal listener will entertain interpretations with different syntactic structures.
+\item Compositional: Holding the syntactic structure fixed, insertion of different (and different numbers of) type-shifting operators by \lstinline{shift} may lead to well-typed outputs. This can lead, for example, to ambiguities of quantifier scope and in whether a pronoun is bound or free.
+\item Lexical: the \lstinline{lexicon} function may be stochastic, returning different options for a single item, or words may have intrinsically stochastic meanings. (The former can always be converted to the latter.)
 \end{itemize}
-In the literal interpretation model we have given above, \lstinline{literal-listener}, these sources of linguistic ambiguity will automatically interact with the interpreter's beliefs about the world.
- When a sentence is ambiguous in any of these ways, the listener will favor plausible interpretations over implausible ones, because the interpreter's model of the world is more likely to generate scenarios which make the sentence true under these interpretations. 
-Implausible interpretations, on the other hand, lead to frequent rejection by \lstinline{query} due to their inconsistency with background information.
+In the literal interpretation model we have given above, \lstinline{literal-listener}, these sources of linguistic ambiguity will interact with the interpreter's beliefs about the world.
+That is, the \lstinline{query} implies a \emph{joint inference} of sentence meaning and world, given that the meaning is true of the world.
+When a sentence is ambiguous in any of the above ways, the listener will favor plausible interpretations over implausible ones, because the interpreter's model of the world is more likely to generate scenarios which make the sentence true. 
+%Implausible interpretations, on the other hand, lead to frequent rejection by \lstinline{query} due to their inconsistency with background information.
 
 For example, consider the utterance ``Most players played in some match''. 
-Depending on the composition operators used by the \lstinline{meaning} function in a given application, two interpretations are possible (given in reduced form here; see appendix \ref{composition} for compositional details):
+Two (simplest, well-typed) interpretations are possible. We give an intuitive paraphrase and the meanings for each (leaving lexical items in place to expose the compsitional structure):
 \begin{itemize}
-\item ``For most players $x$, there was a match $y$ such that $x$ played in $y$.'' 
-\item ``For some match $y$, most players played in $y$.''
+\item Subject wide scope:
+\subitem ``For most players $x$, there was a match $y$ such that $x$ played in $y$.'' 
+\subitem ((R (\sv{Most} \sv{players})) ((AR2 (AR1 \sv{played\ in})) (\sv{some} \sv{match})))
+\item Object wide scope: 
+\subitem ``For some match $y$, most players played in $y$.''
+\subitem ((R (\sv{Most} \sv{players})) ((AR1 (AR2 \sv{played\ in})) (\sv{some} \sv{match})))
 \end{itemize}
-With \lstinline{random-combinator} defined as above, we predict the two readings of of \emph{Most players played in some match} as follows:
-\begin{itemize}
-\item The subject wide scope reading obtains when the meaning function constructs the interpretation
-$$
-\mathbf{BA}(\mathbf{FA}(\sv{most})(\sv{players})
-(\mathbf{FA}(\mathbf{AR}_2(\mathbf{AR}_1(\sv{played\ in})))
-(\mathbf{FA}(\sv{some})(\sv{match})))),
-$$  
-\item The object wide scope reading obtains when the meaning function constructs the interpretation
-$$
-\mathbf{BA}(\mathbf{FA}(\sv{most})(\sv{players})
-(\mathbf{FA}(\mathbf{AR}_1(\mathbf{AR}_2(\sv{played\ in})))
-(\mathbf{FA}(\sv{some})(\sv{match})))).
-$$  
-\end{itemize}
+\todo{Give the (reduced) church expressions for each of these meanings, too?}
+Both readings equally \emph{a priori} probable, since the \lstinline{meaning} function draws type-shifters uniformly at random. 
+However, if one reading is more likely to be true, given background knowledge, it will be preferred.
+This means that we can influence the probability of each reading, and the degree to which each influences the listener's posterior belief, by manipulating relevant world knowledge: for instance, the number of players on each team and the number of matches played.
 
-
-%With \lstinline{random-combinator} defined in this way, we predict the two readings of of \emph{Most players played in some match} as follows:
-%\begin{itemize}
-%\item The subject wide scope reading obtains when the meaning function constructs the interpretation
-%$$
-%\mathbf{BA}(\mathbf{FA}(\sv{most})(\sv{players})
-%(\mathbf{FA}(\mathbf{AR}_2(\mathbf{AR}_1(\sv{played\ in})))
-%(\mathbf{FA}(\sv{some})(\sv{match})))),
-%$$  
-%\item The object wide scope reading obtains when the meaning function constructs the interpretation
-%$$
-%\mathbf{BA}(\mathbf{FA}(\sv{most})(\sv{players})
-%(\mathbf{FA}(\mathbf{AR}_1(\mathbf{AR}_2(\sv{played\ in})))
-%(\mathbf{FA}(\sv{some})(\sv{match})))).
-%$$  
-%\end{itemize}
-
-
-
-%\todo{Give the (reduced) church expressions for each of these meanings, too.}
-On current assumptions, both readings are generated equally often by the \lstinline{meaning} function. 
-However, a listener will actually make use of a given reading to update her beliefs only when it is possible to condition on the reading's truth. 
-This means that we can influence the probability of each reading, and so the degree to which each influences the listener's posterior belief, by manipulating relevant world knowledge: for instance, the number of players on each team and the number of matches played.
-
-For example, suppose that the listener has observed that ten matches were played:
+Suppose that the listener has observed that ten matches were played:
 \begin{lstlisting}
 (query
   ...ToW theory...
