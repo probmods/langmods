@@ -518,8 +518,9 @@ Random choices made to construct and evaluate the meaning will be reasoned about
 %we then return to the tug-of-war example from the previous section and begin to build a lexicon for talking about this domain in natural language. 
 
 \subsection{Random type shifting}
+\label{typeshift}
 
-The above definition for \lstinline{meaning} always results in composition by forward application; this is too limited to generate potential meanings for many sentences. For instance ``Bob runs.'' requires a \emph{backward} application to apply the meaning of ``runs'' to that of ``Bob''. We extend the possible composition methods by allowing the insertion of type-shifting operators. See  \citep{jacobson99,steedman01,barker05} for discussion of such approaches.
+The above definition for \lstinline{meaning} always results in composition by forward application; this is too limited to generate potential meanings for many sentences. For instance ``Bob runs.'' requires a \emph{backward} application to apply the meaning of ``runs'' to that of ``Bob''. We extend the possible composition methods by allowing the insertion of type-shifting operators.
 \begin{lstlisting}
 (define (meaning utterance)
   (if (lexical-item? utterance)
@@ -533,8 +534,8 @@ The above definition for \lstinline{meaning} always results in composition by fo
   
 (define type-shifters `(R S AR1 AR2 ...))
 \end{lstlisting}
-Each intermediate meaning will be shifted zero or more times by a randomly chosen type-shifter; because the number of shifts is determined by a stochastic recursion, fewer shifts are \emph{a priori} more likely (with no shift being most likely of all). 
-Each lexical item thus has the potential to be interpreted in any of an infinite number of (static) types; however, the probability of associating an item with an interpretation in some type declines exponentially with the the number of type-raising operations required to construct this interpretation. 
+Each intermediate meaning will be shifted zero or more times by a randomly chosen type-shifter; because the number of shifts is determined by a stochastic recursion, fewer shifts are \emph{a priori} more likely. 
+Each lexical item thus has the potential to be interpreted in any of an infinite number of (static) types, but the probability of associating an item with an interpretation in some type declines exponentially with the the number of type-raising operations required to construct this interpretation. 
 The use of a stochastic recursion to generate type ambiguities thus automatically enforces the preference for interpretation in lower types, a feature which is often stipulated in discussions of type-shifting \citep{partee1983generalized,partee1987noun}.
 
 We choose a small set of type shifters which is sufficient for the examples of this chapter:
@@ -545,7 +546,11 @@ We choose a small set of type shifters which is sufficient for the examples of t
 \item \textbf{AR2}: \lstinline[mathescape]{($\lambda$ (f) ($\lambda$ (x) ($\lambda$ (y) (y ($\lambda$ (z) ((f x) z))))))}
 \end{itemize}
 Among other ways they can be used, the shifter \textbf{R} enables backward application and \textbf{S} enables composition.
-Type shifters \textbf{AR1} and \textbf{AR2} allow flexible quantifier scope as described in \citet{hendriks93,barker05} (the specific choice here follows \citet[][pp.453ff.]{barker05}). This treatment of quantifier scope is convenient, but others could be implemented by complicating the syntactic or semantic mechanisms in various ways: see e.g.~\citet{may77,steedman2012taking}.
+For instance, \emph{Bob runs} has an additional possible meaning \lstinline[mathescape]{((R `Bob) runs)} which applies the meanings of \emph{runs} to that of \emph{Bob}, as required.
+
+Type shifters \textbf{AR1} and \textbf{AR2} allow flexible quantifier scope as described in \citet{hendriks93,barker05}. \citep[The specific choice here follows][pp.453ff.]{barker05} 
+We explore the ramifications of the different possible scopes in section \ref{ambiguity}.
+This treatment of quantifier scope is convenient, and not uncommon \citep{jacobson99,steedman01}, but others could be implemented by complicating the syntactic or semantic mechanisms in various ways: see e.g.~\citet{may77,steedman2012taking}.
 
 %The purpose of this chapter is not to give a systematic treatment of compositional semantics, but we do want a system of composition which is sufficient to expose the interaction between probabilistic interpretation and compositional phenomena such as quantifier scope.
 %Coping with complex linguistic phenomena requires us to complicate either or both of the syntactic (\lstinline{random-split}) or semantic (\lstinline{random-combinator}) operations. We choose to complicate the semantic component; \lstinline{random-split} is merely a device for creating binary trees from strings, and does not insert silent elements (such as indices or PRO). 
@@ -583,32 +588,69 @@ Type shifters \textbf{AR1} and \textbf{AR2} allow flexible quantifier scope as d
 Natural language utterances are interpreted as Church expressions by the \lstinline{meaning} function---the stochastic $\lambda$-calculus (implemented in Church) thus functions as our intermediate language, just as the ordinary, simply-typed $\lambda$-calculus functions as an intermediate translation language in the fragment of English given by \citet{montague1973}. 
 A key difference, however, is that the intermediate level is not merely a convenience as in Montague's approach. 
 Conceptual representations and world knowledge are also represented in this language (as Church function definitions)---use of a common language to represent linguistic and non-linguistic information allows lexical semantics to be grounded in conceptual structure, leading to intricate interactions between these two types of knowledge. In this section we continue our running tug-of-war example, now specifying a lexicon mapping english words to Church expressions for communicating about this domain.
-%In this section we sketch out a formal fragment of English appropriate for talking about the tug-of-war domain described earlier. The complete lexicon is given in appendix \ref{tow-lexicon}, for reference.
 
-For simplicity we write the denotations of utterances and words, \lstinline[mathescape]{(meaning $\cdot$)} and \lstinline[mathescape]{(lexicon $\cdot$)}, both as \denot{\cdot}. A summary of the lexicon we will use for the tug-of-war domains is shown in Figure \ref{tow-lexicon}.
-The simplest case is the interpretation of a name as a Church symbol, which serves as the unique mental token for some object or individual (the name-bearer). For instance, \denot{Bob} = \lstinline{`Bob}.
-Interpreted in this way, names are directly referential since they are interpreted using the same symbol in every situation, regardless of inferences made during interpretation. 
-%does not depend on stochastic choices made in the interpretation process.
-
+For simplicity we write the denotations of utterances and words, \lstinline[mathescape]{(meaning $\cdot$)} and \lstinline[mathescape]{(lexicon $\cdot$)}, both as \denot{\cdot}.
+The simplest case is the interpretation of a name as a Church symbol, which serves as the unique mental token for some object or individual (the name-bearer).
+\begin{itemize}
+\item \sv{Bob}: \lstinline{`Bob} 
+\item \sv{Team\ 1}: \lstinline{`team1} 
+\item \sv{Match\ 1}: \lstinline{`match1}
+\item ...
+\end{itemize}
+Interpreted in this way names are directly referential since they are interpreted using the same symbol in every situation, regardless of inferences made during interpretation. 
+For simplicity, we assume that the conjunction of NPs forms a list, \sv{and} = \lstinline[mathescape]{list}; for instance, \emph{Team 1 and Team 2} denotes  \lstinline{(list `team1 `team2)}. Compare the set-based account of plurals described in Scha \& Winter, this volume.
 
 A one-place predicate such as \emph{player} or \emph{man} is interpreted as a function from individuals to truth-values. 
-For example, 
-\sv{man} = \lstinline[mathescape]{($\lambda$ (x) (equal? (gender x) `male))} or \sv{player} = \lstinline[mathescape]{($\lambda$ (x) (element? x players))}.
-Similarly, transitive verbs such as \emph{won} and relational nouns such as \emph{captain} denote two-place predicates. For instance, \sv{won} = \lstinline[mathescape]{($\lambda$ (match) ($\lambda$ (x) (equal? x (winner match))))} (we simplify throughout by ignoring tense).
-%
+\begin{itemize}
+\item  \sv{player}: \lstinline[mathescape]{($\lambda$ (x) (element? x players))}
+\item \sv{team}: \lstinline[mathescape]{($\lambda$ (x) (element? x teams))}
+\item \sv{match}: \lstinline[mathescape]{($\lambda$ (x) (element? x matches))}
+\item \sv{man}: \lstinline[mathescape]{($\lambda$ (x) (equal? (gender x) `male))}
+\item \sv{woman}: \lstinline[mathescape]{($\lambda$ (x) (equal? (gender x) `female))}
+\end{itemize}
+Similarly, transitive verbs such as \emph{won} and relational nouns such as \emph{captain} denote two-place predicates. (We simplify throughout by ignoring tense.)
+\begin{itemize}
+\item  \sv{won}: \lstinline[mathescape]{($\lambda$ (match) ($\lambda$ (x) (equal? x (winner match))))}
+\item \sv{played\ in}:  \lstinline[mathescape]{($\lambda$ (match) ($\lambda$ (team-list) (all (map ($\lambda$  (x) (element? x (teams-in-match match)))) team-list)))}
+\item \sv{is\ on}:  \lstinline[mathescape]{($\lambda$ (team) ($\lambda$ (x) (element? x (players-on-team team))))}
+\item \sv{captain}: \lstinline[mathescape]{($\lambda$ (team) ($\lambda$ (x) (equal? x (captain team))))}
+\end{itemize}
+Note that the denotation of \emph{played in} takes a list of individuals as its second argument, but that the order of elements in the list does not matter.
+\todo{where is this set-based plural business used? this def of played in is kind of messy. do we need a shifter that can make a list from an individual?}
+
 Intensionality is implicit in these definitions because the denotations of English expressions can refer to stochastic functions in the intuitive theory, such as \lstinline{gender}.
 Thus predicates pick out functions from individuals to truth-values in any world, but the specific function that they pick out in a world can depend on random choices (e.g., values of \lstinline{flip}) that are made in the process of constructing the world. 
 For instance, \emph{player} is true of the same individuals in every world, because \lstinline{players} is a fixed list (see Figure \ref{tow}) and \lstinline{element?} is the deterministic membership function. 
-On the other hand, \emph{man} denotes a predicate which will be \emph{a priori} true of a given individual (say, \lstinline{`Bob}) in 50\% of worlds---because \lstinline{gender} returns \lstinline{`male} in half of the possible worlds.
-%This is because the denotation of \emph{man} is a function which returns true if and only if its argument is an individual for which the \lstinline{gender} function returns \lstinline{`male}. 
-%The \lstinline{gender} function, in turn, is defined %in figure \ref{theory} 
-%as a memoized stochastic function which takes on values \lstinline{`male} and \lstinline{`female} with equal probability for each argument in each world. 
+On the other hand, \emph{man} denotes a predicate which will be \emph{a priori} true of a given individual (say, \lstinline{`Bob}) in 50\% of worlds---because the memoized stochastic function \lstinline{gender} returns \lstinline{`male} in half of the possible worlds.
 
-We can adopt standard meanings for functional vocabulary, such as quantifiers: 
-\sv{every} = \lstinline[mathescape]{($\lambda$ (P) ($\lambda$ (Q) (subset? P Q)))}.
-(The function \lstinline{subset?} can be defined in the standard way given a domain of discourse: \lstinline{(define (subset? P Q) (null? (filter (not Q) (filter P domain))))}. The \lstinline{domain} is defined in the background knowledge, Figure \ref{tow}.)
+We can generally adopt standard meanings for functional vocabulary, such as quantifiers. 
+\begin{itemize}
+\item \sv{every}: \lstinline[mathescape]{($\lambda$ (P) ($\lambda$ (Q) (= (size P) (size (intersect P Q)))))}
+\item \sv{some}: \lstinline[mathescape]{($\lambda$ (P) ($\lambda$ (Q) (< 0 (size (intersect P Q)))))}
+\item \sv{most}: \lstinline[mathescape]{($\lambda$ (P) ($\lambda$ (Q) (< (size P) (* 2 (size (intersect P Q))))))}
+\end{itemize}
+For simplicity we have written the quantifiers in terms of set size; the \lstinline{size} function can be defined in terms of the \lstinline{domain} of individuals as \lstinline[mathescape]{($\lambda$ (S) (length (filter S domain)))}.
+
+We take gradeable adjectives, such as \emph{strong}, to denote simply functions from individuals to degrees \citet[Cf.][]{neeleman2004degree}. 
+\begin{itemize}
+\item \sv{strong}: \lstinline[mathescape]{($\lambda$ (x) (strength x))}
+\item \sv{weak}: \lstinline[mathescape]{($\lambda$ (x) (- (strength x)))}
+\end{itemize}
+This denotation will require an operator to bind the degree in any sentence interpretation. In the case of the relative and superlative forms this operator will be indicated by the corresponding morpheme.
+For instance, the superlative morpheme \emph{-est} is defined so that \emph{strongest player} will denote a property that is true of an individual when that individual's strength is equal to the maximum strength of all players: 
+\begin{itemize}
+\item \sv{\text{-}est}: \lstinline[mathescape]{($\lambda$ (A) ($\lambda$ (N) ($\lambda$ (x) (= (A x) (max A N)))))}
+\end{itemize}
+(Note that we assume the set operator \lstinline{max} implicitly quantifies over the domain of discourse.)
+For positive form sentences, such as \emph{Bob is strong}, we will employ a type shifting operator which introduces a degree threshold to bind the degree---see section \ref{indices}.
+
+
+
+%For example: 
+%\sv{every} = \lstinline[mathescape]{($\lambda$ (P) ($\lambda$ (Q) (subset? P Q)))}.
+%Where the function \lstinline{subset?} is be defined in the obvious way given a domain of discourse: \lstinline{(define (subset? P Q) (null? (filter (not Q) (filter P domain))))}. The \lstinline{domain} is defined in the background knowledge, Figure \ref{tow}.
 %\sv{every} = \lstinline[mathescape]{($\lambda$ (P) ($\lambda$ (Q) (all (map ($\lambda$ (x) (not (and (P x) (not Q x)))) individuals))))}.
-These definitions are meant to be illustrative, rather than definitive: many alternative definitions of these items could have been used instead to illustrate the theory of language understanding described here.
+%Alternative definitions of these items could have been used instead to illustrate the theory of language understanding described here.
 
 %\todo[inline]{i think GAs can be simplified if we allow a type-shifter Atheta = (lambda (f) (lambda (x) (> (f x) theta))), which can bind the degree. est can then also be simplified into a simple argmax over a set...}
 
@@ -616,72 +658,66 @@ These definitions are meant to be illustrative, rather than definitive: many alt
 %For instance, \sv{strong} = \lstinline[mathescape]{($\lambda$ (x) ($\lambda$ ($\theta$) (>= (strength x) $\theta$)))}, where $\theta$ is a variable over degrees (or ``thresholds'').
 %The interpretation of \emph{strong} and \emph{weak} as predicates requires pragmatic inference of the value of the vague threshold value: see section \ref{indices} below.
 
-We take gradeable adjectives, such as \emph{strong} and \emph{weak}, to denote simply functions from individuals to degrees. For instance, \sv{strong} = \lstinline[mathescape]{($\lambda$ (x) (strength x))}. 
-This denotation will require an operator to bind the degree in any sentence interpretation. In the case of the relative and superlative forms this operator will be indicated by the corresponding morpheme.
-For instance, the superlative morpheme \emph{-est} is defined so that, for example, \emph{strongest player} will denote a property that is true of an individual if and only if that individuals strength is equal to the maximum strength of all players: 
-\sv{\text{-}est} = \lstinline[mathescape]{($\lambda$ (A) ($\lambda$ (N) ($\lambda$ (x) (= (A x) (max A N)))))}.
-For the positive form, \emph{strong}, we will employ in section \ref{indices} a type shifting operator which introduces a degree variable.
-
 %The relative and superlative forms are more straightforward, as the threshold is bound locally. For instance, the superlative morpheme \emph{-est} is defined so that, for example, \emph{strongest player} will denote a property that is true of Bill if and only if the greatest degree of strength that Bill possesses is equal to the greatest degree of strength that any player possesses: \\
 % \sv{\text{-}est} = \lstinline[mathescape]{($\lambda$ (A) ($\lambda$ (N) ($\lambda$ ($\theta$) (= (argmax A x) (argmax ($\lambda$ ($\theta$) (some (map ($\lambda$ (x) ((A x) $\theta$)) N))))))))}.
 
 %\todo[inline]{Leave the threshold as an unbound variable, and define -est to bind this variable before doing its work. discuss with dan... }
 
 
-
-
-\begin{figure}[htbp]
-%For each person, team, and match entity we have an associated name:
-
-\begin{minipage}{0.3 \textwidth}
-Entities:\\
-\sv{Bob} = \lstinline{`Bob} \\
-\sv{Team\ 1} = \lstinline{`team1} \\
-\sv{Match\ 1} = \lstinline{`match1} \\
-...
-\end{minipage}
-\begin{minipage}{0.6 \textwidth}
-Properties:\\
- \sv{player} = \lstinline[mathescape]{($\lambda$ (x) (element? x players))}  \\
- \sv{team} = \lstinline[mathescape]{($\lambda$ (x) (element? x teams))}\\
- \sv{match} = \lstinline[mathescape]{($\lambda$ (x) (element? x matches))}\\
- \sv{man} = \lstinline[mathescape]{($\lambda$ (x) (equal? (gender x) `male))}\\
- \sv{woman} = \lstinline[mathescape]{($\lambda$ (x) (equal? (gender x) `female))}
-\end{minipage}
-
-\begin{minipage}{1.0 \textwidth}
-Transitive verbs:\\
- \sv{won}: \lstinline[mathescape]{($\lambda$ (match) ($\lambda$ (x) (equal? x (winner match))))}\\
- \sv{played\ in}:  \lstinline[mathescape]{($\lambda$ (match) ($\lambda$ (team-list) (all (map ($\lambda$  (x) (element? x (teams-in-match match)))) team-list)))}\\
- \sv{be\ on}:  \lstinline[mathescape]{($\lambda$ (team) ($\lambda$ (x) (element? x (players-on-team team))))} \\
- \sv{captain}: \lstinline[mathescape]{($\lambda$ (team) ($\lambda$ (x) (equal? x (captain team))))}
-\end{minipage}
-
-%We assume that the conjoined NP \emph{Team 1 and Team 2} denotes the list \lstinline{`(team1 team2)}; compare the set-based account of plurals described in Scha \& Winter, this volume.
-%Note that the denotation of \emph{played in} takes such a list as its second argument, but that the order of elements in the list does not matter.
-
-\begin{minipage}{1.0 \textwidth}
-Gradable adjectives:\\
- \sv{strong} = \lstinline[mathescape]{($\lambda$ (x) ($\lambda$ ($\theta$) (>= (strength x) $\theta$)))}\\
- \sv{weak} = \lstinline[mathescape]{($\lambda$ (x) ($\lambda$ ($\theta$) (>= (- (strength x)) $\theta$)))}
-\end{minipage}
-
-\begin{minipage}{1.0 \textwidth}
-Quantifiers and the superlative morpheme: \\
- \sv{every} = \lstinline[mathescape]{($\lambda$ (P) ($\lambda$ (Q) (all (map ($\lambda$ (x) (not (and (P x) (not Q x)))) individuals))))}\\
- \sv{some} = \lstinline[mathescape]{($\lambda$ (P) ($\lambda$ (Q) (some (map ($\lambda$ (x) (and (P x) (Q x))) individuals))))}\\
- \sv{most} = \lstinline[mathescape]{($\lambda$ (P) ($\lambda$ (Q) (> (proportion-true (map ($\lambda$ (x) (and (P x) (Q x))) individuals)) .5)))}\\
- %\sv{\text{-}est} = \lstinline[mathescape]{($\lambda$ (A) ($\lambda$ (N) ($\lambda$ (x) (= (argmax A x) (argmax ($\lambda$ ($\theta$) (some (map ($\lambda$ (x) (>= (A x) $\theta$)) N))))))))}\\
- \sv{\text{-}est} = \lstinline[mathescape]{($\lambda$ (A) ($\lambda$ (N) ($\lambda$ (x) (= (A x) (max A N)))))}
-%\item \sv{the} = \lstinline[mathescape]{($\lambda$ (P) ($\lambda$ (x) (P x)))} 
-\end{minipage}
-%We have had to extend the intuitive theory with a domain of discourse capturing all the entities constructed.
-
-\caption{A fragment of English for discussing tug-of-war. These denotations depend on the concept definitions in Figure \ref{tow-theory}.}
-\label{tow-lexicon}
-\end{figure}
-
-\todo{simplify quantifier denotations...}
+%
+%
+%\begin{figure}[htbp]
+%%For each person, team, and match entity we have an associated name:
+%
+%\begin{minipage}{0.3 \textwidth}
+%Entities:\\
+%\sv{Bob} = \lstinline{`Bob} \\
+%\sv{Team\ 1} = \lstinline{`team1} \\
+%\sv{Match\ 1} = \lstinline{`match1} \\
+%...
+%\end{minipage}
+%\begin{minipage}{0.6 \textwidth}
+%Properties:\\
+% \sv{player} = \lstinline[mathescape]{($\lambda$ (x) (element? x players))}  \\
+% \sv{team} = \lstinline[mathescape]{($\lambda$ (x) (element? x teams))}\\
+% \sv{match} = \lstinline[mathescape]{($\lambda$ (x) (element? x matches))}\\
+% \sv{man} = \lstinline[mathescape]{($\lambda$ (x) (equal? (gender x) `male))}\\
+% \sv{woman} = \lstinline[mathescape]{($\lambda$ (x) (equal? (gender x) `female))}
+%\end{minipage}
+%
+%\begin{minipage}{1.0 \textwidth}
+%Transitive verbs:\\
+% \sv{won}: \lstinline[mathescape]{($\lambda$ (match) ($\lambda$ (x) (equal? x (winner match))))}\\
+% \sv{played\ in}:  \lstinline[mathescape]{($\lambda$ (match) ($\lambda$ (team-list) (all (map ($\lambda$  (x) (element? x (teams-in-match match)))) team-list)))}\\
+% \sv{be\ on}:  \lstinline[mathescape]{($\lambda$ (team) ($\lambda$ (x) (element? x (players-on-team team))))} \\
+% \sv{captain}: \lstinline[mathescape]{($\lambda$ (team) ($\lambda$ (x) (equal? x (captain team))))}
+%\end{minipage}
+%
+%%We assume that the conjoined NP \emph{Team 1 and Team 2} denotes the list \lstinline{`(team1 team2)}; compare the set-based account of plurals described in Scha \& Winter, this volume.
+%%Note that the denotation of \emph{played in} takes such a list as its second argument, but that the order of elements in the list does not matter.
+%
+%\begin{minipage}{1.0 \textwidth}
+%Gradable adjectives:\\
+% \sv{strong} = \lstinline[mathescape]{($\lambda$ (x) ($\lambda$ ($\theta$) (>= (strength x) $\theta$)))}\\
+% \sv{weak} = \lstinline[mathescape]{($\lambda$ (x) ($\lambda$ ($\theta$) (>= (- (strength x)) $\theta$)))}
+%\end{minipage}
+%
+%\begin{minipage}{1.0 \textwidth}
+%Quantifiers and the superlative morpheme: \\
+% \sv{every} = \lstinline[mathescape]{($\lambda$ (P) ($\lambda$ (Q) (all (map ($\lambda$ (x) (not (and (P x) (not Q x)))) individuals))))}\\
+% \sv{some} = \lstinline[mathescape]{($\lambda$ (P) ($\lambda$ (Q) (some (map ($\lambda$ (x) (and (P x) (Q x))) individuals))))}\\
+% \sv{most} = \lstinline[mathescape]{($\lambda$ (P) ($\lambda$ (Q) (> (proportion-true (map ($\lambda$ (x) (and (P x) (Q x))) individuals)) .5)))}\\
+% %\sv{\text{-}est} = \lstinline[mathescape]{($\lambda$ (A) ($\lambda$ (N) ($\lambda$ (x) (= (argmax A x) (argmax ($\lambda$ ($\theta$) (some (map ($\lambda$ (x) (>= (A x) $\theta$)) N))))))))}\\
+% \sv{\text{-}est} = \lstinline[mathescape]{($\lambda$ (A) ($\lambda$ (N) ($\lambda$ (x) (= (A x) (max A N)))))}
+%%\item \sv{the} = \lstinline[mathescape]{($\lambda$ (P) ($\lambda$ (x) (P x)))} 
+%\end{minipage}
+%%We have had to extend the intuitive theory with a domain of discourse capturing all the entities constructed.
+%
+%\caption{A fragment of English for discussing tug-of-war. These denotations depend on the concept definitions in Figure \ref{tow-theory}.}
+%\label{tow-lexicon}
+%\end{figure}
+%
+%\todo{simplify quantifier denotations...}
 
 \subsection{Example interpretations}
 
@@ -750,7 +786,11 @@ However, the utterance is more likely to be true if Jim's strength falls into th
 Conditioning via \lstinline{query} automatically integrates these two sources of uncertainty, concluding that utterance 5 favors low values of \lstinline{(strength `Jim)} and adjusting the inferred strength of his opponent Bob accordingly. 
 \todo{Shalom: Explain how this integration of different sources of uncertainty through conditioning, to update a probability value for stength, works.}
 
-\subsection{\label{ambiguity}Ambiguity}
+
+
+\subsection{Ambiguity}
+\label{ambiguity}
+
 The \lstinline{meaning} function will frequently associate utterances with different interpretations on different evaluations. 
 Ambiguities can arise due to any of the following:
 \begin{itemize}
@@ -785,6 +825,24 @@ $$
 (\mathbf{FA}(\sv{some})(\sv{match})))).
 $$  
 \end{itemize}
+
+
+%With \lstinline{random-combinator} defined in this way, we predict the two readings of of \emph{Most players played in some match} as follows:
+%\begin{itemize}
+%\item The subject wide scope reading obtains when the meaning function constructs the interpretation
+%$$
+%\mathbf{BA}(\mathbf{FA}(\sv{most})(\sv{players})
+%(\mathbf{FA}(\mathbf{AR}_2(\mathbf{AR}_1(\sv{played\ in})))
+%(\mathbf{FA}(\sv{some})(\sv{match})))),
+%$$  
+%\item The object wide scope reading obtains when the meaning function constructs the interpretation
+%$$
+%\mathbf{BA}(\mathbf{FA}(\sv{most})(\sv{players})
+%(\mathbf{FA}(\mathbf{AR}_1(\mathbf{AR}_2(\sv{played\ in})))
+%(\mathbf{FA}(\sv{some})(\sv{match})))).
+%$$  
+%\end{itemize}
+
 
 
 %\todo{Give the (reduced) church expressions for each of these meanings, too.}
@@ -1014,10 +1072,8 @@ In this way, our model yields a broadly Gricean explanation of quantity implicat
 \section{Semantic indices}
 \label{indices}
 
-\todo[inline]{semantic indices as the result of combinators? eg. maybe we should embrace POS insertion as necessary to convert from e->d to e->t...}
-
 In formal semantics \citep{lewis70,montague1973} sentence meanings are often treated as intensions: functions from semantic indices to truth functions. \todo{check: truth functions or truth values?} The semantic theory has nothing to say about how to set these indices, only that they matter and (probably) depend on context. Yet we have already seen that a probabilistic theory of pragmatic interpretation can be used to describe the ways that context influences interpretation. Can we similarly use probabilistic tools to describe the ways that semantic indices are set based on context?
-We must first decide how semantic indices should enter into the probabilistic framework presented above (where we have so far treated meanings simply as truth functions). The simplest assumption would be that they are random variables that occur (unbound) in the meaning expression and are reasoned about by the literal listener:
+We must first decide how semantic indices should enter into the probabilistic framework presented above (where we have so far treated meanings simply as truth functions). The simplest assumption is that they are random variables that occur (unbound) in the meaning expression and are reasoned about by the literal listener:
 \begin{lstlisting}
 (define (literal-listener utterance QUD)
   (query
@@ -1029,24 +1085,25 @@ We must first decide how semantic indices should enter into the probabilistic fr
 \end{lstlisting}
 Here we assume that the meaning may contain an unbound occurrence of \lstinline{index} which is then bound during interpretation by  the \lstinline{(define index ...)} definition.
 Because there is now a joint inference over \lstinline{val} and \lstinline{index}, the index will tend to be set such that the utterance is most likely to be true. 
-To be concrete, consider the case of gradable adjectives like \emph{strong}. In section \ref{lexicon} we have defined \sv{\mathit{strong}} = \lstinline[mathescape]{($\lambda$ (x) (strength x))}; to form a property out of a positive form in a sentence like \emph{Bob is strong.} we must bind the degree in some way.
-A simple way to do this is to add a ``type-shifter'' that introduces a free threshold variable $\theta$:
-\lstinline[mathescape]{(define type-shifters `(R S AR1 AR2  T...))}, with:
+
+To be concrete, consider the case of gradable adjectives like \emph{strong}. In section \ref{lexicon} we have defined \sv{\mathit{strong}} = \lstinline[mathescape]{($\lambda$ (x) (strength x))}; to form a property from the adjective in a positive form sentence like \emph{Bob is strong}, we must bind the degree returned from \lstinline{strength} in some way.
+A simple way to do this is to add a ``type-shifter'' that introduces a free threshold variable $\theta$ \citep[See for example][]{neeleman2004degree}. We extend the set of type shifters that can be inserted by \lstinline{shift} (see section \ref{typeshift}) with:
 \begin{itemize}
-\item \textbf{T}:  \lstinline[mathescape]{($\lambda$ (A) ($\lambda$ (x) (> (A x) theta)))}
+\item \textbf{T}:  \lstinline[mathescape]{($\lambda$ (A) ($\lambda$ (x) (>= (A x) $\theta$)))}
 \end{itemize}
+In this denotation the variable \lstinline[mathescape]{$\theta$} is a free index that will be bound during interpretation as above.
 Now consider possible denotations that can be generated by \lstinline{meaning}.
 \begin{itemize}
 \item \sv{Bob\ strong}=\lstinline[mathescape]{(`Bob ($\lambda$ (x) (strength x)))}
 \item \sv{Bob\ strong}=\lstinline[mathescape]{((R `Bob) ($\lambda$ (x) (strength x)))}
 \item \sv{Bob\ strong}=\lstinline[mathescape]{((R `Bob) (T ($\lambda$ (x) (strength x))))}
 \end{itemize}
-The first of these returns \emph{error} because \lstinline{`Bob} is not a function; the second applies \lstinline{strength} to \lstinline{`Bob} and returns a degree. Both of these meanings will be removed in the \lstinline{query} of \lstinline{literal-listener} because they cannot be equal to true. The third meaning tests whether Bob is stronger than a threshold variable and returns Boolean---it is the simplest well-typed meaning.
+The first of these returns \emph{error} because \lstinline{`Bob} is not a function; the second applies \lstinline{strength} to \lstinline{`Bob} and returns a degree. Both of these meanings will be removed in the \lstinline{query} of \lstinline{literal-listener} because their values will never equal true. The third meaning tests whether Bob is stronger than a threshold variable and returns Boolean---it is the simplest well-typed meaning.
 %, without specifying how \lstinline[mathescape]{$\theta$} is bound in sentences such as \emph{Bob is strong}.
 %We could instead define \sv{strong} = \lstinline[mathescape]{($\lambda$ (x) (>= (strength x) $\theta$))}, allowing \lstinline[mathescape]{$\theta$} to be a free semantic index variable.\footnote{We would then have to make a corresponding change
 %to the meaning of \emph{-est}: it would first bind the threshold variable locally, then proceed as above to saturate the threshold.}
-Taking this simplest well-typed meaning, the utterance ``Bob is strong'' (with \lstinline{QUD} ``how strong is Bob?'') would be interpreted via:
-\begin{lstlisting}
+With this meaning the utterance ``Bob is strong'' (with \lstinline{QUD} ``how strong is Bob?'') would be interpreted (after simplification) via:
+\begin{lstlisting}[mathescape]
 (query
   ...theory...
   (define $\theta$ (uniform))
@@ -1260,78 +1317,78 @@ In the architecture we have described, uncertainty is pervasive through all aspe
 
 
 
-\todo[inline]{Shalom: it seems to me that you can dispense with the appendices A-C, and replace them with references to published work. They do not really contribute to the clarification of the points that you make in the chapter, and omitting them will leave more room for additional explanation and illustration of the technical material in the body of the text.}
+%\todo[inline]{Shalom: it seems to me that you can dispense with the appendices A-C, and replace them with references to published work. They do not really contribute to the clarification of the points that you make in the chapter, and omitting them will leave more room for additional explanation and illustration of the technical material in the body of the text.}
 
-\appendix
+%\appendix
 
-\section{A Fragment of English for Discussing Tug-of-War}
-\label{tow-lexicon}
+%\section{A Fragment of English for Discussing Tug-of-War}
+%\label{tow-lexicon}
+%
+%For each person, team, and match entity we have an associated name:
+%\begin{itemize}
+%\item \denot{Bob} = \lstinline{`Bob}
+%\item \denot{Team\ 1} = \lstinline{`team1}
+%\item \denot{Match\ 1} = \lstinline{`match1}
+%\item ...
+%\end{itemize}
+%
+%We have a set of property terms:
+%\begin{itemize}
+%\item \sv{player} = \lstinline[mathescape]{($\lambda$ (x) (element? x player))}  
+%\item \sv{team} = \lstinline[mathescape]{($\lambda$ (x) (element? x teams))}
+%\item \sv{match} = \lstinline[mathescape]{($\lambda$ (x) (element? x matches))}
+%\item \sv{man} = \lstinline[mathescape]{($\lambda$ (x) (equal? (gender x) `male))}
+%\item \sv{woman} = \lstinline[mathescape]{($\lambda$ (x) (equal? (gender x) `female))}
+%\end{itemize}
+%
+%And transitive verbs
+%(we simplify by ignoring tense):
+%\begin{itemize}
+%\item \sv{won} = \lstinline[mathescape]{($\lambda$ (match) ($\lambda$ (x) (equal? x (winner match))))}
+%\item \sv{played\ in} =  \lstinline[mathescape]{($\lambda$ (match) ($\lambda$ (team-list) (all (map ($\lambda$  (x) (element? x (teams-in-match match)))) team-list)))} 
+%\item \sv{be\ on} =  \lstinline[mathescape]{($\lambda$ (team) ($\lambda$ (x) (element? x (players-on-team team))))} 
+%\item \sv{captain} = \lstinline[mathescape]{($\lambda$ (team) ($\lambda$ (x) (equal? x (captain team))))}
+%\end{itemize}
+%We assume that the conjoined NP \emph{Team 1 and Team 2} denotes the list \lstinline{`(team1 team2)}; compare the set-based account of plurals described in Scha \& Winter, this volume.
+%Note that the denotation of \emph{played in} takes such a list as its second argument, but that the order of elements in the list does not matter.
+%
+%Gradable adjectives:
+%\begin{itemize}
+%\item \sv{strong} = \lstinline[mathescape]{($\lambda$ (x) ($\lambda$ ($\theta$) (>= (strength x) $\theta$)))}
+%\item \lstinline{(define (weakness x) (- 0 (strength x))))}
+%\item \sv{weak} = \lstinline[mathescape]{($\lambda$ (x) ($\lambda$ ($\theta$) (>= (weakness x) $\theta$)))}
+%\end{itemize}
+%The weakness scale is simply the strength scale with the sign reversed.
+%
+%Quantifiers and the superlative morpheme:
+%\begin{itemize}
+%\item \lstinline{(define individuals (union player team match))}
+%\item \sv{every} = \lstinline[mathescape]{($\lambda$ (P) ($\lambda$ (Q) (all (map ($\lambda$ (x) (not (and (P x) (not Q x)))) individuals))))}
+%\item \sv{some} = \lstinline[mathescape]{($\lambda$ (P) ($\lambda$ (Q) (some (map ($\lambda$ (x) (and (P x) (Q x))) individuals))))}
+%\item \sv{most} = \lstinline[mathescape]{($\lambda$ (P) ($\lambda$ (Q) (> (proportion-true (map ($\lambda$ (x) (and (P x) (Q x))) individuals)) .5)))}
+%\item \sv{\text{-}est} = \lstinline[mathescape]{($\lambda$ (A) ($\lambda$ (N) ($\lambda$ (x) (= (argmax A x) (argmax ($\lambda$ ($\theta$) (some (map ($\lambda$ (x) (>= (A x) $\theta$)) N))))))))}
+%%\item \sv{the} = \lstinline[mathescape]{($\lambda$ (P) ($\lambda$ (x) (P x)))} 
+%\end{itemize}
+%We have had to extend the intuitive theory with a domain of discourse capturing all the entities constructed.
 
-For each person, team, and match entity we have an associated name:
-\begin{itemize}
-\item \denot{Bob} = \lstinline{`Bob}
-\item \denot{Team\ 1} = \lstinline{`team1}
-\item \denot{Match\ 1} = \lstinline{`match1}
-\item ...
-\end{itemize}
-
-We have a set of property terms:
-\begin{itemize}
-\item \sv{player} = \lstinline[mathescape]{($\lambda$ (x) (element? x player))}  
-\item \sv{team} = \lstinline[mathescape]{($\lambda$ (x) (element? x teams))}
-\item \sv{match} = \lstinline[mathescape]{($\lambda$ (x) (element? x matches))}
-\item \sv{man} = \lstinline[mathescape]{($\lambda$ (x) (equal? (gender x) `male))}
-\item \sv{woman} = \lstinline[mathescape]{($\lambda$ (x) (equal? (gender x) `female))}
-\end{itemize}
-
-And transitive verbs
-(we simplify by ignoring tense):
-\begin{itemize}
-\item \sv{won} = \lstinline[mathescape]{($\lambda$ (match) ($\lambda$ (x) (equal? x (winner match))))}
-\item \sv{played\ in} =  \lstinline[mathescape]{($\lambda$ (match) ($\lambda$ (team-list) (all (map ($\lambda$  (x) (element? x (teams-in-match match)))) team-list)))} 
-\item \sv{be\ on} =  \lstinline[mathescape]{($\lambda$ (team) ($\lambda$ (x) (element? x (players-on-team team))))} 
-\item \sv{captain} = \lstinline[mathescape]{($\lambda$ (team) ($\lambda$ (x) (equal? x (captain team))))}
-\end{itemize}
-We assume that the conjoined NP \emph{Team 1 and Team 2} denotes the list \lstinline{`(team1 team2)}; compare the set-based account of plurals described in Scha \& Winter, this volume.
-Note that the denotation of \emph{played in} takes such a list as its second argument, but that the order of elements in the list does not matter.
-
-Gradable adjectives:
-\begin{itemize}
-\item \sv{strong} = \lstinline[mathescape]{($\lambda$ (x) ($\lambda$ ($\theta$) (>= (strength x) $\theta$)))}
-\item \lstinline{(define (weakness x) (- 0 (strength x))))}
-\item \sv{weak} = \lstinline[mathescape]{($\lambda$ (x) ($\lambda$ ($\theta$) (>= (weakness x) $\theta$)))}
-\end{itemize}
-The weakness scale is simply the strength scale with the sign reversed.
-
-Quantifiers and the superlative morpheme:
-\begin{itemize}
-\item \lstinline{(define individuals (union player team match))}
-\item \sv{every} = \lstinline[mathescape]{($\lambda$ (P) ($\lambda$ (Q) (all (map ($\lambda$ (x) (not (and (P x) (not Q x)))) individuals))))}
-\item \sv{some} = \lstinline[mathescape]{($\lambda$ (P) ($\lambda$ (Q) (some (map ($\lambda$ (x) (and (P x) (Q x))) individuals))))}
-\item \sv{most} = \lstinline[mathescape]{($\lambda$ (P) ($\lambda$ (Q) (> (proportion-true (map ($\lambda$ (x) (and (P x) (Q x))) individuals)) .5)))}
-\item \sv{\text{-}est} = \lstinline[mathescape]{($\lambda$ (A) ($\lambda$ (N) ($\lambda$ (x) (= (argmax A x) (argmax ($\lambda$ ($\theta$) (some (map ($\lambda$ (x) (>= (A x) $\theta$)) N))))))))}
-%\item \sv{the} = \lstinline[mathescape]{($\lambda$ (P) ($\lambda$ (x) (P x)))} 
-\end{itemize}
-We have had to extend the intuitive theory with a domain of discourse capturing all the entities constructed.
-
-\section{Random Composition}
-\label{composition}
-
-With \lstinline{random-combinator} defined in this way, we predict the two readings of of \emph{Most players played in some match} as follows:
-\begin{itemize}
-\item The subject wide scope reading obtains when the meaning function constructs the interpretation
-$$
-\mathbf{BA}(\mathbf{FA}(\sv{most})(\sv{players})
-(\mathbf{FA}(\mathbf{AR}_2(\mathbf{AR}_1(\sv{played\ in})))
-(\mathbf{FA}(\sv{some})(\sv{match})))),
-$$  
-\item The object wide scope reading obtains when the meaning function constructs the interpretation
-$$
-\mathbf{BA}(\mathbf{FA}(\sv{most})(\sv{players})
-(\mathbf{FA}(\mathbf{AR}_1(\mathbf{AR}_2(\sv{played\ in})))
-(\mathbf{FA}(\sv{some})(\sv{match})))).
-$$  
-\end{itemize}
+%\section{Random Composition}
+%\label{composition}
+%
+%With \lstinline{random-combinator} defined in this way, we predict the two readings of of \emph{Most players played in some match} as follows:
+%\begin{itemize}
+%\item The subject wide scope reading obtains when the meaning function constructs the interpretation
+%$$
+%\mathbf{BA}(\mathbf{FA}(\sv{most})(\sv{players})
+%(\mathbf{FA}(\mathbf{AR}_2(\mathbf{AR}_1(\sv{played\ in})))
+%(\mathbf{FA}(\sv{some})(\sv{match})))),
+%$$  
+%\item The object wide scope reading obtains when the meaning function constructs the interpretation
+%$$
+%\mathbf{BA}(\mathbf{FA}(\sv{most})(\sv{players})
+%(\mathbf{FA}(\mathbf{AR}_1(\mathbf{AR}_2(\sv{played\ in})))
+%(\mathbf{FA}(\sv{some})(\sv{match})))).
+%$$  
+%\end{itemize}
 
 
 %%%%%
