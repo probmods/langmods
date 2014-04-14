@@ -599,7 +599,7 @@ The simplest case is the interpretation of a name as a Church symbol, which serv
 \item ...
 \end{itemize}
 Interpreted in this way names are directly referential since they are interpreted using the same symbol in every situation, regardless of inferences made during interpretation. 
-For simplicity, we assume that the conjunction of NPs forms a list, \sv{and} = \lstinline[mathescape]{($\lambda$ (x) ($\lambda$ (y) (list x y)))}; for instance, \emph{Team 1 and Team 2} denotes  \lstinline{(list `team1 `team2)}. Compare the set-based account of plurals described in Scha \& Winter, this volume.
+%For simplicity, we assume that the conjunction of NPs forms a list, \sv{and} = \lstinline[mathescape]{($\lambda$ (x) ($\lambda$ (y) (list x y)))}; for instance, \emph{Team 1 and Team 2} denotes  \lstinline{(list `team1 `team2)}. Compare the set-based account of plurals described in Scha \& Winter, this volume.
 
 A one-place predicate such as \emph{player} or \emph{man} is interpreted as a function from individuals to truth-values. 
 \begin{itemize}
@@ -612,17 +612,25 @@ A one-place predicate such as \emph{player} or \emph{man} is interpreted as a fu
 Similarly, transitive verbs such as \emph{won} and relational nouns such as \emph{captain} denote two-place predicates. (We simplify throughout by ignoring tense.)
 \begin{itemize}
 \item  \sv{won}: \lstinline[mathescape]{($\lambda$ (match) ($\lambda$ (x) (equal? x (winner match))))}
-\item \sv{played\ in}:  \lstinline[mathescape]{($\lambda$ (match) ($\lambda$ (team-list) (all (map ($\lambda$  (x) (element? x (teams-in-match match)))) team-list)))}
+\item \sv{played\ in}:  \lstinline[mathescape]{($\lambda$ (match) ($\lambda$ (x) (element? x (teams-in-match match))))}
 \item \sv{is\ on}:  \lstinline[mathescape]{($\lambda$ (team) ($\lambda$ (x) (element? x (players-on-team team))))}
 \item \sv{captain}: \lstinline[mathescape]{($\lambda$ (team) ($\lambda$ (x) (equal? x (captain team))))}
 \end{itemize}
-Note that the denotation of \emph{played in} takes a list of individuals as its second argument, but that the order of elements in the list does not matter.
-\todo{where is this set-based plural business used? this def of played in is kind of messy. do we need a shifter that can make a list from an individual?}
 
 Intensionality is implicit in these definitions because the denotations of English expressions can refer to stochastic functions in the intuitive theory, such as \lstinline{gender}.
 Thus predicates pick out functions from individuals to truth-values in any world, but the specific function that they pick out in a world can depend on random choices (e.g., values of \lstinline{flip}) that are made in the process of constructing the world. 
 For instance, \emph{player} is true of the same individuals in every world, because \lstinline{players} is a fixed list (see Figure \ref{tow}) and \lstinline{element?} is the deterministic membership function. 
 On the other hand, \emph{man} denotes a predicate which will be \emph{a priori} true of a given individual (say, \lstinline{`Bob}) in 50\% of worlds---because the memoized stochastic function \lstinline{gender} returns \lstinline{`male} in half of the possible worlds.
+
+For simplicity, in the few places in our examples where plurals are required, we treat them as denoting lists of individuals. In particular, in a phrase like \emph{Team 1 and Team 2}, the conjunction of NPs forms a list: 
+\begin{itemize}
+\item \sv{and} = \lstinline[mathescape]{($\lambda$ (x) ($\lambda$ (y) (list x y)))}
+\end{itemize}
+Compare this to the set-based account of plurals described in Scha \& Winter, this volume. To allow properties to apply to such collections we include a type-shifting operator (in \lstinline{type-shifters}, see section \ref{typeshift}) that universally quantifies the property over the list:
+\begin{itemize}
+\item \textbf{DIST}: \lstinline[mathescape]{($\lambda$ (V) ($\lambda$ (s) (all (map V s))))}
+\end{itemize}
+For instance, \emph{Bob and Jim played in Match 1} can be interpreted by shifting the property \sv{played\ in\ Match\ 1} to a predicate on lists. (Note that the order of elements in the list will not matter.)
 
 We can generally adopt standard meanings for functional vocabulary, such as quantifiers. 
 \begin{itemize}
@@ -632,7 +640,7 @@ We can generally adopt standard meanings for functional vocabulary, such as quan
 \end{itemize}
 For simplicity we have written the quantifiers in terms of set size; the \lstinline{size} function can be defined in terms of the \lstinline{domain} of individuals as \lstinline[mathescape]{($\lambda$ (S) (length (filter S domain)))}.\footnote{In the examples below, we assume for simplicity that many function words, for example \emph{is} and \emph{the}, are semantically vacuous, i.e., that they denote identity functions.}
 
-We take gradeable adjectives, such as \emph{strong}, to denote simply functions from individuals to degrees \citet[Cf.][]{neeleman2004degree}. 
+We take gradeable adjectives, such as \emph{strong}, to denote simply functions from individuals to degrees \citep[e.g.][]{neeleman2004degree}:
 \begin{itemize}
 \item \sv{strong}: \lstinline[mathescape]{($\lambda$ (x) (strength x))}
 \item \sv{weak}: \lstinline[mathescape]{($\lambda$ (x) (- (strength x)))}
@@ -737,7 +745,7 @@ For each of the following utterances we give one possible, highest probability, 
 \subitem simplified: \lstinline{(element? `Jim (players-on-team `team2))}
 %
 \item Utterance 3: \emph{Team 1 and Team 2 played in Match 1.}
-\subitem \lstinline{meaning}: \lstinline[mathescape]{((R ((R `team 1) (($\lambda$ (x) ($\lambda$ (y) (list x y))) `team2))) (($\lambda$ (match) ($\lambda$ (team-list) (all (map ($\lambda$  (x) (element? x (teams-in-match match)))) team-list))) `match1))}
+\subitem \lstinline{meaning}: \lstinline[mathescape]{((R ((R `team 1) (($\lambda$ (x) ($\lambda$ (y) (list x y))) `team2))) (DIST (($\lambda$ (match) ($\lambda$ (x) (element? x (teams-in-match match)))) `match1)))}
 \subitem simplified: \lstinline[mathescape]{(all (map ($\lambda$ (x) (element? x (teams-in-match `match1)))) `(team1 team2))} 
 %
 \item Utterance 4: \emph{Team 1 won Match 1.}
@@ -782,9 +790,9 @@ For each of the following utterances we give one possible, highest probability, 
 
 The literal listener conditions on each of these meanings in turn, updating her posterior belief distribution.
 %posterior belief state after these utterances will thus be given by sequentially conditioning on the truth of the literal interpretations assigned to these utterances by the \lstinline{meaning} function. 
-In the absence of pragmatic reasoning (described below), this is equivalent to conditioning on the conjunction of the meanings of each utterance.  
+In the absence of pragmatic reasoning (which is described below), this is equivalent to conditioning on the conjunction of the meanings of each utterance.  
 %The listener's posterior beliefs about Bob's strength (i.e.~\lstinline{(strength `Bob)}) will be identical to those shown in Figure \ref{explainingaway}b: 
-Bob's inferred strength ((i.e.~ the posterior on \lstinline{(strength `Bob)}) increases substantially relative to the uninformed prior (see Figure \ref{explawayutt}). 
+Bob's inferred strength (i.e.~the posterior on \lstinline{(strength `Bob)}) increases substantially relative to the uninformed prior (see Figure \ref{explawayutt}). 
 
 Suppose, however, the speaker continues with the utterance:
 \begin{itemize}
@@ -808,8 +816,6 @@ Conditioning on this proposition about Jim, we find that the inferred distributi
 Note, however, that this non-monotonic effect comes about not by directly observing a low value for the strength of Jim, as in our earlier example, but by conditioning on the truth of an utterance which does not entail \emph{any} precise value of Jim's strength. 
 That is, because there is uncertainty about the strengths of all players, in principle Jim could be the weakest player even if he is quite strong, as long as all the other players are strong as well. 
 However, the utterance is most likely to be true if the other players are about average strength, and Jim is particularly weak; conditioning on Utterance 5 thus lowers Jim's expected strength and adjusts Bob's strength accordingly.
-
-\todo{prettify the meanings..}
 
 \begin{figure}[tbh]
 \begin{center}
