@@ -19,13 +19,15 @@
 \usepackage{color}
 \usepackage{xcolor}
 \usepackage{listings} 
-\usepackage{inconsolata}
+% \usepackage{inconsolata}
 \usepackage{colonequals}
 \usepackage{todonotes}
 \usepackage{gb4e}
 
  \usepackage{hyperref}
  \usepackage{amsmath, amsthm, amssymb}
+ 
+\usepackage{textcomp}
 
 % single-spacing
 \setstretch{1.0}
@@ -40,6 +42,7 @@
  \lstset{
   language=Scheme, % Andreas Stuhlmüller. Scheme listings. https://github.com/stuhlmueller/scheme-listings.git
   columns=fixed,
+  upquote=true,
   keepspaces,
   tabsize=2,
   extendedchars=true,
@@ -267,11 +270,11 @@ Memoization is a higher-order function that upgrades a stochastic function to ha
 In order to avoid an artificial symmetry breaking (and for technical reasons), the semantics of memoization is defined so that all random values that may be returned by a memoized function are created when the memoized function is \emph{created}, not where it is called.}
 
 \label{eval}
-In Church, as in most LISP-like languages, source code is a first-class data type: it is represented by lists. The quote operator tells the evaluation process to treat a list as a literal list of symbols, rather than evaluating it: \lstinline{(flip)} results in a random value \lstinline{true} or \lstinline{false}, while \lstinline{`(flip)} results in the list \lstinline{(flip)} as a \emph{value}.
- For us this will be important because we can ``reverse'' the process by calling the \lstinline{eval} function on a piece of reified code. For instance, \lstinline{(eval `(flip))} results in a random value \lstinline{true} or \lstinline{false} again. Usefully for us, evaluation triggered by \lstinline{eval} happens in the local context with any bound variables in scope. For instance:
+In Church, as in most LISP-like languages, source code is a first-class data type: it is represented by lists. The quote operator tells the evaluation process to treat a list as a literal list of symbols, rather than evaluating it: \lstinline{(flip)} results in a random value \lstinline{true} or \lstinline{false}, while \lstinline{'(flip)} results in the list \lstinline{(flip)} as a \emph{value}.
+ For us this will be important because we can ``reverse'' the process by calling the \lstinline{eval} function on a piece of reified code. For instance, \lstinline{(eval '(flip))} results in a random value \lstinline{true} or \lstinline{false} again. Usefully for us, evaluation triggered by \lstinline{eval} happens in the local context with any bound variables in scope. For instance:
 \begin{lstlisting}[mathescape]
-(define expression `(flip bias))
-(define foo (($\lambda$ (bias) ($\lambda$ (e) (eval e))) (uniform)))
+(define expression '(flip bias))
+(define foo (($\lambda$ (bias) ($\lambda$ (e) (eval e))) (uniform 0 1)))
 (foo expression)
 \end{lstlisting}
 In this snippet the variable \lstinline{bias} is not in scope at the top level where \lstinline{expression} is defined, but it is in scope where \lstinline{expression} is evaluated, inside the function bound to \lstinline{foo}. For the natural language architecture described below this allows utterances to be evaluated in the local context of comprehension. For powerful applications of these ideas in natural language semantics see \cite{shan2010character}.
@@ -279,7 +282,7 @@ In this snippet the variable \lstinline{bias} is not in scope at the top level w
 \label{bottom-val}
 Church is a dynamically typed language: values have types, but expressions don't have fixed types that can be determined \emph{a priori}. 
 One consequence of dynamic typing for a probabilistic language is that expressions may take on a distribution of different types. For instance, the expression \lstinline{(if (flip) 1 true)} will be integer half the time and Boolean the other half. This has interesting implications for natural language, where we require consistent dynamic types but have no particular reason to require deterministically assigned static types.
-For simplicity (and utility below) we assume that when an operator is applied to values outside of its domain, for instance \lstinline{(+ 1 `a)}, it returns a special value \emph{error} which is itself outside the domain of all operators, except the equality operator \lstinline{eq?}. By allowing \lstinline{eq?} to test for error we permit very simple error handling, and allow \lstinline{query} (which relies on a simple equality test to decide whether to ``keep going'') to filter out mis-typed sub-computations.
+For simplicity (and utility below) we assume that when an operator is applied to values outside of its domain, for instance \lstinline{(+ 1 'a)}, it returns a special value \emph{error} which is itself outside the domain of all operators, except the equality operator \lstinline{eq?}. By allowing \lstinline{eq?} to test for error we permit very simple error handling, and allow \lstinline{query} (which relies on a simple equality test to decide whether to ``keep going'') to filter out mis-typed sub-computations.
 
 
 %\todo[inline]{Do we want to give a definitional interpreter (eval) for ESLC in an appendix???}
@@ -307,7 +310,7 @@ Our intuitive knowledge of this domain (and indeed most similar team games) rest
 We now sketch a simple realization of these concepts in Church. 
 To start, each player has some traits that influence his or her contribution to the game: strength, which may depend on gender.
 \begin{lstlisting}[mathescape]
-(define gender (mem ($\lambda$ (p) (if (flip) `male `female))))
+(define gender (mem ($\lambda$ (p) (if (flip) 'male 'female))))
 (define gender-mean-strength (mem ($\lambda$ (g) (gaussian 0 2))))
 (define strength (mem ($\lambda$ (p) (gaussian (gender-mean-strength (gender p)) 1))))
 \end{lstlisting}
@@ -319,32 +322,51 @@ We are now already in a position to make useful inferences.
 We could, for instance observe the strengths and genders of several players, and then Pat's strength but not gender, and ask for the latter:
 \begin{lstlisting}[mathescape]
 (query
-  (define gender (mem ($\lambda$ (p) (if (flip) `male `female))))
+  (define gender (mem ($\lambda$ (p) (if (flip) 'male 'female))))
   (define gender-mean-strength (mem ($\lambda$ (g) (gaussian 0 2))))
   (define strength (mem ($\lambda$ (p) (gaussian (gender-mean-strength (gender p)) 1))))
   
-  (gender `Pat)
+  (gender 'Pat)
   
-  (and (equal? (gender `Bob) `male) (= (strength `Bob) -1.1)
-       (equal? (gender `Jane) `female) (= (strength `Jane) 0.5)
-       (equal? (gender `Jim) `male) (= (strength `Jim) -0.3)
-       (= (strength `Pat) 0.7)))
+  (and (equal? (gender 'Bob) 'male) (= (strength 'Bob) -1.1)
+       (equal? (gender 'Jane) 'female) (= (strength 'Jane) 0.5)
+       (equal? (gender 'Jim) 'male) (= (strength 'Jim) -0.3)
+       (= (strength 'Pat) 0.7)))
 \end{lstlisting}
+\todo[inline]{Erin: This doesn't work in webchurch because the tricks for having gaussians or other ERPs in the condition of queries don't work when the ERPs are hidden inside \lstinline{mem} or other stuff. can fix by using soft-equals or CFA.}
 The result of this query is that Pat is more likely to be female than male (probability .63). 
 This is because the observed males are weaker than Jane, the observed female, and so a strong player such as Pat is likely to be female as well.
 
 In the game of tug-of-war players are on teams, which themselves have properties such as captains:
 \begin{lstlisting}[mathescape]
-(define players `(Bob Jim Mary Sue Bill Evan Sally Tim Pat Jane Terrence Kate))
+(define players '(Bob Jim Mary Sue Bill Evan Sally Tim Pat Jane Terrence Kate))
 (define team-size (uniform-draw '(1 2 3 4 5 6)))
 (define players-on-team (mem ($\lambda$ (team) (draw-n team-size players))))
 (define captain (mem ($\lambda$ (team) (uniform-draw (players-on-team team)))))
 \end{lstlisting}
+\todo[inline]{Erin: \lstinline{draw-n} not defined yet. can put in some seperate ``helper functions'' file or section or something when we put up the code}
+% here's my attempt at defining draw-n:
+% (define draw-n
+%   (lambda
+%     (n lst)
+%     (define next-draw (uniform-draw lst))
+%     (define rest-of-lst
+%       (fold (lambda
+%               (list-item cumulative-value)
+%               (if
+%                (equal? list-item next-draw)
+%                cumulative-value
+%                (append (list list-item) cumulative-value)))
+%             '()
+%             lst))
+%     (if (= n 1)
+%         (list next-draw)
+%         (append (list next-draw) (draw-n (- n 1) rest-of-lst)))))
 Here the \lstinline{draw-n} ERP draws uniformly but without replacement from a list.
 %
 In addition to players and teams, we have matches: events that have two teams and a winner, the winner depends on how hard each team is pulling, which depends on how hard each team member is pulling.
 \begin{lstlisting}[mathescape]
-(define teams `(team1 team2 team3))
+(define teams '(team1 team2 team3))
 
 (define teams-in-match (mem ($\lambda$ (match) (draw-n 2 teams))))
 (define pulling (mem ($\lambda$ (player match) 
@@ -363,12 +385,12 @@ Notice that the team pulling is simply the sum of how hard each member is pullin
  \begin{figure}[htbp]
 \begin{center}
  \begin{lstlisting}[mathescape]
-(define players `(Bob Jim Mary Sue Bill Evan Sally Tim Joe Jane Terrence Kate))
-(define teams `(team1 team2 team3))
-(define matches `(match1 match2 match3 match4))
-(define individuals (union players teams matches))
+(define players '(Bob Jim Mary Sue Bill Evan Sally Tim Joe Jane Terrence Kate))
+(define teams '(team1 team2 team3))
+(define matches '(match1 match2 match3 match4))
+(define individuals (append players teams matches))
 
-(define gender (mem ($\lambda$ (p) (if (flip) `male `female))))
+(define gender (mem ($\lambda$ (p) (if (flip) 'male 'female))))
 (define gender-mean-strength (mem ($\lambda$ (g) (gaussian 0 2))))
 (define strength (mem ($\lambda$ (p) (gaussian (gender-mean-strength (gender p)) 1))))
 
@@ -387,6 +409,7 @@ Notice that the team pulling is simply the sum of how hard each member is pullin
         teamA
         teamB)))
 \end{lstlisting}
+\todo[inline]{Erin: The way this is defined, one person could be on multiple teams. E.g. there's nothing stopping Bob from being on team1, team2, and team3. This may be unavoidable...footnote?}
 
 \caption{The collected Church definitions forming our simple intuitive theory (or conceptual lexicon) for the tug-of-war domain.}
 \label{tow}
@@ -403,11 +426,11 @@ Imagine that Bob is playing Jim in match 1; we can infer Bob's strength before o
 \begin{lstlisting}[mathescape]
 (query
   ...ToW theory...
-  (strength `Bob) ;; variable of interest
+  (strength 'Bob) ;; variable of interest
   (and ;; conditioning expression 
-    (equal? (players-on-team `team1) `(Bob))
-    (equal? (players-on-team `team2) `(Jim))
-    (equal? (teams-in-match `match1) `(team1 team2))))
+    (equal? (players-on-team 'team1) '(Bob))
+    (equal? (players-on-team 'team2) '(Jim))
+    (equal? (teams-in-match 'match1) '(team1 team2))))
 \end{lstlisting}
 In this and all that follows \lstinline{...ToW theory...} is an abbreviation for the definitions in Figure \ref{tow}. 
 The result of this strength is simply the prior belief about Bob's strength: a distribution with mean 0.0.
@@ -416,25 +439,25 @@ Now imagine that Bob wins this match:
 \begin{lstlisting}[mathescape]
 (query
   ...ToW theory...
-  (strength `Bob) ;; variable of interest 
+  (strength 'Bob) ;; variable of interest 
   (and ;; conditioning expression
-    (equal? (players-on-team `team1) `(Bob))
-    (equal? (players-on-team `team2) `(Jim))
-    (equal? (teams-in-match `match1) `(team1 team2))
-    (equal? (winner `match1) `team1)))
+    (equal? (players-on-team 'team1) '(Bob))
+    (equal? (players-on-team 'team2) '(Jim))
+    (equal? (teams-in-match 'match1) '(team1 team2))
+    (equal? (winner 'match1) 'team1)))
 \end{lstlisting}
 If we evaluate this query we find that Bob is inferred to be relatively strong: his mean strength after observing this match is about 1.2, much higher than his a priori mean strength of $0.0$. 
 However, imagine that we then learned that Jim is a weak player:
  \begin{lstlisting}[mathescape]
 (query
   ...ToW theory...
-  (strength `Bob) ;; variable of interest 
+  (strength 'Bob) ;; variable of interest 
   (and ;; conditioning expression
-    (equal? (players-on-team `team1) `(Bob))
-    (equal? (players-on-team `team2) `(Jim))
-    (equal? (teams-in-match `match1) `(team1 team2))
-    (equal? (winner `match1) `team1))
-    (= (strength `Jim) -3.0))
+    (equal? (players-on-team 'team1) '(Bob))
+    (equal? (players-on-team 'team2) '(Jim))
+    (equal? (teams-in-match 'match1) '(team1 team2))
+    (equal? (winner 'match1) 'team1))
+    (= (strength 'Jim) -3.0))
 \end{lstlisting}
 
 Now, we have very little evidence about Bob's strength---the inferred mean strength from this query goes back to (almost) 0.0. 
@@ -533,7 +556,7 @@ The above definition for \lstinline{meaning} always results in composition by fo
       m
       (list (uniform-draw type-shifters) (shift m))))
   
-(define type-shifters `(R S AR1 AR2 ...))
+(define type-shifters '(R S AR1 AR2 ...))
 \end{lstlisting}
 Each intermediate meaning will be shifted zero or more times by a randomly chosen type-shifter; because the number of shifts is determined by a stochastic recursion, fewer shifts are \emph{a priori} more likely. 
 Each lexical item thus has the potential to be interpreted in any of an infinite number of (static) types, but the probability of associating an item with an interpretation in some type declines exponentially with the the number of type-raising operations required to construct this interpretation. 
@@ -547,7 +570,7 @@ We choose a small set of type shifters which is sufficient for the examples of t
 \item \textbf{AR2}: \lstinline[mathescape]{($\lambda$ (f) ($\lambda$ (x) ($\lambda$ (y) (y ($\lambda$ (z) ((f x) z))))))}
 \end{itemize}
 Among other ways they can be used, the shifter \textbf{R} enables backward application and \textbf{S} enables composition.
-For instance, \emph{Bob runs} has an additional possible meaning \lstinline[mathescape]{((R `Bob) runs)} which applies the meanings of \emph{runs} to that of \emph{Bob}, as required.
+For instance, \emph{Bob runs} has an additional possible meaning \lstinline[mathescape]{((R 'Bob) runs)} which applies the meanings of \emph{runs} to that of \emph{Bob}, as required.
 
 Type shifters \textbf{AR1} and \textbf{AR2} allow flexible quantifier scope as described in \citet{hendriks93,barker05}. \citep[The specific choice here follows][pp.453ff.]{barker05} 
 We explore the ramifications of the different possible scopes in section \ref{ambiguity}.
@@ -564,10 +587,10 @@ This treatment of quantifier scope is convenient, and not uncommon \citep{jacobs
 %Formally, this means that \lstinline{random-combinator} is defined as a a function which selects a composition operator $\mathit{Op}$ and then performs a stochastic recursion: depending on the outcome of a coin flip, \lstinline{random-combinator} will either output $\mathit{Op}$ or select a type-shifter $\mathcal{T}$, apply $\mathcal{T}$ to one of the arguments of $\mathit{Op}$ at random, and flip another coin to determine whether to output the result or select another type-shifter and repeat.
 %\begin{lstlisting}[mathescape]
 %(define (random-combinator)
-%  (let ([Op (uniform-draw `(FA BA FC BC ...))])
+%  (let ([Op (uniform-draw '(FA BA FC BC ...))])
 %    (if (flip) Op
 %      (random-shift Op (random-type-shifter)))))
-%(define (random-type-shifter) (uniform-draw `(AR1 AR2 ...)))
+%(define (random-type-shifter) (uniform-draw '(AR1 AR2 ...)))
 %(define (random-shift Op type-shifter)
 %  (let ([shifted (if (flip)
 %    ($\lambda$ (arg1 arg2) (Op (type-shifter arg1) arg2))
@@ -593,21 +616,21 @@ Conceptual representations and world knowledge are also represented in this lang
 For simplicity we write the denotations of utterances and words, \lstinline[mathescape]{(meaning $\cdot$)} and \lstinline[mathescape]{(lexicon $\cdot$)}, both as \denot{\cdot}.
 The simplest case is the interpretation of a name as a Church symbol, which serves as the unique mental token for some object or individual (the name-bearer).
 \begin{itemize}
-\item \sv{Bob}: \lstinline{`Bob} 
-\item \sv{Team\ 1}: \lstinline{`team1} 
-\item \sv{Match\ 1}: \lstinline{`match1}
+\item \sv{Bob}: \lstinline{'Bob} 
+\item \sv{Team\ 1}: \lstinline{'team1} 
+\item \sv{Match\ 1}: \lstinline{'match1}
 \item ...
 \end{itemize}
 Interpreted in this way names are directly referential since they are interpreted using the same symbol in every situation, regardless of inferences made during interpretation. 
-For simplicity, we assume that the conjunction of NPs forms a list, \sv{and} = \lstinline[mathescape]{($\lambda$ (x) ($\lambda$ (y) (list x y)))}; for instance, \emph{Team 1 and Team 2} denotes  \lstinline{(list `team1 `team2)}. Compare the set-based account of plurals described in Scha \& Winter, this volume.
+For simplicity, we assume that the conjunction of NPs forms a list, \sv{and} = \lstinline[mathescape]{($\lambda$ (x) ($\lambda$ (y) (list x y)))}; for instance, \emph{Team 1 and Team 2} denotes  \lstinline{(list 'team1 'team2)}. Compare the set-based account of plurals described in Scha \& Winter, this volume.
 
 A one-place predicate such as \emph{player} or \emph{man} is interpreted as a function from individuals to truth-values. 
 \begin{itemize}
 \item  \sv{player}: \lstinline[mathescape]{($\lambda$ (x) (element? x players))}
 \item \sv{team}: \lstinline[mathescape]{($\lambda$ (x) (element? x teams))}
 \item \sv{match}: \lstinline[mathescape]{($\lambda$ (x) (element? x matches))}
-\item \sv{man}: \lstinline[mathescape]{($\lambda$ (x) (equal? (gender x) `male))}
-\item \sv{woman}: \lstinline[mathescape]{($\lambda$ (x) (equal? (gender x) `female))}
+\item \sv{man}: \lstinline[mathescape]{($\lambda$ (x) (equal? (gender x) 'male))}
+\item \sv{woman}: \lstinline[mathescape]{($\lambda$ (x) (equal? (gender x) 'female))}
 \end{itemize}
 Similarly, transitive verbs such as \emph{won} and relational nouns such as \emph{captain} denote two-place predicates. (We simplify throughout by ignoring tense.)
 \begin{itemize}
@@ -622,7 +645,7 @@ Note that the denotation of \emph{played in} takes a list of individuals as its 
 Intensionality is implicit in these definitions because the denotations of English expressions can refer to stochastic functions in the intuitive theory, such as \lstinline{gender}.
 Thus predicates pick out functions from individuals to truth-values in any world, but the specific function that they pick out in a world can depend on random choices (e.g., values of \lstinline{flip}) that are made in the process of constructing the world. 
 For instance, \emph{player} is true of the same individuals in every world, because \lstinline{players} is a fixed list (see Figure \ref{tow}) and \lstinline{element?} is the deterministic membership function. 
-On the other hand, \emph{man} denotes a predicate which will be \emph{a priori} true of a given individual (say, \lstinline{`Bob}) in 50\% of worlds---because the memoized stochastic function \lstinline{gender} returns \lstinline{`male} in half of the possible worlds.
+On the other hand, \emph{man} denotes a predicate which will be \emph{a priori} true of a given individual (say, \lstinline{'Bob}) in 50\% of worlds---because the memoized stochastic function \lstinline{gender} returns \lstinline{'male} in half of the possible worlds.
 
 We can generally adopt standard meanings for functional vocabulary, such as quantifiers. 
 \begin{itemize}
@@ -672,9 +695,9 @@ For positive form sentences, such as \emph{Bob is strong}, we will employ a type
 %
 %\begin{minipage}{0.3 \textwidth}
 %Entities:\\
-%\sv{Bob} = \lstinline{`Bob} \\
-%\sv{Team\ 1} = \lstinline{`team1} \\
-%\sv{Match\ 1} = \lstinline{`match1} \\
+%\sv{Bob} = \lstinline{'Bob} \\
+%\sv{Team\ 1} = \lstinline{'team1} \\
+%\sv{Match\ 1} = \lstinline{'match1} \\
 %...
 %\end{minipage}
 %\begin{minipage}{0.6 \textwidth}
@@ -682,8 +705,8 @@ For positive form sentences, such as \emph{Bob is strong}, we will employ a type
 % \sv{player} = \lstinline[mathescape]{($\lambda$ (x) (element? x players))}  \\
 % \sv{team} = \lstinline[mathescape]{($\lambda$ (x) (element? x teams))}\\
 % \sv{match} = \lstinline[mathescape]{($\lambda$ (x) (element? x matches))}\\
-% \sv{man} = \lstinline[mathescape]{($\lambda$ (x) (equal? (gender x) `male))}\\
-% \sv{woman} = \lstinline[mathescape]{($\lambda$ (x) (equal? (gender x) `female))}
+% \sv{man} = \lstinline[mathescape]{($\lambda$ (x) (equal? (gender x) 'male))}\\
+% \sv{woman} = \lstinline[mathescape]{($\lambda$ (x) (equal? (gender x) 'female))}
 %\end{minipage}
 %
 %\begin{minipage}{1.0 \textwidth}
@@ -694,7 +717,7 @@ For positive form sentences, such as \emph{Bob is strong}, we will employ a type
 % \sv{captain}: \lstinline[mathescape]{($\lambda$ (team) ($\lambda$ (x) (equal? x (captain team))))}
 %\end{minipage}
 %
-%%We assume that the conjoined NP \emph{Team 1 and Team 2} denotes the list \lstinline{`(team1 team2)}; compare the set-based account of plurals described in Scha \& Winter, this volume.
+%%We assume that the conjoined NP \emph{Team 1 and Team 2} denotes the list \lstinline{'(team1 team2)}; compare the set-based account of plurals described in Scha \& Winter, this volume.
 %%Note that the denotation of \emph{played in} takes such a list as its second argument, but that the order of elements in the list does not matter.
 %
 %\begin{minipage}{1.0 \textwidth}
@@ -729,20 +752,20 @@ For each of the following utterances we give one possible, highest probability, 
 
 \begin{itemize}
 \item Utterance 1: \emph{Bob is on Team 1.}
-\subitem \lstinline{meaning}: \lstinline[mathescape]{((R `Bob) ($\lambda$ (team) ($\lambda$ (x) (element? x (players-on-team team))) `team1))}
-\subitem simplified: \lstinline{(element? `Bob (players-on-team `team1))}
+\subitem \lstinline{meaning}: \lstinline[mathescape]{((R 'Bob) ($\lambda$ (team) ($\lambda$ (x) (element? x (players-on-team team))) 'team1))}
+\subitem simplified: \lstinline{(element? 'Bob (players-on-team 'team1))}
 %
 \item Utterance 2: \emph{Jim is on Team 2.}
-\subitem \lstinline{meaning}: \lstinline[mathescape]{((R `Jim) ($\lambda$ (team) ($\lambda$ (x) (element? x (players-on-team team))) `team2))}
-\subitem simplified: \lstinline{(element? `Jim (players-on-team `team2))}
+\subitem \lstinline{meaning}: \lstinline[mathescape]{((R 'Jim) ($\lambda$ (team) ($\lambda$ (x) (element? x (players-on-team team))) 'team2))}
+\subitem simplified: \lstinline{(element? 'Jim (players-on-team 'team2))}
 %
 \item Utterance 3: \emph{Team 1 and Team 2 played in Match 1.}
-\subitem \lstinline{meaning}: \lstinline[mathescape]{((R ((R `team 1) (($\lambda$ (x) ($\lambda$ (y) (list x y))) `team2))) (($\lambda$ (match) ($\lambda$ (team-list) (all (map ($\lambda$  (x) (element? x (teams-in-match match)))) team-list))) `match1))}
-\subitem simplified: \lstinline[mathescape]{(all (map ($\lambda$ (x) (element? x (teams-in-match `match1)))) `(team1 team2))} 
+\subitem \lstinline{meaning}: \lstinline[mathescape]{((R ((R 'team 1) (($\lambda$ (x) ($\lambda$ (y) (list x y))) 'team2))) (($\lambda$ (match) ($\lambda$ (team-list) (all (map ($\lambda$  (x) (element? x (teams-in-match match)))) team-list))) 'match1))}
+\subitem simplified: \lstinline[mathescape]{(all (map ($\lambda$ (x) (element? x (teams-in-match 'match1)))) '(team1 team2))} 
 %
 \item Utterance 4: \emph{Team 1 won Match 1.}
-\subitem \lstinline{meaning}:  \lstinline[mathescape]{((R `team1) (($\lambda$ (match) ($\lambda$ (x) (equal? x (winner match)))) `match1))}
-\subitem simplified: \lstinline{(equal? `team1 (winner `match1))}
+\subitem \lstinline{meaning}:  \lstinline[mathescape]{((R 'team1) (($\lambda$ (match) ($\lambda$ (x) (equal? x (winner match)))) 'match1))}
+\subitem simplified: \lstinline{(equal? 'team1 (winner 'match1))}
 \end{itemize}
 
 
@@ -752,45 +775,45 @@ For each of the following utterances we give one possible, highest probability, 
 %\begin{itemize}
 %\item Possible interpretation: \textbf{BA}(\sv{Bob})(\textbf{FA}(\sv{be\ on})(\sv{Team\ 1}))
 %\item [$\equiv$] \sv{be\ on}(\sv{Team\ 1})(\sv{Bob})
-%\item [$=$] \lstinline[mathescape]{((($\lambda$ (team) ($\lambda$ (x) (element? x (players-on-team team)))) `team1) `Bob)}
-%\item [$\equiv$] \lstinline{(element? `Bob (players-on-team `team1))}
+%\item [$=$] \lstinline[mathescape]{((($\lambda$ (team) ($\lambda$ (x) (element? x (players-on-team team)))) 'team1) 'Bob)}
+%\item [$\equiv$] \lstinline{(element? 'Bob (players-on-team 'team1))}
 %\end{itemize}
 %%
 %\item Utterance 2: ``Jim is on Team 2.''
 %\begin{itemize}
 %\item Possible interpretation: \textbf{BA}(\sv{Jim})(\textbf{FA}(\sv{be\ on})(\sv{Team\ 2}))
 %\item [$\equiv$] \sv{be\ on}(\sv{Team\ 2})(\sv{Jim})
-%\item [$=$] \lstinline[mathescape]{((($\lambda$ (team) ($\lambda$ (x) (element? x (players-on-team team)))) `team2) `Jim)}
-%\item [$\equiv$] \lstinline{(element? `Jim (players-on-team `team2))}
+%\item [$=$] \lstinline[mathescape]{((($\lambda$ (team) ($\lambda$ (x) (element? x (players-on-team team)))) 'team2) 'Jim)}
+%\item [$\equiv$] \lstinline{(element? 'Jim (players-on-team 'team2))}
 %\end{itemize}
 %\item Utterance 3: ``Team 1 and Team 2 played in Match 1.''
 %\begin{itemize}
 %\item Possible interpretation: \textbf{BA}(\sv{Team\ 1\ and\ Team\ 2})(\textbf{FA}(\sv{played\ in})(\sv{Match\ 1}))
 %\item [$\equiv$] \sv{played\ in}(\sv{Match\ 1})(\sv{Team\ 1\ and\ Team\ 2})
-%\item [$=$] \lstinline[mathescape]{($\lambda$ (match) ($\lambda$ (team-list) (all (map ($\lambda$ (x) (element? x (teams-in-match match)))) team-list) `match1) `(team1 team2))} 
-%\item [$\equiv$] \lstinline[mathescape]{(all (map ($\lambda$ (x) (element? x (teams-in-match `match1)))) `(team1 team2))}   
-%\item [$\equiv$] \lstinline[mathescape]{(and (element? `team1 (teams-in-match `match1)) (element? `team2 (teams-in-match `match1)))}  
+%\item [$=$] \lstinline[mathescape]{($\lambda$ (match) ($\lambda$ (team-list) (all (map ($\lambda$ (x) (element? x (teams-in-match match)))) team-list) 'match1) '(team1 team2))} 
+%\item [$\equiv$] \lstinline[mathescape]{(all (map ($\lambda$ (x) (element? x (teams-in-match 'match1)))) '(team1 team2))}   
+%\item [$\equiv$] \lstinline[mathescape]{(and (element? 'team1 (teams-in-match 'match1)) (element? 'team2 (teams-in-match 'match1)))}  
 %\end{itemize}
 %\item Utterance 4: ``Team 1 won Match 1.''
 %\begin{itemize}
 %\item Possible interpretation: \textbf{BA}(\sv{Team\ 1})(\textbf{FA}(\sv{won})(\sv{Match\ 1}))
 %\item [$\equiv$] \sv{won}(\sv{Match\ 1})(\sv{Team\ 1})
-%\item [$=$] \lstinline[mathescape]{((($\lambda$ (match) ($\lambda$ (x) (equal? x (winner match)))) `match1) `team1)}
-%\item [$\equiv$] \lstinline{(equal? `team1 (winner `match1))}
+%\item [$=$] \lstinline[mathescape]{((($\lambda$ (match) ($\lambda$ (x) (equal? x (winner match)))) 'match1) 'team1)}
+%\item [$\equiv$] \lstinline{(equal? 'team1 (winner 'match1))}
 %\end{itemize}
 %\end{itemize}
 
 The literal listener conditions on each of these meanings in turn, updating her posterior belief distribution.
 %posterior belief state after these utterances will thus be given by sequentially conditioning on the truth of the literal interpretations assigned to these utterances by the \lstinline{meaning} function. 
 In the absence of pragmatic reasoning (described below), this is equivalent to conditioning on the conjunction of the meanings of each utterance.  
-%The listener's posterior beliefs about Bob's strength (i.e.~\lstinline{(strength `Bob)}) will be identical to those shown in Figure \ref{explainingaway}b: 
-Bob's inferred strength ((i.e.~ the posterior on \lstinline{(strength `Bob)}) increases substantially relative to the uninformed prior (see Figure \ref{explawayutt}). 
+%The listener's posterior beliefs about Bob's strength (i.e.~\lstinline{(strength 'Bob)}) will be identical to those shown in Figure \ref{explainingaway}b: 
+Bob's inferred strength ((i.e.~ the posterior on \lstinline{(strength 'Bob)}) increases substantially relative to the uninformed prior (see Figure \ref{explawayutt}). 
 
 Suppose, however, the speaker continues with the utterance:
 \begin{itemize}
 \item Utterance 5: \emph{Jim is the weakest player.}
-\subitem \lstinline{meaning}:  \lstinline[mathescape]{((R `Jim) (((R ($\lambda$ (x) (- (strength x)))) ($\lambda$ (A) ($\lambda$ (N) ($\lambda$ (x) (= (A x) (max A N)))))) ($\lambda$ (x) (element? x players))))}
-\subitem simplified: \lstinline[mathescape]{(= (- (strength `Jim)) (max ($\lambda$ (x) (- (strength x))) ($\lambda$ (x) (element? x players))))}
+\subitem \lstinline{meaning}:  \lstinline[mathescape]{((R 'Jim) (((R ($\lambda$ (x) (- (strength x)))) ($\lambda$ (A) ($\lambda$ (N) ($\lambda$ (x) (= (A x) (max A N)))))) ($\lambda$ (x) (element? x players))))}
+\subitem simplified: \lstinline[mathescape]{(= (- (strength 'Jim)) (max ($\lambda$ (x) (- (strength x))) ($\lambda$ (x) (element? x players))))}
 \end{itemize}
 %
 %\begin{itemize}
@@ -799,8 +822,8 @@ Suppose, however, the speaker continues with the utterance:
 %\item Possible interpretation:\\ 
 %\textbf{BA}(\sv{Jim})(\textbf{FA}(\sv{is})(\textbf{FA}(\sv{the})(\textbf{FA}(\textbf{BA}(\sv{weak})(\sv{\text{-}est}))(\sv{player}))))
 %\item [$\equiv$] \sv{\text{-}est}(\sv{weak})(\sv{player})(\sv{Jim})
-%\item [$=$] \lstinline[mathescape]{(((($\lambda$ (A) ($\lambda$ (N) ($\lambda$ (x) (= (argmax A x) (argmax ($\lambda$ ($\theta$) (some (map ($\lambda$ (x) ((A x) $\theta$)) N)))))))) ($\lambda$ (x) (element? x player))) ($\lambda$ (x) ($\lambda$ ($\theta$) (> (weakness x) $\theta$)))) `Jim)}
-%\item [$\equiv$] \lstinline[mathescape]{(= (argmax ($\lambda$ ($\theta$) (> (weakness `Jim) $\theta$))) (argmax ($\lambda$ ($\theta$) (some (map ($\lambda$ (x) ((weakness x) $\theta$)) ($\lambda$ (x) (element? x player)))))))    }
+%\item [$=$] \lstinline[mathescape]{(((($\lambda$ (A) ($\lambda$ (N) ($\lambda$ (x) (= (argmax A x) (argmax ($\lambda$ ($\theta$) (some (map ($\lambda$ (x) ((A x) $\theta$)) N)))))))) ($\lambda$ (x) (element? x player))) ($\lambda$ (x) ($\lambda$ ($\theta$) (> (weakness x) $\theta$)))) 'Jim)}
+%\item [$\equiv$] \lstinline[mathescape]{(= (argmax ($\lambda$ ($\theta$) (> (weakness 'Jim) $\theta$))) (argmax ($\lambda$ ($\theta$) (some (map ($\lambda$ (x) ((weakness x) $\theta$)) ($\lambda$ (x) (element? x player)))))))    }
 %\end{itemize}
 %\end{itemize}
 This expression will be true if and only if Jim's strength is the smallest of any player.
@@ -890,7 +913,7 @@ For example, suppose that the listener has observed that ten matches were played
   (eval QUD)
   (and 
     (= number-of-matches 10)
-    (eval (meaning `(most players played in some match)))))
+    (eval (meaning '(most players played in some match)))))
 \end{lstlisting}
 Recall that there are twelve players in our model, so that team size can fall anywhere from 1 to 6 players with equal probability. 
 If the number of matches is known to be large, then the subject wide scope reading can be true even if \lstinline{team-size} is small: it could easily happen that most players played in one or another of ten matches even if each team has only one or two players. 
@@ -1052,7 +1075,7 @@ Why then does it arise?
 
 Quantity implicatures follow from our model due to the pragmatic listener's use of ``counterfactual'' reasoning to help reconstruct the speaker's intended message from his observed utterance choice.
 Suppose that the \lstinline{QUD} is ``How many matches did Jane play in?''
-\todo{Put in formal QUD.. \lstinline{(num-true (element? `jane (map players-on-team (teams-in-match matches)))}}. 
+\todo{Put in formal QUD.. \lstinline{(num-true (element? 'jane (map players-on-team (teams-in-match matches)))}}. 
 Then alternative utterance ``Jane played in all the matches'' would have been appropriate if it were in fact true. Then the speaker's preference for informative utterance would have caused him to (probabilistically) prefer this utterance to the less informative ``Jane played in some match'' if it were true. 
 This preference is generated by the fact that---as long as utterances $u$ over $u'$ are assigned equal probability by \lstinline{language-prior}, the probability that a knowledgeable speaker will choose $u$ over $u'$ given a question under discussion $Q$ is determined by the probability that the listener will choose the correct answer to $Q$ if the speaker chooses $u$.
 Since the speaker in fact chose a much less informative utterance in this case, the listener can use Bayesian reasoning to infer that some precondition for the stronger utterance's use---e.g., its truth---is probably not fulfilled. 
@@ -1127,11 +1150,11 @@ A simple way to do this is to add a ``type-shifter'' that introduces a free thre
 In this denotation the variable \lstinline[mathescape]{$\theta$} is a free index that will be bound during interpretation as above.
 Now consider possible denotations that can be generated by \lstinline{meaning}.
 \begin{itemize}
-\item \sv{Bob\ strong}=\lstinline[mathescape]{(`Bob ($\lambda$ (x) (strength x)))}
-\item \sv{Bob\ strong}=\lstinline[mathescape]{((R `Bob) ($\lambda$ (x) (strength x)))}
-\item \sv{Bob\ strong}=\lstinline[mathescape]{((R `Bob) (T ($\lambda$ (x) (strength x))))}
+\item \sv{Bob\ strong}=\lstinline[mathescape]{('Bob ($\lambda$ (x) (strength x)))}
+\item \sv{Bob\ strong}=\lstinline[mathescape]{((R 'Bob) ($\lambda$ (x) (strength x)))}
+\item \sv{Bob\ strong}=\lstinline[mathescape]{((R 'Bob) (T ($\lambda$ (x) (strength x))))}
 \end{itemize}
-The first of these returns \emph{error} because \lstinline{`Bob} is not a function; the second applies \lstinline{strength} to \lstinline{`Bob} and returns a degree. Both of these meanings will be removed in the \lstinline{query} of \lstinline{literal-listener} because their values will never equal true. The third meaning tests whether Bob is stronger than a threshold variable and returns Boolean---it is the simplest well-typed meaning.
+The first of these returns \emph{error} because \lstinline{'Bob} is not a function; the second applies \lstinline{strength} to \lstinline{'Bob} and returns a degree. Both of these meanings will be removed in the \lstinline{query} of \lstinline{literal-listener} because their values will never equal true. The third meaning tests whether Bob is stronger than a threshold variable and returns Boolean---it is the simplest well-typed meaning.
 %, without specifying how \lstinline[mathescape]{$\theta$} is bound in sentences such as \emph{Bob is strong}.
 %We could instead define \sv{strong} = \lstinline[mathescape]{($\lambda$ (x) (>= (strength x) $\theta$))}, allowing \lstinline[mathescape]{$\theta$} to be a free semantic index variable.\footnote{We would then have to make a corresponding change
 %to the meaning of \emph{-est}: it would first bind the threshold variable locally, then proceed as above to saturate the threshold.}
@@ -1139,10 +1162,10 @@ With this meaning the utterance ``Bob is strong'' (with \lstinline{QUD} ``how st
 \begin{lstlisting}[mathescape]
 (query
   ...theory...
-  (define $\theta$ (uniform))
-  (define val (strength `Bob))
+  (define $\theta$ (uniform 0 1))
+  (define val (strength 'Bob))
   val
-  (>= (strength `Bob) $\theta$))
+  (>= (strength 'Bob) $\theta$))
 \end{lstlisting}
 
 \todo[inline]{Need an extended discussion of why and when to lift a free variable. Show the scaling properties of level-0 and level-1 variable inference...}
@@ -1359,9 +1382,9 @@ In the architecture we have described, uncertainty is pervasive through all aspe
 %
 %For each person, team, and match entity we have an associated name:
 %\begin{itemize}
-%\item \denot{Bob} = \lstinline{`Bob}
-%\item \denot{Team\ 1} = \lstinline{`team1}
-%\item \denot{Match\ 1} = \lstinline{`match1}
+%\item \denot{Bob} = \lstinline{'Bob}
+%\item \denot{Team\ 1} = \lstinline{'team1}
+%\item \denot{Match\ 1} = \lstinline{'match1}
 %\item ...
 %\end{itemize}
 %
@@ -1370,8 +1393,8 @@ In the architecture we have described, uncertainty is pervasive through all aspe
 %\item \sv{player} = \lstinline[mathescape]{($\lambda$ (x) (element? x player))}  
 %\item \sv{team} = \lstinline[mathescape]{($\lambda$ (x) (element? x teams))}
 %\item \sv{match} = \lstinline[mathescape]{($\lambda$ (x) (element? x matches))}
-%\item \sv{man} = \lstinline[mathescape]{($\lambda$ (x) (equal? (gender x) `male))}
-%\item \sv{woman} = \lstinline[mathescape]{($\lambda$ (x) (equal? (gender x) `female))}
+%\item \sv{man} = \lstinline[mathescape]{($\lambda$ (x) (equal? (gender x) 'male))}
+%\item \sv{woman} = \lstinline[mathescape]{($\lambda$ (x) (equal? (gender x) 'female))}
 %\end{itemize}
 %
 %And transitive verbs
@@ -1382,7 +1405,7 @@ In the architecture we have described, uncertainty is pervasive through all aspe
 %\item \sv{be\ on} =  \lstinline[mathescape]{($\lambda$ (team) ($\lambda$ (x) (element? x (players-on-team team))))} 
 %\item \sv{captain} = \lstinline[mathescape]{($\lambda$ (team) ($\lambda$ (x) (equal? x (captain team))))}
 %\end{itemize}
-%We assume that the conjoined NP \emph{Team 1 and Team 2} denotes the list \lstinline{`(team1 team2)}; compare the set-based account of plurals described in Scha \& Winter, this volume.
+%We assume that the conjoined NP \emph{Team 1 and Team 2} denotes the list \lstinline{'(team1 team2)}; compare the set-based account of plurals described in Scha \& Winter, this volume.
 %Note that the denotation of \emph{played in} takes such a list as its second argument, but that the order of elements in the list does not matter.
 %
 %Gradable adjectives:
@@ -1395,7 +1418,7 @@ In the architecture we have described, uncertainty is pervasive through all aspe
 %
 %Quantifiers and the superlative morpheme:
 %\begin{itemize}
-%\item \lstinline{(define individuals (union player team match))}
+%\item \lstinline{(define individuals (append player team match))}
 %\item \sv{every} = \lstinline[mathescape]{($\lambda$ (P) ($\lambda$ (Q) (all (map ($\lambda$ (x) (not (and (P x) (not Q x)))) individuals))))}
 %\item \sv{some} = \lstinline[mathescape]{($\lambda$ (P) ($\lambda$ (Q) (some (map ($\lambda$ (x) (and (P x) (Q x))) individuals))))}
 %\item \sv{most} = \lstinline[mathescape]{($\lambda$ (P) ($\lambda$ (Q) (> (proportion-true (map ($\lambda$ (x) (and (P x) (Q x))) individuals)) .5)))}
@@ -1432,9 +1455,9 @@ In the architecture we have described, uncertainty is pervasive through all aspe
 %\section{Example sentences}
 %\begin{itemize}
 %\item "the teams in match1 were bob and jim. bob won match1." ... "jim is the weakest player." : initial graded inference about bob's strength. explaining away. initially think bob strong, then probably not.
-%\subitem \textsv{the teams in match1 were bob and jim}= \lstinline{(equal? (teams-in-match `match1) `((Bob) (Jim)))}. (Note converting each person into the set which is his team....)
-%\subitem \textsv{bob won match1}= \lstinline{(equal? (winner `match1) `(Bob))} (Note again converting Bob to his team.)
-%\subitem \textsv{jim is the weakest player}= \lstinline{(equal? `Jim (est (< (strength x) t) players))}  (Est has to grab the threshold and set it to highest value s.t. set is non-empty.) 
+%\subitem \textsv{the teams in match1 were bob and jim}= \lstinline{(equal? (teams-in-match 'match1) '((Bob) (Jim)))}. (Note converting each person into the set which is his team....)
+%\subitem \textsv{bob won match1}= \lstinline{(equal? (winner 'match1) '(Bob))} (Note again converting Bob to his team.)
+%\subitem \textsv{jim is the weakest player}= \lstinline{(equal? 'Jim (est (< (strength x) t) players))}  (Est has to grab the threshold and set it to highest value s.t. set is non-empty.) 
 %
 %
 %%\item  "teamA won match 3"
@@ -1461,8 +1484,8 @@ In the architecture we have described, uncertainty is pervasive through all aspe
 %\caption{default}
 %\begin{center}
 %\begin{tabular}{llc}
-%\sv{`players}&= & $`(Bob\ Jim ...)$ \\
-%\sv{`Bob}&= & $`Bob$ or $`(Bob)$ \\
+%\sv{'players}&= & $'(Bob\ Jim ...)$ \\
+%\sv{'Bob}&= & $'Bob$ or $'(Bob)$ \\
 %\sv{player}&= & $\lambda.x (x\in players) $ \\
 % 
 %\end{tabular}
@@ -1895,7 +1918,7 @@ In the architecture we have described, uncertainty is pervasive through all aspe
 %Crucially, $\theta$ is left as a free variable in the semantic representation. The meaning of \emph{Sam is tall}, then, is simply that Sam's height is at least $\theta$; the task of inferring $\theta$ in order to derive a meaning for this sentence will be preformed by the full interpretation model, \lstinline{L1-sv}. This approach to the interpretation of vague adjectives captures the insights of previous probabilistic accounts \citep{edgington97,schmidtetal09,frazeebeaver10,lassiter11}, but improves on them in several ways, notably in providing a clear lexical semantics from which the probabilities follow.
 %
 %
-%To illustrate, imagine a situation in which a speaker is attempting to communicate Sam's height to a listener who does not know how tall Sam is, but knows that Sam is an adult male. The \lstinline{QUD} is \lstinline{(height `sam)}. We assume that listener and speaker share the common prior knowledge that heights of people are approximately normally distributed. The meaning of the sentence \emph{Sam is tall}, as constructed by the \lstinline{meaning} function, will be simply \lstinline[mathescape,keepspaces]{(> (height `sam) theta)}.
+%To illustrate, imagine a situation in which a speaker is attempting to communicate Sam's height to a listener who does not know how tall Sam is, but knows that Sam is an adult male. The \lstinline{QUD} is \lstinline{(height 'sam)}. We assume that listener and speaker share the common prior knowledge that heights of people are approximately normally distributed. The meaning of the sentence \emph{Sam is tall}, as constructed by the \lstinline{meaning} function, will be simply \lstinline[mathescape,keepspaces]{(> (height 'sam) theta)}.
 %The listener \lstinline{L1-sv} will then do a joint inference of Sam's height and the threshold variable \lstinline{theta}.
 %
 %\begin{figure}[tbp]
@@ -2096,7 +2119,7 @@ In the architecture we have described, uncertainty is pervasive through all aspe
 %%, leaving it as a mystery why the structures underlying the meanings of modal expressions should resemble so closely the cognitive mechanisms which they are used to describe.
 %In our approach the meanings of linguistic expressions of uncertainty, desire, and causation are not \emph{sui generis}, but are defined in terms of the concepts that agents use to reason about their own and others' actions and motivations. 
 %
-%The key technical idea is that the intuitive theory of mind provides for each person a distribution over worlds. Rather than reifying worlds directly, we can represent beliefs as mappings from expressions (the question of interest, \lstinline{QOI}) to values. Thus Bob's beliefs, \lstinline{(beliefs `bob)}, will be a function from expressions to values, and\\ \lstinline[keepspaces]{((beliefs `bob) `(sky-is `blue))} represents (the probability that) Bob believes the sky is blue.
+%The key technical idea is that the intuitive theory of mind provides for each person a distribution over worlds. Rather than reifying worlds directly, we can represent beliefs as mappings from expressions (the question of interest, \lstinline{QOI}) to values. Thus Bob's beliefs, \lstinline{(beliefs 'bob)}, will be a function from expressions to values, and\\ \lstinline[keepspaces]{((beliefs 'bob) '(sky-is 'blue))} represents (the probability that) Bob believes the sky is blue.
 %The belief function for a rational Bayesian agent can be written:
 %\begin{lstlisting}[mathescape]
 %(define (beliefs person)
