@@ -869,67 +869,71 @@ When a sentence is ambiguous in any of the above ways, the listener will favor p
 For example, consider the utterance ``Most players played in some match''. 
 Two (simplest, well-typed) interpretations are possible. We give an intuitive paraphrase and the meanings for each (leaving lexical items in place to expose the compsitional structure):
 \begin{itemize}
-\item Subject wide scope:
+\item Subject-wide scope:
 \subitem ``For most players $x$, there was a match $y$ such that $x$ played in $y$.'' 
 \subitem ((R (\sv{Most} \sv{players})) ((AR2 (AR1 \sv{played\ in})) (\sv{some} \sv{match})))
-\item Object wide scope: 
+\item Object-wide scope: 
 \subitem ``For some match $y$, most players played in $y$.''
 \subitem ((R (\sv{Most} \sv{players})) ((AR1 (AR2 \sv{played\ in})) (\sv{some} \sv{match})))
 \end{itemize}
 \todo{Give the (reduced) church expressions for each of these meanings, too?}
 Both readings equally \emph{a priori} probable, since the \lstinline{meaning} function draws type-shifters uniformly at random. 
 However, if one reading is more likely to be true, given background knowledge, it will be preferred.
-This means that we can influence the probability of each reading, and the degree to which each influences the listener's posterior belief, by manipulating relevant world knowledge: for instance, the number of players on each team and the number of matches played.
+This means that we can influence the meaning used, and the degree to which each meaning influences the listener's posterior beliefs, by manipulating relevant world knowledge.
 
-Suppose that the listener has observed that ten matches were played:
-\begin{lstlisting}
-(query
-  ...ToW theory...
-  (eval QUD)
-  (and 
-    (= number-of-matches 10)
-    (eval (meaning '(most players played in some match)))))
-\end{lstlisting}
-Recall that there are twelve players in our model, so that team size can fall anywhere from 1 to 6 players with equal probability. 
-If the number of matches is known to be large, then the subject wide scope reading can be true even if \lstinline{team-size} is small: it could easily happen that most players played in one or another of ten matches even if each team has only one or two players. 
+%: for instance, the number of players on each team and the number of matches played.
+To illustrate the effect of background knowledge on choice of meaning, imagine varying the number of matches played in our tug-of-war example. 
+%Suppose that the listener has observed that ten matches were played:
+%\begin{lstlisting}
+%(query
+%  ...ToW theory...
+%  (eval QUD)
+%  (and 
+%    (= number-of-matches 10)
+%    (eval (meaning '(most players played in some match)))))
+%\end{lstlisting}
+Recall (see Figure \ref{tow}) that all teams are of size \lstinline{team-size}, which varies across worlds and can be anywhere from 1 to 6 players, with equal probability. 
+If the number of matches is large (say we \lstinline{(define matches '(match1 ... match10))}), then the subject-wide scope reading can be true even if \lstinline{team-size} is small: it could easily happen that most players played in one or another of ten matches even if each team has only one or two players. 
+%
+In contrast, the object-wide scope reading, which requires most players on a \emph{single} match, can be true only if teams are large enough (i.e.~\lstinline{team-size} is $\geq 4$, so that more than half of the players are in each match). 
+The \lstinline{literal-listener} jointly infers \lstinline{team-size} and the reading of the utterance, assuming the utterance is true; because of the asymmetry in when the two readings will be true, there will be a preference for the subject-wide reading if the number of matches is large---it is more often true.
+If the number of matches is small, however, the asymmetry between readings will be decreased. 
+Suppose that only one match was played (i.e.~\lstinline{(define matches '(match1))}), then both readings can be true only if the team size is large.
+The listener will thus infer that \lstinline{team-size}$\geq 4$ and the two readings of the utterance are equally probable.
+Figure \ref{scope-ambiguity}, left panel, shows the strength of each reading as the number of matches varies. 
+The right panel shows the mean inferred team size as the number of matches varies, for each reading and for the marginal. 
+%Note that the inferred team size is insensitive to variation in the number of matches when object-wide scope is used: this is because the existence of a single match with most players in it entails that team size is 4, 5, or 6 (with equal probability), no matter how many matches were played. 
+%However, when the subject wide scope reading is assigned the inferred number of players declines steadily as the number of matches increases. 
+Thus language understanding by joint inference predicts that the resolution of quantifier scope ambiguities will be highly sensitive to background information. 
 
-The object wide scope reading, in contrast, is satisfiable in such a situation only if \lstinline{team-size} is 4, 5, or 6 (so that more than half of the total players are in each match). 
-Since \lstinline{team-size} is unknown, this asymmetry leads to a preference for the subject wide scope reading with large values of \lstinline{number-of-matches}: this reading is compatible with situations which are \emph{a priori} possible, but are excluded by the object wide scope reading. 
-
-On the other hand, suppose that only one match was played: then both readings can be true only if each team has the maximum possible number of players (6). 
-The listener will thus infer that \lstinline{team-size} is equal to 6, and the two readings of the utterance are equally probable, as they were in the prior.
-
-The left panel of the figure \ref{scope-ambiguity}
- plots the strength of each reading as the number of matches varies. 
-The right panel shows the mean inferred team size as the number of matches varies. 
 \begin{figure}[tbh]
 \begin{center}
 \includegraphics[scale=.45]{quantifiers.pdf}
 \end{center}
-\label{scope-ambiguity}
 \caption{The probability of the listener interpreting the utterance \emph{Most players played in some match} according to the two possible scopal configurations depends in intricate ways on the interpreter's beliefs and observations about the number of matches and the number of players on each team (left). This, in turn, influences the total information conveyed by the utterance (right).}
+\label{scope-ambiguity}
 \end{figure} 
-Note that the inferred team size is insensitive to variation in the number of matches when the object wide scope reading is assigned: this is because the existence of a single match with most players in it entails that team size is 4, 5, or 6 (with equal probability), no matter how many matches were played. 
-However, when the subject wide scope reading is assigned the inferred number of players declines steadily as the number of matches increases. 
 
-This model of language understanding predicts that the resolution of quantifier scope ambiguities should be highly sensitive to background information, and that an ambiguous utterance may lead to rather different belief update effects depending on the plausibility of the various interpretations given background knowledge. 
+More generally, an ambiguous utterance may be resolved differently, and lead to rather different belief update effects, depending on the plausibility of the various interpretations given background knowledge. In a probabilistic framework, preferences over alternative interpretations vary continuously between the extremes of assigning equal probability to multiple interpretations and assigning probability $1$ to a single interpretation.
+This is true whether the ambiguity comes from syntax, composition, or lexicon. 
+Indeed, psycholinguistic research suggests that background information has exactly this kind of graded effect 
+on syntactic ambiguity \citep{crain1985not,altmann1988interaction,spivey2002eye}.
+%
+%For instance, lexical ambiguities of the ``bank''/``bank'' variety could be treated either by having the \lstinline{lexicon} function map ``bank'' to either of two discrete meanings, or by assuming that the latent mechanism which divides utterances into words recognizes two distinct words with this phonological realization.
+%Intrinsically graded (e.g., prototype) meanings are most naturally thought of as stochastically denoting regions of a non-discrete conceptual space. 
+%
+%The model makes essentially the same predictions about the resolution of structural ambiguities. Let $u$ be an utterance with two equally probable parses.
+%With no background information to constrain interpretation, either interpretation of this utterance might be appropriate, and a true ambiguity is felt. 
+%However, if one of the two possible interpretations is more likely to be true than the other, the literal listener will automatically prefer the parse which generates the more probable interpretation.
+%In the limit, if one interpretation has zero prior probability, the syntactic ambiguity will not be felt because the interpretation that it generates will always be rejected by the \lstinline{query} function embedded in the definition of the literal listener.
 
-The model makes essentially the same predictions about the resolution of structural ambiguities. Let $u$ be an utterance with two equally probable parses.
-With no background information to constrain interpretation, either interpretation of this utterance might be appropriate, and a true ambiguity is felt. 
-However, if one of the two possible interpretations is more likely to be true than the other, the literal listener will automatically prefer the parse which generates the more probable interpretation.
-In the limit, if one interpretation has zero prior probability, the syntactic ambiguity will not be felt because the interpretation that it generates will always be rejected by the \lstinline{query} function embedded in the definition of the literal listener.
-The model predicts that these preferences should display continuous variation between the extremes of assigning equal probability to both and assigning probability 1 to one parse.
-Psycholinguistic research has demonstrated that background information affects the syntactic structures assigned to ambiguous sentences in this way \citep{crain1985not,altmann1988interaction,spivey2002eye}.
 
-Lexical uncertainty will not be our focus here, but we should mention two prominent cases: lexical ambiguity and graded meanings. 
-Lexical ambiguities of the ``bank''/``bank'' variety could be treated either by having the \lstinline{lexicon} function map ``bank'' to either of two discrete meanings, or by assuming that the latent mechanism which divides utterances into words recognizes two distinct words with this phonological realization.
-Intrinsically graded (e.g., prototype) meanings are most naturally thought of as stochastically denoting regions of a non-discrete conceptual space. 
+
 
 
 \subsection{Compositionality}
-%\todo[inline]{Noah: discuss that compositionality in language and thought are similar but along different `directions'...}
 
-It should be clear that compositionally has played a key role in our model of language interpretation thus far. It has in fact played several key roles: expressions in SLC are built from simpler expressions, sequences of utterances are interpreted by sequential conditioning, the \lstinline{meaning} function composes SLC expressions to form sentence meanings. There are thus several, interlocking ``directions'' of compositionality at work, and they result in interactions that could appear non-compositional if only one direction was considered. Let us focus on two: compositionality of world knowledge and compositionality of linguistic meaning.
+It should be clear that compositionality has played a key role in our model of language interpretation thus far. It has in fact played several key roles: expressions in SLC are built from simpler expressions, sequences of utterances are interpreted by sequential conditioning, the \lstinline{meaning} function composes SLC expressions to form sentence meanings. There are thus several, interlocking ``directions'' of compositionality at work, and they result in interactions that could appear non-compositional if only one direction was considered. Let us focus on two: compositionality of world knowledge and compositionality of linguistic meaning.
 
 Compositionality of world knowledge refers to the way that we use SLC to build distributions over possible worlds, not by directly assigning probabilities to all possible expressions, but by an evaluation process that recursively samples values for sub-expressions. 
 That is, we have a compositional language for specifying generative models of the world.
