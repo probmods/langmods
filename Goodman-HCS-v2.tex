@@ -285,13 +285,7 @@ One consequence of dynamic typing for a probabilistic language is that expressio
 For simplicity (and utility below) we assume that when an operator is applied to values outside of its domain, for instance \lstinline{(+ 1 'a)}, it returns a special value \emph{error} which is itself outside the domain of all operators, except the equality operator \lstinline{eq?}. By allowing \lstinline{eq?} to test for error we permit very simple error handling, and allow \lstinline{query} (which relies on a simple equality test to decide whether to ``keep going'') to filter out mis-typed sub-computations.
 
 
-%\todo[inline]{Do we want to give a definitional interpreter (eval) for ESLC in an appendix???}
-
-
-
 \subsection{Commonsense knowledge}
-
-\todo[inline]{Need to make sure the Church code accurately reflects the simulation setup.}
 
 \todo[inline]{Shalom: The first paragraph of subsection 1.2 is not clear. You need to explain how probability distributions over complete worlds can be derived from distributions over bounded sets of situations in a sampling space. This is a crucial point. You tend to use worlds and situations as interchageable, but they are not. Situation theory was introduced as an alternative to possible worlds semantics,
 and there are significant difference in the model theories associated with each of these approaches. Both classical and Bayesian probability theory tends to treat situations as worlds, but in fact bounded sets of situations (situation types defined over a bounded set of alternatives) are formally and computationally distinct from complete worlds. }
@@ -301,7 +295,7 @@ To evaluate any particular expression or query requires evaluating only a small 
 That is, a particular query only depends on the partial world of expressions actually constructed during the evaluation process. 
 The relationship between the idealized complete possible worlds and these partial worlds is coherent because taking the marginal sum over any expressions that are evaluated but that don't impact the value of the query (condition or query expressions) results in the same distribution as if we didn't evaluate them. For instance \lstinline{(first (pair (flip) (flip)))} results in the same distribution as \lstinline{(flip)} (the second \lstinline{flip} is created but then discarded, resulting in the same distribution as if it had never been created).
 %\todo{Noah: need to state this theorem more formally.} 
-For this reason we can comfortably speak interchangeably about possible worlds and partial worlds (or situations).
+For this reason we can comfortably speak interchangeably about possible worlds and partial worlds.
 
 In this chapter we use sets of stochastic functions in Church to specify the intuitive knowledge---or theory---that a person has about the world. 
 To make this more precise we now describe an example, the tug-of-war game, which we will use later in the chapter as the non-linguistic conceptual basis of a semantics and pragmatics for a small fragment of English. 
@@ -933,7 +927,7 @@ on syntactic ambiguity \citep{crain1985not,altmann1988interaction,spivey2002eye}
 
 \subsection{Compositionality}
 
-It should be clear that compositionality has played a key role in our model of language interpretation thus far. It has in fact played several key roles: expressions in SLC are built from simpler expressions, sequences of utterances are interpreted by sequential conditioning, the \lstinline{meaning} function composes SLC expressions to form sentence meanings. There are thus several, interlocking ``directions'' of compositionality at work, and they result in interactions that could appear non-compositional if only one direction was considered. Let us focus on two: compositionality of world knowledge and compositionality of linguistic meaning.
+It should be clear that compositionality has played a key role in our model of language interpretation thus far. It has in fact played several key roles: Church expressions are built from simpler expressions, sequences of utterances are interpreted by sequential conditioning, the \lstinline{meaning} function composes Church expressions to form sentence meanings. There are thus several, interlocking ``directions'' of compositionality at work, and they result in interactions that could appear non-compositional if only one direction was considered. Let us focus on two: compositionality of world knowledge and compositionality of linguistic meaning.
 
 Compositionality of world knowledge refers to the way that we use SLC to build distributions over possible worlds, not by directly assigning probabilities to all possible expressions, but by an evaluation process that recursively samples values for sub-expressions. 
 That is, we have a compositional language for specifying generative models of the world.
@@ -943,12 +937,12 @@ This is the standard truth-functional semantics approach to meaning composition.
 %
 Interpreted meaning---the posterior distribution arrived at by \lstinline{literal-listener}---is not immediately compositional along either world knowledge or linguistic structure. 
 Instead it arises from the interaction of these two factors.
-The glue between these two structures is the conceptual lexicon; it defines the conceptual language for imagining particular situations, and the primitive semantic vocabulary for semantic meaning.
+The glue between these two structures is the intuitive theory; it defines the conceptual language for imagining particular situations, and the primitive  vocabulary for semantic meaning.
 
 An alternative approach to compositional probabilistic semantics would be to let each linguistic expression denote a distribution or probability directly, and build the linguistic interpretation by composing them. This appears attractive: it is more direct and simpler (and does not rely on complex generative knowledge of the world). 
 How would we compose these distributions? For instance take ``Jack is strong and Bob is strong''. If ``Jack is strong'' has probability $0.2$ and ``Bob is strong'' has probability $0.3$, what is the probability of the whole sentence? 
 A natural approach would be to multiply the two probabilities. 
-However this implies that their strengths are independent---which is intuitively unlikely: if Jack and Bob are both men, then learning that Jack is strong suggests than men are strong, which suggests that Bill is strong.
+However this implies that their strengths are independent---which is intuitively unlikely: for instance, if Jack and Bob are both men, then learning that Jack is strong suggests than men are strong, which suggests that Bill is strong.
 A more productive strategy is the one we have taken: world knowledge specifies a joint distribution on the strength of Bob and Jack (by first sampling the prototypical strength of men, then sampling the strength of each), and the sentence imposes a \emph{constraint} on this distribution (that each man's strength exceeds a threshold). 
 The sentence denotes not a world probability simpliciter, but a constraint on worlds which \emph{is} built compositionally. 
 
