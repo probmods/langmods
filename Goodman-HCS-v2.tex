@@ -287,30 +287,20 @@ For simplicity (and utility below) we assume that when an operator is applied to
 
 \subsection{Commonsense knowledge}
 
-\todo[inline]{Shalom: The first paragraph of subsection 1.2 is not clear. You need to explain how probability distributions over complete worlds can be derived from distributions over bounded sets of situations in a sampling space. This is a crucial point. You tend to use worlds and situations as interchageable, but they are not. Situation theory was introduced as an alternative to possible worlds semantics,
-and there are significant difference in the model theories associated with each of these approaches. Both classical and Bayesian probability theory tends to treat situations as worlds, but in fact bounded sets of situations (situation types defined over a bounded set of alternatives) are formally and computationally distinct from complete worlds. }
-
-A set of stochastic function definitions in Church can be interpreted as a distribution over possible worlds: A world consists of a value for each well-formed expression that can be made from the defined functions (in each calling position). 
-To evaluate any particular expression or query requires evaluating only a small subset of this infinitude of expressions. 
-That is, a particular query only depends on the partial world of expressions actually constructed during the evaluation process. 
-The relationship between the idealized complete possible worlds and these partial worlds is coherent because taking the marginal sum over any expressions that are evaluated but that don't impact the value of the query (condition or query expressions) results in the same distribution as if we didn't evaluate them. For instance \lstinline{(first (pair (flip) (flip)))} results in the same distribution as \lstinline{(flip)} (the second \lstinline{flip} is created but then discarded, resulting in the same distribution as if it had never been created).
-%\todo{Noah: need to state this theorem more formally.} 
-For this reason we can comfortably speak interchangeably about possible worlds and partial worlds.
-
 In this chapter we use sets of stochastic functions in Church to specify the intuitive knowledge---or theory---that a person has about the world. 
-To make this more precise we now describe an example, the tug-of-war game, which we will use later in the chapter as the non-linguistic conceptual basis of a semantics and pragmatics for a small fragment of English. 
+To illustrate this idea we now describe an example, the tug-of-war game, which we will use later in the chapter as the non-linguistic conceptual basis of a semantics and pragmatics for a small fragment of English. 
 Tug-of-war is a simple game in which two teams pull on either side of a rope; the team that pulls hardest will win. 
 Our intuitive knowledge of this domain (and indeed most similar team games) rests on a set of interrelated concepts: players, teams, strength, matches, winners, etc. 
 We now sketch a simple realization of these concepts in Church. 
-To start, each player has some traits that influence his or her contribution to the game: strength, which may depend on gender.
+To start, each player has some traits, strength and gender, that may influence each other and his or her contribution to the game.
 \begin{lstlisting}[mathescape]
 (define gender (mem ($\lambda$ (p) (if (flip) 'male 'female))))
 (define gender-mean-strength (mem ($\lambda$ (g) (gaussian 0 2))))
 (define strength (mem ($\lambda$ (p) (gaussian (gender-mean-strength (gender p)) 1))))
 \end{lstlisting}
 We have defined the strength of a person as a \emph{mixture model}: strength depends on a latent class, gender, through the (a priori unknown) gender means. 
-Note that we are able to describe the properties of people (\lstinline{strength}, \lstinline{gender}) without needing to specify the people---instead we assume that each person is represented by a unique symbol, and memoize the functions on this symbol, resulting in functions which create the properties of a person only when needed (but then hold those properties persistently). 
-In particular, the person argument, \lstinline{p}, is never used in the function \lstinline{gender}, but it matters because the function is memoized---a gender will be persistently associated to each person though generating that gender initially doesn't depend on the person. 
+Note that we are able to describe the properties of people (\lstinline{strength}, \lstinline{gender}) without needing to specify the people---instead we assume that each person is represented by a unique symbol, using memoized functions from these symbols to properties to create the properties of a person only when needed (but then hold those properties persistently). 
+In particular, the person argument, \lstinline{p}, is never used in the function \lstinline{gender}, but it matters because the function is memoized---a gender will be persistently associated to each person even though the distribution of genders doesn't depend on the person. 
 We will exploit this pattern often below.
 We are now already in a position to make useful inferences. 
 We could, for instance observe the strengths and genders of several players, and then Pat's strength but not gender, and ask for the latter:
@@ -333,7 +323,9 @@ This is because the observed males are weaker than Jane, the observed female, an
 
 In the game of tug-of-war players are on teams, which themselves have properties such as captains:
 \begin{lstlisting}[mathescape]
-(define players '(Bob Jim Mary Sue Bill Evan Sally Tim Pat Jane Terrence Kate))
+(define players '(Bob Jim Mary Sue Bill Evan Sally Tim Pat Jane Dan Kate))
+(define teams '(team1 team2 team3))
+
 (define team-size (uniform-draw '(1 2 3 4 5 6)))
 (define players-on-team (mem ($\lambda$ (team) (draw-n team-size players))))
 (define captain (mem ($\lambda$ (team) (uniform-draw (players-on-team team)))))
@@ -356,30 +348,27 @@ In the game of tug-of-war players are on teams, which themselves have properties
 %     (if (= n 1)
 %         (list next-draw)
 %         (append (list next-draw) (draw-n (- n 1) rest-of-lst)))))
+%
 Here the \lstinline{draw-n} ERP draws uniformly but without replacement from a list.
 %
 In addition to players and teams, we have matches: events that have two teams and a winner, the winner depends on how hard each team is pulling, which depends on how hard each team member is pulling.
 \begin{lstlisting}[mathescape]
-(define teams '(team1 team2 team3))
-
 (define teams-in-match (mem ($\lambda$ (match) (draw-n 2 teams))))
 (define pulling (mem ($\lambda$ (player match) 
-         (+ (strength player) (gaussian 0 0.5)))))
+                         (+ (strength player) (gaussian 0 0.5)))))
 (define team-pulling (mem ($\lambda$ (team match) 
                               (sum (map pulling (players-on-team team))))))
 (define (winner match) 
-  (let ([teamA (first (teams-in-match match))]
-        [teamB (second (teams-in-match match))])
-    (if (> (team-pulling teamA) (team-pulling teamB))
-        teamA
-        teamB)))
+  (define teamA (first (teams-in-match match)))
+  (define teamB (second (teams-in-match match)))
+  (if (> (team-pulling teamA) (team-pulling teamB)) teamA teamB))
 \end{lstlisting}
 Notice that the team pulling is simply the sum of how hard each member is pulling; each player pulls with their intrinsic strength, plus a random amount that indicates their effort on this match. 
  
  \begin{figure}[htbp]
 \begin{center}
  \begin{lstlisting}[mathescape]
-(define players '(Bob Jim Mary Sue Bill Evan Sally Tim Joe Jane Terrence Kate))
+(define players '(Bob Jim Mary Sue Bill Evan Sally Tim Joe Jane Dan Kate))
 (define teams '(team1 team2 team3))
 (define matches '(match1 match2 match3 match4))
 (define individuals (append players teams matches))
@@ -411,7 +400,7 @@ Notice that the team pulling is simply the sum of how hard each member is pullin
 \end{figure}
 
  
-The conceptual lexicon of functions for the tug-of-war domain is given altogether in Figure \ref{tow}.
+The intuitive theory, or conceptual lexicon of functions, for the tug-of-war domain is given altogether in Figure \ref{tow}.
 A conceptual lexicon like this one describes generative knowledge about the world---interrelated concepts that can be used to describe the causal story of how various observations come to be. 
 %
 We can use this knowledge to reason from observations to predictions or latent states by conditioning (i.e. \lstinline{query}). 
@@ -427,8 +416,8 @@ Imagine that Bob is playing Jim in match 1; we can infer Bob's strength before o
     (equal? (teams-in-match 'match1) '(team1 team2))))
 \end{lstlisting}
 In this and all that follows \lstinline{...ToW theory...} is an abbreviation for the definitions in Figure \ref{tow}. 
-The result of this strength is simply the prior belief about Bob's strength: a distribution with mean 0.0.
-
+The result of this inference is simply the prior belief about Bob's strength: a distribution with mean 0.0 (Figure \ref{explainingaway}a).
+%
 Now imagine that Bob wins this match:
 \begin{lstlisting}[mathescape]
 (query
@@ -440,7 +429,18 @@ Now imagine that Bob wins this match:
     (equal? (teams-in-match 'match1) '(team1 team2))
     (equal? (winner 'match1) 'team1)))
 \end{lstlisting}
-If we evaluate this query we find that Bob is inferred to be relatively strong: his mean strength after observing this match is about 1.2, much higher than his a priori mean strength of $0.0$. 
+If we evaluate this query we find that Bob is inferred to be relatively strong: his mean strength after observing this match is about 1.2 (Figure \ref{explainingaway}b), much higher than his \emph{a priori} mean strength of $0.0$. 
+
+\begin{figure}[tbh]
+\begin{center}
+\includegraphics[scale=.5]{explaining-away-example.pdf}
+\end{center}
+\caption{An example of explaining away. 
+Lines show the distribution on Bob's inferred strength after (a) no observations (solid); (b) observing that Bob beat Jim, whose strength is unknown (long dash); (c) learning that Jim is very weak, with strength -3 (short dash).}
+\label{explainingaway}
+\end{figure}
+
+
 However, imagine that we then learned that Jim is a weak player:
  \begin{lstlisting}[mathescape]
 (query
@@ -453,29 +453,48 @@ However, imagine that we then learned that Jim is a weak player:
     (equal? (winner 'match1) 'team1))
     (= (strength 'Jim) -3.0))
 \end{lstlisting}
-
-Now, we have very little evidence about Bob's strength---the inferred mean strength from this query goes back to (almost) 0.0. 
-This is an example of \emph{explaining away}: the assumption that Jim is weak has explained the observation that  Bob beat Jim, which otherwise would have provided evidence that Bob is strong. 
-\begin{figure}[tbh]
-\begin{center}
-\includegraphics[scale=.5]{explaining-away-example.pdf}
-\end{center}
-\caption{An example of explaining away. 
-Lines show the distribution on Bob's inferred strength after (a) no observations (solid); (b) observing that Bob beat Jim, whose strength is unknown (long dash); (c) learning that Jim is very weak, with strength -3 (short dash).}
-\label{explainingaway}
-\end{figure}
+Now we have very little evidence about Bob's strength---the inferred mean strength from this query goes back to (almost) 0.0 (Figure \ref{explainingaway}c). 
+This is an example of \emph{explaining away}: the assumption that Jim is weak has explained the observation that Bob beat Jim, which otherwise would have provided evidence that Bob is strong. 
 Notice that we have gone through a non-monotonic reasoning sequence: Our degree of belief that Bob is strong went up from the first piece of evidence, and then back down from the second. 
 The explaining away pattern is extremely common in probabilistic inference over structure models. 
-It is characterized by a priori independent variables (such as Bob and Jim's strengths) becoming coupled together by an observation (such as the outcome of match 1). 
-Another way of saying this is that our knowledge of the world, the generative model, can have a significant amount of modularity; our inferences after making observations will generally not be modular in this way, instead complex patterns of influence can couple together disparate pieces of the model.
+It is characterized by \emph{a priori} independent variables (such as Bob and Jim's strengths) becoming coupled together by an observation (such as the outcome of match 1). 
+Another way of saying this is that our knowledge of the world, the generative model, can have a significant amount of modularity; our inferences after making observations will generally not be modular in this way. Instead, complex patterns of influence can couple together disparate pieces of the model.
 
 %Another common pattern is \emph{screening off}: 
 % \todo[inline]{Observe sam beats jim, predict sam will beat jim again. Knowing jim and sam's strengths, finding out sam beat jim doesn't change prediction. }
 
 There are a number of other patterns of reasoning that are common results of probabilistic inference over structured models. 
-For instance, \emph{screening off} describes the situation when two variables that were a priori dependent become independent after an observation (in some sense the opposite of explaining away).
+For instance, \emph{screening off} describes the situation when two variables that were \emph{a priori} dependent become independent after an observation (in some sense the opposite of explaining away).
 Other patterns include Occam's razor (complexity of hypotheses is automatically penalized), transfer learning (an inductive bias learned from one domain constrains interpretation of evidence in a new domain), and the blessing of abstraction (abstract knowledge can be learned faster than concrete knowledge). 
 These will be less important in what follows, but we note that they are potentially important for the question of language learning---when we view learning as an inference, the dynamics of probabilistic inference come to bear on the learning problem. For detailed examples of these patterns, using Church representation, see \url{http://probmods.org}.
+ 
+ 
+ 
+ \subsection{Possible worlds}
+
+\todo[inline]{Shalom: The first paragraph of subsection 1.2 is not clear. You need to explain how probability distributions over complete worlds can be derived from distributions over bounded sets of situations in a sampling space. This is a crucial point. You tend to use worlds and situations as interchageable, but they are not. Situation theory was introduced as an alternative to possible worlds semantics,
+and there are significant difference in the model theories associated with each of these approaches. Both classical and Bayesian probability theory tends to treat situations as worlds, but in fact bounded sets of situations (situation types defined over a bounded set of alternatives) are formally and computationally distinct from complete worlds.}
+
+A set of stochastic function definitions in Church can be interpreted as a distribution over possible worlds: A world consists of a value\footnote{In fact a world consists of a countable sequence of values for each expression, since the same sub-expression may occur multiple times with different values.} for each well-formed expression that can be made using the defined functions.  For instance, consider the definitions:
+\begin{lstlisting}[mathescape]
+(define f ($\lambda$ () (flip 0.2)))
+(define g ($\lambda$ (x) (or x (flip 0.4))))
+\end{lstlisting}
+From these we can form a multitude of expressions, such as \lstinline{(f)}, \lstinline{(g (g (f)))}, and \lstinline{(and (g (f)) (f))}. A world is an assignment of a value to each expression; note that not all worlds will be well-formed evaluations (the relationship between expressions and their sub-expressions may not be a consistent evaluation).
+To evaluate any particular expression or query requires evaluating only a small subset of this infinitude of expressions. 
+That is, a particular query only depends on the partial world of expressions actually constructed during the evaluation process. 
+The relationship between the idealized complete possible worlds and these partial worlds is coherent because taking the marginal sum over any expressions that are evaluated but that don't impact the value of the query (condition or query expressions) results in the same distribution as if we didn't evaluate them. For instance \lstinline{(first (pair (flip) (flip)))} results in the same distribution as \lstinline{(flip)} (the second \lstinline{flip} is created but then discarded, resulting in the same distribution as if it had never been created).
+%\todo{Noah: need to state this theorem more formally.} 
+For this reason we can comfortably speak interchangeably about possible worlds and partial worlds.
+
+
+ 
+ 
+ 
+ 
+ 
+ 
+ 
  
 \section{Meaning as condition}
 \label{literal}
