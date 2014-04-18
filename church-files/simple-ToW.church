@@ -1,0 +1,16 @@
+;helper functions
+(define approx-strength
+	(lambda (a b)
+		(define epsilon 0.4)
+		(< (abs (- a b)) epsilon)))
+;query
+(rejection-query
+ (define gender (mem (lambda (p) (if (flip) 'male 'female))))
+ (define gender-mean-strength (mem (lambda (g) (gaussian 0 2))))
+ (define strength (mem (lambda (p) (gaussian (gender-mean-strength (gender p))
+                                             1))))
+ (gender 'Pat)
+ (and (equal? (gender 'Bob) 'male) (approx-strength (strength 'Bob) -1.1)
+      (equal? (gender 'Jane) 'female) (approx-strength (strength 'Jane) 0.5)
+      (equal? (gender 'Jim) 'male) (approx-strength (strength 'Jim) -0.3)
+      (approx-strength (strength 'Pat) 0.7)))
