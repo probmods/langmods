@@ -472,20 +472,31 @@ These will be less important in what follows, but we note that they are potentia
  
  \subsection{Possible worlds}
 
-\todo[inline]{Shalom: The first paragraph of subsection 1.2 is not clear. You need to explain how probability distributions over complete worlds can be derived from distributions over bounded sets of situations in a sampling space. This is a crucial point. You tend to use worlds and situations as interchageable, but they are not. Situation theory was introduced as an alternative to possible worlds semantics,
-and there are significant difference in the model theories associated with each of these approaches. Both classical and Bayesian probability theory tends to treat situations as worlds, but in fact bounded sets of situations (situation types defined over a bounded set of alternatives) are formally and computationally distinct from complete worlds.}
+%\todo[inline]{Shalom: The first paragraph of subsection 1.2 is not clear. You need to explain how probability distributions over complete worlds can be derived from distributions over bounded sets of situations in a sampling space. This is a crucial point. You tend to use worlds and situations as interchageable, but they are not. Situation theory was introduced as an alternative to possible worlds semantics,
+%and there are significant difference in the model theories associated with each of these approaches. Both classical and Bayesian probability theory tends to treat situations as worlds, but in fact bounded sets of situations (situation types defined over a bounded set of alternatives) are formally and computationally distinct from complete worlds.}
 
-A set of stochastic function definitions in Church can be interpreted as a distribution over possible worlds: A world consists of a value\footnote{In fact a world consists of a countable sequence of values for each expression, since the same sub-expression may occur multiple times with different values.} for each well-formed expression that can be made using the defined functions.  For instance, consider the definitions:
-\begin{lstlisting}[mathescape]
-(define f ($\lambda$ () (flip 0.2)))
-(define g ($\lambda$ (x) (or x (flip 0.4))))
-\end{lstlisting}
-From these we can form a multitude of expressions, such as \lstinline{(f)}, \lstinline{(g (g (f)))}, and \lstinline{(and (g (f)) (f))}. A world is an assignment of a value to each expression; note that not all worlds will be well-formed evaluations (the relationship between expressions and their sub-expressions may not be a consistent evaluation).
-To evaluate any particular expression or query requires evaluating only a small subset of this infinitude of expressions. 
-That is, a particular query only depends on the partial world of expressions actually constructed during the evaluation process. 
-The relationship between the idealized complete possible worlds and these partial worlds is coherent because taking the marginal sum over any expressions that are evaluated but that don't impact the value of the query (condition or query expressions) results in the same distribution as if we didn't evaluate them. For instance \lstinline{(first (pair (flip) (flip)))} results in the same distribution as \lstinline{(flip)} (the second \lstinline{flip} is created but then discarded, resulting in the same distribution as if it had never been created).
-%\todo{Noah: need to state this theorem more formally.} 
-For this reason we can comfortably speak interchangeably about possible worlds and partial worlds.
+\todo[inline]{dan, is this section coherent? could also just remove it...}
+
+We have illustrated how a collection of Church function definitions---an intuitive theory---describes knowledge about the world; indeed, such an intuitive theory can be interpreted as a distribution over possible worlds. To see this, first assume that all the (stochastic) functions (including ERPs) are memoized. Then the value of any expression is determined by the values of some functions on some inputs; any expression is assigned an input if we have the values of \emph{all} the functions on \emph{all} possible inputs (because the functions are memoized there is only one value in each evaluation). A complete world is then a complete assignment of values to functions, and a distribution over worlds is defined by the return-value probabilities of the functions.
+
+Of course any particular expression or query that we write involving the intuitive theory will only involve a fraction of the (infinite number of) assignments needed to make a complete world. Instead, any query will rely on a partial world---all the function applications to values that can actually be reached while evaluating the query. There is clearly also a distribution over such partial worlds; how are the distributions over partial and complete worlds related? Fortunately there is a \emph{marginal coherence} relation: If function application \lstinline{(f v)} is not in a given partial world, we can extend the world by adding this application (and any sub-applications it will invoke); marginalizing out the added random choices in the distribution over the extended world yields exactly the original distribution over partial worlds.
+Thus the distribution over partial worlds relevant to any query (which we get by ignoring irrelevant potential random choices) is the marginal distribution of the distribution over complete worlds.
+For this reason we can comfortably speak interchangeably about possible worlds and partial worlds in our discussion of intuitive theories.
+
+If not all stochastic functions are memoized, very similar reasoning goes through: now each function is associated with an infinite number of return values, individuated by call order or position.
+
+
+%A set of stochastic function definitions in Church can be interpreted as a distribution over possible worlds: A world consists of a value\footnote{In fact a world consists of a countable sequence of values for each expression, since the same sub-expression may occur multiple times with different values.} for each well-formed expression that can be made using the defined functions.  For instance, consider the definitions:
+%\begin{lstlisting}[mathescape]
+%(define f ($\lambda$ () (flip 0.2)))
+%(define g ($\lambda$ (x) (or x (flip 0.4))))
+%\end{lstlisting}
+%From these we can form a multitude of expressions, such as \lstinline{(f)}, \lstinline{(g (g (f)))}, and \lstinline{(and (g (f)) (f))}. A world is an assignment of a value to each expression; note that not all worlds will be well-formed evaluations (the relationship between expressions and their sub-expressions may not be a consistent evaluation).
+%To evaluate any particular expression or query requires evaluating only a small subset of this infinitude of expressions. 
+%That is, a particular query only depends on the partial world of expressions actually constructed during the evaluation process. 
+%The relationship between the idealized complete possible worlds and these partial worlds is coherent because taking the marginal sum over any expressions that are evaluated but that don't impact the value of the query (condition or query expressions) results in the same distribution as if we didn't evaluate them. For instance \lstinline{(first (pair (flip) (flip)))} results in the same distribution as \lstinline{(flip)} (the second \lstinline{flip} is created but then discarded, resulting in the same distribution as if it had never been created).
+%%\todo{Noah: need to state this theorem more formally.} 
+%For this reason we can comfortably speak interchangeably about possible worlds and partial worlds.
 
 
  
