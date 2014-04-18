@@ -1,0 +1,136 @@
+; helper functions
+
+(define approx-strength
+	(lambda (a b)
+		(define epsilon 0.4)
+		(< (abs (- a b)) epsilon)))
+
+(define draw-n
+  (lambda
+    (n lst)
+    (define next-draw (uniform-draw lst))
+    (define rest-of-lst
+      (fold (lambda
+              (list-item cumulative-value)
+              (if
+               (equal? list-item next-draw)
+               cumulative-value
+               (append (list list-item) cumulative-value)))
+            '()
+            lst))
+    (if (= n 1)
+        (list next-draw)
+        (append (list next-draw) (draw-n (- n 1) rest-of-lst)))))
+
+(define element?
+  (lambda (element lst)
+    (fold
+     (lambda (list-item cumulative-value) (if (equal? element list-item) #t cumulative-value))
+     #f
+     lst)))
+
+(define filter
+  (lambda (f lst)
+    (fold
+     (lambda (list-item cumulative-value)
+       (if (f list-item)
+           (append (list list-item) cumulative-value)
+           cumulative-value))
+     '()
+     lst)))
+
+(define range
+  (lambda (a b)
+    (if (> a b) '()
+        (if (= a b)
+            '()
+            (append (list a) (range (+ a 1) b))))))
+
+(define random-split
+  (lambda (list-of-stuff)
+    (define possible-indices (range 1 (- (length list-of-stuff) 1)))
+    (define split-index
+      (if (> (length possible-indices) 0)
+          (uniform-draw possible-indices)
+          0))
+    (define three-parts (fold
+     (lambda (item cumval)
+       (define n (first cumval))
+       (define first-lst (second cumval))
+       (define second-lst (third cumval))
+       (if (< split-index n)
+           (list (+ n 1) first-lst (append second-lst (list item)))
+           (list (+ n 1) (append first-lst (list item)) second-lst)))
+     '(0 () ())
+     list-of-stuff))
+    (define first-ret-lst
+      (if (> (length (second three-parts)) 1)
+          (second three-parts)
+          (first (second three-parts))))
+    (define second-ret-lst
+      (if (> (length (third three-parts)) 1)
+          (third three-parts)
+          (first (third three-parts))))
+    (list first-ret-lst second-ret-lst)))
+
+; tug of war theory
+
+(define players '(Bob Jim Mary Sue Bill Evan Sally Tim Joe Jane Terrence Kate))
+(define teams '(team1 team2 team3))
+(define matches '(match1 match2 match3 match4))
+(define individuals (append players teams matches))
+(define gender (mem (lambda (p) (if (flip) 'male 'female))))
+(define gender-mean-strength (mem (lambda (g) (gaussian 0 2))))
+(define strength (mem (lambda (p) (gaussian (gender-mean-strength (gender p)) 1))))
+(define team-size (uniform-draw '(1 2 3 4 5 6)))
+(define players-on-team (mem (lambda (team) (draw-n team-size players))))
+(define captain (mem (lambda (team) (uniform-draw (players-on-team team)))))
+(define teams-in-match (mem (lambda (match) (draw-n 2 teams))))
+(define pulling (mem (lambda (player match) (+ (strength player) (gaussian 0
+                                                                           0.5)))))
+(define team-pulling (mem (lambda (team match)
+                            (sum (map (lambda (x) (pulling x match))
+                                      (players-on-team team))))))
+(define (winner match)
+  (let ([ teamA (first (teams-in-match match)) ]
+        [ teamB (second (teams-in-match match)) ])
+    (if (> (team-pulling teamA match) (team-pulling teamB match))
+        teamA
+        teamB)))
+
+; semantics
+
+(define (meaning utterance)
+  (if (lexical-item? utterance)
+    (lexicon utterance)
+    (compose utterance)))
+
+(define (compose utterance)
+  (define subs (random-split utterance))
+  ((meaning (first subs)) (meaning (second subs))))
+
+(define lexicon-data
+  '( ; individuals
+    (Bob 'Bob)
+    (team1 'team1)
+    (match1 'match1)
+    ; one-place predicates
+    (player (lambda (x) (element? x players)))
+    (team (lambda (x) (element? x teams)))
+    (match (lambda (x) (element? x matches)))
+    (man (lambda (x) (equal? (gender x) 'male)))
+    (woman (lambda (x) (equal? (gender x) 'female)))))
+
+(define lexicon
+  (lambda (utterance)
+    (eval (second
+     (first
+      (filter (lambda (lexical-entry)
+                (equal? (first lexical-entry) utterance))
+              lexicon-data))))))
+
+(define lexical-item?
+  (lambda (utterance)
+    (element? utterance (map first lexicon-data))))
+
+(meaning '(player Bob))
