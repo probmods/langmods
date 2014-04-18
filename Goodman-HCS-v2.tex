@@ -257,6 +257,7 @@ For parsimony, Church uses a special syntax, \lstinline{query}, to specify such 
   qexpr
   condition)
 \end{lstlisting}
+\todo[inline]{In webchurch, the condition is actually inside the condition function. So if, for example, you want to condition on \lstinline{x} being equal to 1, the last argument to your \lstinline{query} would be\lstinline{(condition (= x 1))}.}
 where \lstinline{...definitions...} is a list of definitions, \lstinline{qexpr} is the expression of interest who's value we want, and \lstinline{condition} is a condition expression that must return \lstinline{true}. 
 This syntax is internally transformed into a thunk and predicate that can be used in the rejection sampling procedure:
 \begin{lstlisting}[mathescape]
