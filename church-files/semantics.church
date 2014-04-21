@@ -25,7 +25,8 @@
 (define element?
   (lambda (element lst)
     (fold
-     (lambda (list-item cumulative-value) (if (equal? element list-item) #t cumulative-value))
+     (lambda (list-item cumulative-value)
+      (if (equal? element list-item) #t cumulative-value))
      #f
      lst)))
 
@@ -73,6 +74,17 @@
           (first (third three-parts))))
     (list first-ret-lst second-ret-lst)))
 
+(define size (lambda (S) (length (filter S individuals))))
+
+(define intersect
+  (lambda (P Q)
+    (lambda (x)
+      (and (P x) (Q x)))))
+
+(define my-max
+  (lambda (A N)
+    (apply max (map A (filter N individuals)))))
+
 ; tug of war theory
 
 (define players '(Bob Jim Mary Sue Bill Evan Sally Tim Joe Jane Terrence Kate))
@@ -81,13 +93,14 @@
 (define individuals (append players teams matches))
 (define gender (mem (lambda (p) (if (flip) 'male 'female))))
 (define gender-mean-strength (mem (lambda (g) (gaussian 0 2))))
-(define strength (mem (lambda (p) (gaussian (gender-mean-strength (gender p)) 1))))
+(define strength (mem (lambda (p)
+  (gaussian (gender-mean-strength (gender p)) 1))))
 (define team-size (uniform-draw '(1 2 3 4 5 6)))
 (define players-on-team (mem (lambda (team) (draw-n team-size players))))
 (define captain (mem (lambda (team) (uniform-draw (players-on-team team)))))
 (define teams-in-match (mem (lambda (match) (draw-n 2 teams))))
-(define pulling (mem (lambda (player match) (+ (strength player) (gaussian 0
-                                                                           0.5)))))
+(define pulling (mem (lambda
+  (player match) (+ (strength player) (gaussian 0 0.5)))))
 (define team-pulling (mem (lambda (team match)
                             (sum (map (lambda (x) (pulling x match))
                                       (players-on-team team))))))
@@ -112,14 +125,47 @@
 (define lexicon-data
   '( ; individuals
     (Bob 'Bob)
+    (Jim 'Jim)
+    (Mary 'Mary)
+    (Sue 'Sue)
+    (Bill 'Bill)
+    (Evan 'Evan)
+    (Sally 'Sally)
+    (Tim 'Tim)
+    (Joe 'Joe)
+    (Jane 'Jane)
+    (Terrence 'Terrence)
+    (Kate 'Kate)
     (team1 'team1)
+    (team2 'team2)
+    (team3 'team3)
     (match1 'match1)
+    (match2 'match2)
+    (match3 'match3)
+    (match4 'match4)
     ; one-place predicates
     (player (lambda (x) (element? x players)))
     (team (lambda (x) (element? x teams)))
     (match (lambda (x) (element? x matches)))
     (man (lambda (x) (equal? (gender x) 'male)))
-    (woman (lambda (x) (equal? (gender x) 'female)))))
+    (woman (lambda (x) (equal? (gender x) 'female)))
+    ; two-place predicates
+    (won (lambda (match) (lambda (x) (equal? x (winner match)))))
+    (played-in (lambda (match) (lambda (x) (element? x (teams-in-match match)))))
+    (is-on (lambda (team) (lambda (x) (element? x (players-on-team team)))))
+    (captain (lambda (team) (lambda (x) (equal? x (captain team)))))
+    ; quantifiers
+    (every (lambda (P) (lambda (Q) (= (size P) (size (intersect P Q))))))
+    (my-some (lambda (P) (lambda (Q) (< 0 (size (intersect P Q))))))
+    (most
+      (lambda (P)
+        (lambda (Q) (< (size P) (* 2 (size (intersect P Q)))))))
+    ; gradeable adjectives
+    (strong (lambda (x) (strength x)))
+    (weak (lambda (x) (- (strength x))))
+    (est (lambda (A) (lambda (N) (lambda (x) (= (A x) (my-max A N))))))
+    ; other
+    (conj-and (lambda (x) (lambda (y) (list x y))))))
 
 (define lexicon
   (lambda (utterance)
@@ -133,4 +179,16 @@
   (lambda (utterance)
     (element? utterance (map first lexicon-data))))
 
-(meaning '(player Bob))
+;(list
+;  (meaning '(is-on team1 Bob))
+;  (meaning '(is-on team2 Jim))
+;  (meaning '(played-in match1 conj-and team1 team2))
+;  (meaning '(won match1 team1))
+;  'team1
+;  (players-on-team 'team1)
+;  'team2
+;  (players-on-team 'team2)
+;  'match1
+;  (teams-in-match 'match1)
+;  (winner 'match1)
+;  (meaning '(est weak player Jim)))
