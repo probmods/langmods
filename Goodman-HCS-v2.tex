@@ -671,7 +671,7 @@ On the other hand, \emph{man} denotes a predicate which will be \emph{a priori} 
 
 For simplicity, in the few places in our examples where plurals are required, we treat them as denoting lists of individuals. In particular, in a phrase like \emph{Team 1 and Team 2}, the conjunction of NPs forms a list: 
 \begin{itemize}
-\item \sv{and} = \lstinline[mathescape]{($\lambda$ (x) ($\lambda$ (y) (list x y)))}
+\item \sv{and} = \lstinline[mathescape]{($\lambda$ (x) ($\lambda$ (y) (list x y)))}  \todo{Erin: \lstinline{and} is already defined in a different way. Can we call this one something else?} 
 \end{itemize}
 Compare this to the set-based account of plurals described in Scha \& Winter, this volume. To allow properties to apply to such collections we include a type-shifting operator (in \lstinline{type-shifters}, see section \ref{typeshift}) that universally quantifies the property over the list:
 \begin{itemize}
@@ -682,10 +682,10 @@ For instance, \emph{Bob and Jim played in Match 1} can be interpreted by shiftin
 We can generally adopt standard meanings for functional vocabulary, such as quantifiers. 
 \begin{itemize}
 \item \sv{every}: \lstinline[mathescape]{($\lambda$ (P) ($\lambda$ (Q) (= (size P) (size (intersect P Q)))))}
-\item \sv{some}: \lstinline[mathescape]{($\lambda$ (P) ($\lambda$ (Q) (< 0 (size (intersect P Q)))))}
+\item \sv{some}: \lstinline[mathescape]{($\lambda$ (P) ($\lambda$ (Q) (< 0 (size (intersect P Q)))))}  \todo{Erin: \lstinline{some} is already defined in a different way. Can we call this one something else?} 
 \item \sv{most}: \lstinline[mathescape]{($\lambda$ (P) ($\lambda$ (Q) (< (size P) (* 2 (size (intersect P Q))))))}
 \end{itemize}
-For simplicity we have written the quantifiers in terms of set size; the \lstinline{size} function can be defined in terms of the \lstinline{domain} of individuals as \lstinline[mathescape]{($\lambda$ (S) (length (filter S domain)))}.\footnote{In the examples below, we assume for simplicity that many function words, for example \emph{is} and \emph{the}, are semantically vacuous, i.e., that they denote identity functions.}
+For simplicity we have written the quantifiers in terms of set size; the \lstinline{size} function can be defined in terms of the \todo{Erin: should this be \lstinline{individuals}?} \lstinline{domain} of individuals as \lstinline[mathescape]{($\lambda$ (S) (length (filter S domain)))}.\footnote{In the examples below, we assume for simplicity that many function words, for example \emph{is} and \emph{the}, are semantically vacuous, i.e., that they denote identity functions.}
 
 We take gradeable adjectives, such as \emph{strong}, to denote simply functions from individuals to degrees \citep[e.g.][]{neeleman2004degree}:
 \begin{itemize}
@@ -697,7 +697,7 @@ For instance, the superlative morpheme \emph{-est} is defined so that \emph{stro
 \begin{itemize}
 \item \sv{\text{-}est}: \lstinline[mathescape]{($\lambda$ (A) ($\lambda$ (N) ($\lambda$ (x) (= (A x) (max A N)))))}
 \end{itemize}
-(Note that we assume the set operator \lstinline{max} implicitly quantifies over the domain of discourse.)
+(Note that we assume the set operator \lstinline{max} \todo{Erin: \lstinline{max} is already defined in a different way. Can we call this one something else?} implicitly quantifies over the domain of discourse.)
 For positive form sentences, such as \emph{Bob is strong}, we will employ a type shifting operator which introduces a degree threshold to bind the degree---see section \ref{indices}.
 
 
