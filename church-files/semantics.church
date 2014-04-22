@@ -47,33 +47,6 @@
             '()
             (append (list a) (range (+ a 1) b))))))
 
-(define random-split
-  (lambda (list-of-stuff)
-    (define possible-indices (range 1 (- (length list-of-stuff) 1)))
-    (define split-index
-      (if (> (length possible-indices) 0)
-          (uniform-draw possible-indices)
-          0))
-    (define three-parts (fold
-     (lambda (item cumval)
-       (define n (first cumval))
-       (define first-lst (second cumval))
-       (define second-lst (third cumval))
-       (if (< split-index n)
-           (list (+ n 1) first-lst (append second-lst (list item)))
-           (list (+ n 1) (append first-lst (list item)) second-lst)))
-     '(0 () ())
-     list-of-stuff))
-    (define first-ret-lst
-      (if (> (length (second three-parts)) 1)
-          (second three-parts)
-          (first (second three-parts))))
-    (define second-ret-lst
-      (if (> (length (third three-parts)) 1)
-          (third three-parts)
-          (first (third three-parts))))
-    (list first-ret-lst second-ret-lst)))
-
 (define size (lambda (S) (length (filter S individuals))))
 
 (define intersect
@@ -111,76 +84,57 @@
         teamA
         teamB)))
 
-; semantics
+;SEMANTICS
 
-(define (meaning utterance)
-  (if (lexical-item? utterance)
-    (lexicon utterance)
-    (compose utterance)))
+; individuals
+(define Bob 'Bob)
+(define Jim 'Jim)
+(define Mary 'Mary)
+(define Sue 'Sue)
+(define Bill 'Bill)
+(define Evan 'Evan)
+(define Sally 'Sally)
+(define Tim 'Tim)
+(define Joe 'Joe)
+(define Jane 'Jane)
+(define Terrence 'Terrence)
+(define Kate 'Kate)
+(define team1 'team1)
+(define team2 'team2)
+(define team3 'team3)
+(define match1 'match1)
+(define match2 'match2)
+(define match3 'match3)
+(define match4 'match4)
+; one-place predicates
+(define player (lambda (x) (element? x players)))
+(define team (lambda (x) (element? x teams)))
+(define match (lambda (x) (element? x matches)))
+(define man (lambda (x) (equal? (gender x) 'male)))
+(define woman (lambda (x) (equal? (gender x) 'female)))
+; two-place predicates
+(define won (lambda (match) (lambda (x) (equal? x (winner match)))))
+(define played-in (lambda (match) (lambda (x) (element? x (teams-in-match match)))))
+(define is-on (lambda (team) (lambda (x) (element? x (players-on-team team)))))
+(define captain (lambda (team) (lambda (x) (equal? x (captain team)))))
+; quantifiers
+(define every (lambda (P) (lambda (Q) (= (size P) (size (intersect P Q))))))
+(define my-some (lambda (P) (lambda (Q) (< 0 (size (intersect P Q))))))
+(define most
+  (lambda (P)
+    (lambda (Q) (< (size P) (* 2 (size (intersect P Q)))))))
+; gradeable adjectives
+(define strong (lambda (x) (strength x)))
+(define weak (lambda (x) (- (strength x))))
+(define est (lambda (A) (lambda (N) (lambda (x) (= (A x) (my-max A N))))))
+; other
+(define conj-and (lambda (x) (lambda (y) (list x y))))))
 
-(define (compose utterance)
-  (define subs (random-split utterance))
-  ((meaning (first subs)) (meaning (second subs))))
 
-(define lexicon-data
-  '( ; individuals
-    (Bob 'Bob)
-    (Jim 'Jim)
-    (Mary 'Mary)
-    (Sue 'Sue)
-    (Bill 'Bill)
-    (Evan 'Evan)
-    (Sally 'Sally)
-    (Tim 'Tim)
-    (Joe 'Joe)
-    (Jane 'Jane)
-    (Terrence 'Terrence)
-    (Kate 'Kate)
-    (team1 'team1)
-    (team2 'team2)
-    (team3 'team3)
-    (match1 'match1)
-    (match2 'match2)
-    (match3 'match3)
-    (match4 'match4)
-    ; one-place predicates
-    (player (lambda (x) (element? x players)))
-    (team (lambda (x) (element? x teams)))
-    (match (lambda (x) (element? x matches)))
-    (man (lambda (x) (equal? (gender x) 'male)))
-    (woman (lambda (x) (equal? (gender x) 'female)))
-    ; two-place predicates
-    (won (lambda (match) (lambda (x) (equal? x (winner match)))))
-    (played-in (lambda (match) (lambda (x) (element? x (teams-in-match match)))))
-    (is-on (lambda (team) (lambda (x) (element? x (players-on-team team)))))
-    (captain (lambda (team) (lambda (x) (equal? x (captain team)))))
-    ; quantifiers
-    (every (lambda (P) (lambda (Q) (= (size P) (size (intersect P Q))))))
-    (my-some (lambda (P) (lambda (Q) (< 0 (size (intersect P Q))))))
-    (most
-      (lambda (P)
-        (lambda (Q) (< (size P) (* 2 (size (intersect P Q)))))))
-    ; gradeable adjectives
-    (strong (lambda (x) (strength x)))
-    (weak (lambda (x) (- (strength x))))
-    (est (lambda (A) (lambda (N) (lambda (x) (= (A x) (my-max A N))))))
-    ; other
-    (conj-and (lambda (x) (lambda (y) (list x y))))))
-
-(define lexicon
-  (lambda (utterance)
-    (eval (second
-     (first
-      (filter (lambda (lexical-entry)
-                (equal? (first lexical-entry) utterance))
-              lexicon-data))))))
-
-(define lexical-item?
-  (lambda (utterance)
-    (element? utterance (map first lexicon-data))))
 
 ;(list
-;  (meaning '(is-on team1 Bob))
+  ;(meaning '(is-on team1 Bob))
+  ;(meaning '(is-on team1 Bob))
 ;  (meaning '(is-on team2 Jim))
 ;  (meaning '(played-in match1 conj-and team1 team2))
 ;  (meaning '(won match1 team1))
@@ -192,3 +146,5 @@
 ;  (teams-in-match 'match1)
 ;  (winner 'match1)
 ;  (meaning '(est weak player Jim)))
+
+;(random-split '(1 2 3 4 5 6 7))
