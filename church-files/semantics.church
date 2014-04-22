@@ -84,6 +84,12 @@
         teamA
         teamB)))
 
+; TYPE SHIFTERS
+(define R (lambda (x) (lambda (y) (y x))))
+(define S (lambda (x) (lambda (y) (lambda (z) (x (y z))))))
+(define AR1 (lambda (f) (lambda (x) (lambda (y) (x (lambda (z) ((f z) y)))))))
+(define AR2 (lambda (f) (lambda (x) (lambda (y) (x (lambda (z) ((f x) z)))))))
+
 ;SEMANTICS
 
 ; individuals
