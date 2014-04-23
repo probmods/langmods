@@ -47,110 +47,105 @@
             '()
             (append (list a) (range (+ a 1) b))))))
 
-(define size (lambda (S) (length (filter S individuals))))
-
 (define intersect
   (lambda (P Q)
     (lambda (x)
       (and (P x) (Q x)))))
 
-(define my-max
-  (lambda (A N)
-    (apply max (map A (filter N individuals)))))
-
-; tug of war theory
-
-(define players '(Bob Jim Mary Sue Bill Evan Sally Tim Joe Jane Terrence Kate))
-(define teams '(team1 team2 team3))
-(define matches '(match1 match2 match3 match4))
-(define individuals (append players teams matches))
-(define gender (mem (lambda (p) (if (flip) 'male 'female))))
-(define gender-mean-strength (mem (lambda (g) (gaussian 0 2))))
-(define strength (mem (lambda (p)
-  (gaussian (gender-mean-strength (gender p)) 1))))
-(define team-size (uniform-draw '(1 2 3 4 5 6)))
-(define players-on-team (mem (lambda (team) (draw-n team-size players))))
-(define captain (mem (lambda (team) (uniform-draw (players-on-team team)))))
-(define teams-in-match (mem (lambda (match) (draw-n 2 teams))))
-(define pulling (mem (lambda
-  (player match) (+ (strength player) (gaussian 0 0.5)))))
-(define team-pulling (mem (lambda (team match)
-                            (sum (map (lambda (x) (pulling x match))
-                                      (players-on-team team))))))
-(define (winner match)
-  (let ([ teamA (first (teams-in-match match)) ]
-        [ teamB (second (teams-in-match match)) ])
-    (if (> (team-pulling teamA match) (team-pulling teamB match))
-        teamA
-        teamB)))
 
 ; TYPE SHIFTERS
 (define R (lambda (x) (lambda (y) (y x))))
 (define S (lambda (x) (lambda (y) (lambda (z) (x (y z))))))
 (define AR1 (lambda (f) (lambda (x) (lambda (y) (x (lambda (z) ((f z) y)))))))
 (define AR2 (lambda (f) (lambda (x) (lambda (y) (x (lambda (z) ((f x) z)))))))
+(define DIST (lambda (V) (lambda (s) (all (map V s)))))
 
-;SEMANTICS
+(rejection-query
+    ; utility
+  (define size (lambda (S) (length (filter S individuals))))
+  (define my-max
+    (lambda (A N)
+      (apply max (map A N))))
+  ;SEMANTICS
 
-; individuals
-(define Bob 'Bob)
-(define Jim 'Jim)
-(define Mary 'Mary)
-(define Sue 'Sue)
-(define Bill 'Bill)
-(define Evan 'Evan)
-(define Sally 'Sally)
-(define Tim 'Tim)
-(define Joe 'Joe)
-(define Jane 'Jane)
-(define Terrence 'Terrence)
-(define Kate 'Kate)
-(define team1 'team1)
-(define team2 'team2)
-(define team3 'team3)
-(define match1 'match1)
-(define match2 'match2)
-(define match3 'match3)
-(define match4 'match4)
-; one-place predicates
-(define player (lambda (x) (element? x players)))
-(define team (lambda (x) (element? x teams)))
-(define match (lambda (x) (element? x matches)))
-(define man (lambda (x) (equal? (gender x) 'male)))
-(define woman (lambda (x) (equal? (gender x) 'female)))
-; two-place predicates
-(define won (lambda (match) (lambda (x) (equal? x (winner match)))))
-(define played-in (lambda (match) (lambda (x) (element? x (teams-in-match match)))))
-(define is-on (lambda (team) (lambda (x) (element? x (players-on-team team)))))
-(define captain (lambda (team) (lambda (x) (equal? x (captain team)))))
-; quantifiers
-(define every (lambda (P) (lambda (Q) (= (size P) (size (intersect P Q))))))
-(define my-some (lambda (P) (lambda (Q) (< 0 (size (intersect P Q))))))
-(define most
-  (lambda (P)
-    (lambda (Q) (< (size P) (* 2 (size (intersect P Q)))))))
-; gradeable adjectives
-(define strong (lambda (x) (strength x)))
-(define weak (lambda (x) (- (strength x))))
-(define est (lambda (A) (lambda (N) (lambda (x) (= (A x) (my-max A N))))))
-; other
-(define conj-and (lambda (x) (lambda (y) (list x y))))))
+  ; individuals
+  (define Bob 'Bob)
+  (define Jim 'Jim)
+  (define Mary 'Mary)
+  (define Sue 'Sue)
+  (define Bill 'Bill)
+  (define Evan 'Evan)
+  (define Sally 'Sally)
+  (define Tim 'Tim)
+  (define Joe 'Joe)
+  (define Jane 'Jane)
+  (define Terrence 'Terrence)
+  (define Kate 'Kate)
+  (define team1 'team1)
+  (define team2 'team2)
+  (define team3 'team3)
+  (define match1 'match1)
+  (define match2 'match2)
+  (define match3 'match3)
+  (define match4 'match4)
+  ; one-place predicates
+  (define player (lambda (x) (element? x players)))
+  (define team (lambda (x) (element? x teams)))
+  (define match (lambda (x) (element? x matches)))
+  (define man (lambda (x) (equal? (gender x) 'male)))
+  (define woman (lambda (x) (equal? (gender x) 'female)))
+  ; two-place predicates
+  (define won (lambda (match) (lambda (x) (equal? x (winner match)))))
+  (define played-in (lambda (match) (lambda (x) (element? x (teams-in-match match)))))
+  (define is-on (lambda (team) (lambda (x) (element? x (players-on-team team)))))
+  (define captain (lambda (team) (lambda (x) (equal? x (captain team)))))
+  ; quantifiers
+  (define every (lambda (P) (lambda (Q) (= (size P) (size (intersect P Q))))))
+  (define my-some (lambda (P) (lambda (Q) (< 0 (size (intersect P Q))))))
+  (define most
+    (lambda (P)
+      (lambda (Q) (< (size P) (* 2 (size (intersect P Q)))))))
+  ; gradeable adjectives
+  (define strong (lambda (x) (strength x)))
+  (define weak (lambda (x) (- (strength x))))
+  (define est (lambda (A) (lambda (N) (lambda (x) (= (A x) (my-max A N))))))
+  ; other
+  (define conj-and (lambda (x) (lambda (y) (list x y))))
+  ;tug of war theory
+  (define players '(Bob Jim Mary Sue Bill Evan Sally Tim Joe Jane Terrence Kate))
+  (define teams '(team1 team2 team3))
+  (define matches '(match1 match2 match3 match4))
+  (define individuals (append players teams matches))
+  (define gender (mem (lambda (p) (if (flip) 'male 'female))))
+  (define gender-mean-strength (mem (lambda (g) (gaussian 0 2))))
+  (define strength (mem (lambda (p)
+    (gaussian (gender-mean-strength (gender p)) 1))))
+  (define team-size (uniform-draw '(1 2 3 4 5 6)))
+  (define players-on-team (mem (lambda (team) (draw-n team-size players))))
+  (define captain (mem (lambda (team) (uniform-draw (players-on-team team)))))
+  (define teams-in-match (mem (lambda (match) (draw-n 2 teams))))
+  (define pulling (mem (lambda
+    (player match) (+ (strength player) (gaussian 0 0.5)))))
+  (define team-pulling (mem (lambda (team match)
+                              (sum (map (lambda (x) (pulling x match))
+                                        (players-on-team team))))))
+  (define (winner match)
+    (let ([ teamA (first (teams-in-match match)) ]
+          [ teamB (second (teams-in-match match)) ])
+      (if (> (team-pulling teamA match) (team-pulling teamB match))
+          teamA
+          teamB)))
 
+  (strength 'Jim) ; ; variable of interest
 
+  (and
+    ((R Bob) (is-on team1))
+    ((R Jim) (is-on team2))
 
-;(list
-  ;(meaning '(is-on team1 Bob))
-  ;(meaning '(is-on team1 Bob))
-;  (meaning '(is-on team2 Jim))
-;  (meaning '(played-in match1 conj-and team1 team2))
-;  (meaning '(won match1 team1))
-;  'team1
-;  (players-on-team 'team1)
-;  'team2
-;  (players-on-team 'team2)
-;  'match1
-;  (teams-in-match 'match1)
-;  (winner 'match1)
-;  (meaning '(est weak player Jim)))
+    ((R ((R 'team1) (conj-and 'team2))) (DIST (played-in 'match1)))
+    ((R 'team1) (won 'match1))
 
-;(random-split '(1 2 3 4 5 6 7))
+    ((R 'Jim) (((R weak) est) players))
+
+  )
+)
