@@ -60,12 +60,12 @@
 (define AR2 (lambda (f) (lambda (x) (lambda (y) (x (lambda (z) ((f x) z)))))))
 (define DIST (lambda (V) (lambda (s) (all (map V s)))))
 
-(rejection-query
+(mh-query 1 1
     ; utility
   (define size (lambda (S) (length (filter S individuals))))
   (define my-max
     (lambda (A N)
-      (apply max (map A N))))
+      (apply max (map A (filter N individuals)))))
   ;SEMANTICS
 
   ; individuals
@@ -136,16 +136,16 @@
           teamA
           teamB)))
 
-  (strength 'Jim) ; ; variable of interest
+  (strength 'Bob)
 
   (and
     ((R Bob) (is-on team1))
     ((R Jim) (is-on team2))
-
     ((R ((R 'team1) (conj-and 'team2))) (DIST (played-in 'match1)))
+    
     ((R 'team1) (won 'match1))
 
-    ((R 'Jim) (((R weak) est) players))
+    ((R 'Jim) (((R weak) est) player))
 
   )
 )

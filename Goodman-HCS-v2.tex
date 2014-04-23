@@ -896,14 +896,19 @@ Two (simplest, well-typed) interpretations are possible. We give an intuitive pa
 \item Subject-wide scope:
 \subitem ``For most players $x$, there was a match $y$ such that $x$ played in $y$.'' 
 \subitem ((R (\sv{Most} \sv{players})) ((AR2 (AR1 \sv{played\ in})) (\sv{some} \sv{match})))
+\subitem \lstinline{meaning}: \lstinline[mathescape]{((R (most player)) ((AR2 (AR1 played-in)) (some match)))}
+\todo[inline]{Erin: I don't think there's any simpler way to write this.}
 \item Object-wide scope: 
 \subitem ``For some match $y$, most players played in $y$.''
 \subitem ((R (\sv{Most} \sv{players})) ((AR1 (AR2 \sv{played\ in})) (\sv{some} \sv{match})))
+\subitem \lstinline{meaning}: \lstinline[mathescape]{((R (most player)) ((AR1 (AR2 played-in)) (some match)))}
 \end{itemize}
 \todo{Give the (reduced) church expressions for each of these meanings, too?}
+\todo[inline]{Erin: players don't currently play in matches, and these quantifiers assume players play in matches (not just teams). I can change played-in to check if the team was in the match OR the player was on a team that played in a match. Then this quantifier will work. Sound good?}
 Both readings equally \emph{a priori} probable, since the \lstinline{meaning} function draws type-shifters uniformly at random. 
 However, if one reading is more likely to be true, given background knowledge, it will be preferred.
 This means that we can influence the meaning used, and the degree to which each meaning influences the listener's posterior beliefs, by manipulating relevant world knowledge.
+
 
 %: for instance, the number of players on each team and the number of matches played.
 To illustrate the effect of background knowledge on choice of meaning, imagine varying the number of matches played in our tug-of-war example. 
