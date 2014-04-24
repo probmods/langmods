@@ -22,35 +22,26 @@
         (append (list next-draw) (draw-n (- n 1) rest-of-lst)))))
 
 ;query
-(mh-query 2000 10
+(mh-query 10000 10
  ;... ToW theory...
- (define players '(Bob Jim Mary Sue Bill Evan Sally Tim Joe Jane Terrence Kate))
- (define teams '(team1 team2 team3))
- (define matches '(match1 match2 match3 match4))
+ (define team1 (list 'jane))
+ (define team2 (list 'bob))
+ (define match1 (list 'team1 'team2))
+ (define players (list 'jane 'bob))
+ (define teams (list 'team1 'team2))
+ (define matches (list 'match1))
  (define individuals (append players teams matches))
- (define gender (mem (lambda (p) (if (flip) 'male 'female))))
+ (define jane-gender (if (flip) 'male 'female))
+ (define bob-gender (if (flip) 'male 'female))
  (define gender-mean-strength (mem (lambda (g) (gaussian 0 2))))
- (define strength (mem (lambda (p) (gaussian (gender-mean-strength (gender p)) 1))))
- (define team-size (uniform-draw '(1 2 3 4 5 6)))
- (define players-on-team (mem (lambda (team) (draw-n team-size players))))
- (define captain (mem (lambda (team) (uniform-draw (players-on-team team)))))
- (define teams-in-match (mem (lambda (match) (draw-n 2 teams))))
- (define pulling (mem (lambda (player match) (+ (strength player) (gaussian 0
-                                                                          0.5)))))
- (define team-pulling (mem (lambda (team match)
-                               (sum (map (lambda (x) (pulling x match))
-                                       (players-on-team team))))))
- (define (winner match)
-   (let ([ teamA (first (teams-in-match match)) ]
-          [ teamB (second (teams-in-match match)) ])
-     (if (> (team-pulling teamA match) (team-pulling teamB match))
-       teamA
-       teamB)))
+ (define jane-strength (gaussian (gender-mean-strength jane-gender) 1))
+ (define bob-strength (gaussian (gender-mean-strength bob-gender) 1))
+ (define team-size 1)
+ (define team1-pulling (+ jane-strength (gaussian 0 0.5)))
+ (define team2-pulling (+ bob-strength (gaussian 0 0.5)))
+ (define winner (if (> team1-pulling team2-pulling) 'team1 'team2))
  
- (strength 'Jane) ; ; variable of interest
+ jane-strength ; ; variable of interest
 
- (and ; ; conditioning expression
-   (equal? (players-on-team 'team1) '(Jane))
-   (equal? (players-on-team 'team2) '(Bob))
-   (equal? (teams-in-match 'match1) '(team1 team2)))
+ (equal? winner 'team1)
 )

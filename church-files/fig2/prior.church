@@ -43,9 +43,5 @@
  
  jane-strength ; ; variable of interest
 
- (and
-  (equal? winner 'team1)
-  (approx-strength bob-strength -3.0)
-  (equal? jane-gender 'female)
-  (equal? bob-gender 'male))
+ #t
 )
