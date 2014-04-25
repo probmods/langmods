@@ -49,13 +49,7 @@
  
  (strength 'Jane) ; ; variable of interest
 
- (and ; ; conditioning expression
-   (equal? (players-on-team 'team1) '(Jane))
-   (equal? (players-on-team 'team2) '(Bob))
-   (equal? (teams-in-match 'match1) '(team1 team2))
-   (equal? (winner 'match1) 'team1) ; observation: Bob beats Jim
-   (approx-strength (strength 'Bob) -3.0) ; observation: Bob beats Jim, Jim weak
-   )
+ #t
 ))
 
 (display (mh-query 10000 10
@@ -85,13 +79,7 @@
  
  (strength 'Jane) ; ; variable of interest
 
- (and ; ; conditioning expression
-   (equal? (players-on-team 'team1) '(Jane))
-   (equal? (players-on-team 'team2) '(Bob))
-   (equal? (teams-in-match 'match1) '(team1 team2))
-   (equal? (winner 'match1) 'team1) ; observation: Bob beats Jim
-   (approx-strength (strength 'Bob) -3.0) ; observation: Bob beats Jim, Jim weak
-   )
+ #t
 ))
 
 (mh-query 10000 10
@@ -121,11 +109,5 @@
  
  (strength 'Jane) ; ; variable of interest
 
- (and ; ; conditioning expression
-   (equal? (players-on-team 'team1) '(Jane))
-   (equal? (players-on-team 'team2) '(Bob))
-   (equal? (teams-in-match 'match1) '(team1 team2))
-   (equal? (winner 'match1) 'team1) ; observation: Bob beats Jim
-   (approx-strength (strength 'Bob) -3.0) ; observation: Bob beats Jim, Jim weak
-   )
+ #t
 )

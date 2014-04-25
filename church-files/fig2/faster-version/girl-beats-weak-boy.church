@@ -1,0 +1,51 @@
+;helper functions
+(define approx-strength
+  (lambda (a b)
+    (define epsilon 0.4)
+    (< (abs (- a b)) epsilon)))
+
+(define draw-n
+  (lambda
+    (n lst)
+    (define next-draw (uniform-draw lst))
+    (define rest-of-lst
+      (fold (lambda
+              (list-item cumulative-value)
+              (if
+               (equal? list-item next-draw)
+               cumulative-value
+               (append (list list-item) cumulative-value)))
+            '()
+            lst))
+    (if (= n 1)
+        (list next-draw)
+        (append (list next-draw) (draw-n (- n 1) rest-of-lst)))))
+
+;query
+(mh-query 10000 10
+ ;... ToW theory...
+ (define team1 (list 'jane))
+ (define team2 (list 'bob))
+ (define match1 (list 'team1 'team2))
+ (define players (list 'jane 'bob))
+ (define teams (list 'team1 'team2))
+ (define matches (list 'match1))
+ (define individuals (append players teams matches))
+ (define jane-gender (if (flip) 'male 'female))
+ (define bob-gender (if (flip) 'male 'female))
+ (define gender-mean-strength (mem (lambda (g) (gaussian 0 2))))
+ (define jane-strength (gaussian (gender-mean-strength jane-gender) 1))
+ (define bob-strength (gaussian (gender-mean-strength bob-gender) 1))
+ (define team-size 1)
+ (define team1-pulling (+ jane-strength (gaussian 0 0.5)))
+ (define team2-pulling (+ bob-strength (gaussian 0 0.5)))
+ (define winner (if (> team1-pulling team2-pulling) 'team1 'team2))
+ 
+ jane-strength ; ; variable of interest
+
+ (and
+  (equal? winner 'team1)
+  (approx-strength bob-strength -3.0)
+  (equal? jane-gender 'female)
+  (equal? bob-gender 'male))
+)

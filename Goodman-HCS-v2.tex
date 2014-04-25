@@ -354,6 +354,7 @@ Here the \lstinline{draw-n} ERP draws uniformly but without replacement from a l
 In addition to players and teams, we have matches: events that have two teams and a winner, the winner depends on how hard each team is pulling, which depends on how hard each team member is pulling.
 \begin{lstlisting}[mathescape]
 (define teams-in-match (mem ($\lambda$ (match) (draw-n 2 teams))))
+(define players-in-match ($\lambda$ (match) (apply append (map players-on-team (teams-in-match match)))))
 (define pulling (mem ($\lambda$ (player match) 
                          (+ (strength player) (gaussian 0 0.5)))))
 (define team-pulling (mem ($\lambda$ (team match) 
@@ -382,6 +383,7 @@ Notice that the team pulling is simply the sum of how hard each member is pullin
 (define captain (mem ($\lambda$ (team) (uniform-draw (players-on-team team)))))
 
 (define teams-in-match (mem ($\lambda$ (match) (draw-n 2 teams))))
+(define players-in-match ($\lambda$ (match) (apply append (map players-on-team (teams-in-match match)))))
 (define pulling (mem ($\lambda$ (player match) (+ (strength player) (gaussian 0 0.5)))))
 (define team-pulling (mem ($\lambda$ (team match) 
                           (sum (map ($\lambda$  (x) (pulling x match)) (players-on-team team))))))
@@ -659,7 +661,7 @@ A one-place predicate such as \emph{player} or \emph{man} is interpreted as a fu
 Similarly, transitive verbs such as \emph{won} and relational nouns such as \emph{captain} denote two-place predicates. (We simplify throughout by ignoring tense.)
 \begin{itemize}
 \item  \sv{won}: \lstinline[mathescape]{($\lambda$ (match) ($\lambda$ (x) (equal? x (winner match))))}
-\item \sv{played\ in}:  \lstinline[mathescape]{($\lambda$ (match) ($\lambda$ (x) (element? x (teams-in-match match))))}
+\item \sv{played\ in}:  \lstinline[mathescape]{($\lambda$ (match) ($\lambda$ (x) (or (element? x (teams-in-match match)) (element? x (players-in-match match)))))}
 \item \sv{is\ on}:  \lstinline[mathescape]{($\lambda$ (team) ($\lambda$ (x) (element? x (players-on-team team))))}
 \item \sv{captain}: \lstinline[mathescape]{($\lambda$ (team) ($\lambda$ (x) (equal? x (captain team))))}
 \end{itemize}
@@ -904,7 +906,6 @@ Two (simplest, well-typed) interpretations are possible. We give an intuitive pa
 \subitem \lstinline{meaning}: \lstinline[mathescape]{((R (most player)) ((AR1 (AR2 played-in)) (some match)))}
 \end{itemize}
 \todo{Give the (reduced) church expressions for each of these meanings, too?}
-\todo[inline]{Erin: players don't currently play in matches, and these quantifiers assume players play in matches (not just teams). I can change played-in to check if the team was in the match OR the player was on a team that played in a match. Then this quantifier will work. Sound good?}
 Both readings equally \emph{a priori} probable, since the \lstinline{meaning} function draws type-shifters uniformly at random. 
 However, if one reading is more likely to be true, given background knowledge, it will be preferred.
 This means that we can influence the meaning used, and the degree to which each meaning influences the listener's posterior beliefs, by manipulating relevant world knowledge.
