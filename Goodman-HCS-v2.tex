@@ -1035,7 +1035,7 @@ similarly for other such schematic subsections in the chapter.}
 \label{pragmatics}
 
 The \lstinline{literal-listener} described above treats utterances as true information about the world, updating her beliefs accordingly. 
-In real language understanding, however, utterances are taken as speech acts that inform the listener indirectly by conveying a speaker's intention. In this section we describe a version of the \emph{rational speech acts} model \citep{goodman2013knowledge,frankgoodman12}, in which a sophisticated listener reasons about the intention of an informative speaker.
+In real language understanding, however, utterances are taken as speech acts that inform the listener indirectly by conveying a speaker's intention. In this section we describe a version of the \emph{Rational Speech Acts} model \citep{goodman2013knowledge,frankgoodman12}, in which a sophisticated listener reasons about the intention of an informative speaker.
 
 First, imagine a speaker who wishes to convey that the question under discussion (\lstinline{QUD}) has a particular answer (i.e.~value). This can be viewed as an inference: what utterance is most likely to lead the (literal) listener to the correct interpretation?
 \begin{lstlisting}
@@ -1126,17 +1126,31 @@ Thus, our model yields a broadly Gricean explanation of quantity implicature. In
 
 \subsection{Extensions and related work}
 
-\todo[inline]{Noah: fill in pragmatics extensions and related work.}
+The simple Rational Speech Acts (RSA) framework sketched above has been fruitfully extended and applied to a number of phenomena in pragmatic understanding; many other extensions suggest themselves, but haven't yet been explored.
+In \citep{FG12} the RSA model was applied to explain the results of simple reference games in which a speaker attempted to communicate one of a set of objects to a listener by using a simple property to describe it (e.g.~\emph{blue} or \emph{square}). Here the intuitive theory can be seen as simply a prior distribution, \lstinline{(define ref (ref-prior objects))} over which object is the referent in the current trial, the \lstinline{QUD} is simply \lstinline{ref}, and the properties have their standard extensions. By measuring the \lstinline{ref-prior} empirically \citet{FG12} were able to predict the speaker and listener judgements with high quantitative accuracy (correlation around 0.99).
 
-\begin{itemize}
-\item Our approach shares with other theories of implicature the need to place such restrictions on the set of relevant alternatives.
-\item Representing speaker knowledge \cite{Goodman2013}.
-\item Obvious directions: inferring QUD, more general goals.
-\item Frank and Goodman 2012, ref exprs. Reference via joint inference (effect of prior); salience. (Cf. Lewis "the cat".)
-\item Relation to IBR and game-theoretic pragmatics. (Franke, Jaeger, Benz.)
-\end{itemize}
-%how about a match between '(bob sue) and '(dude alice), where 'dude is male with unknown name, and the utterance is "he's strong!"... "he" should be interpreted as 'dude since otherwise could have used "Bob". this is just like the FG setup.
-%then do a version where there are two unnamed males, but only one of them was in the match... salience should enter to set "he" to guy just in a match.
+In \citet{Goodman13} the RSA framework was extended to take into account the speaker's knowledge state. In this case the speaker should choose an utterance based on it's \emph{expected} informativity given the speaker's belief distribution. (Or, equivalently, the utility is based on the KL divergence of the listener's posterior beliefs from the speaker's.) This extended model makes the interesting prediction that listeners should not draw strong quantity implicatures from utterances by ignorant speakers. The experiments in \citet{Goodman13} show that this is the case, and that the quantitative predictions of the model are borne out.
+
+As a final example of extensions to the RSA framework, the \lstinline{QUD} itself can be an object of inference. If the pragmatic listener is unsure what topic the speaker is addressing, as must often be the case, then she should jointly infer the \lstinline{QUD} and it's \lstinline{val} under the assumption that the speaker chose an utterance to be informative about the topic (whatever it is). This simple extension can lead to striking predictions. In \citet{kao-metaphor,kao-hyperbole} such \lstinline{QUD} inference was shown to give rise to non-literal interpretations: hyperbolic and metaphoric usage.
+
+The RSA approach shares elements with a number of other formal approaches to pragmatics. 
+%For instance, like other theories of implicature the set of relevant alternatives must be specified
+It is most similar to game theoretic approaches to pragmatics. In particular to approaches that treat pragmatic inference as iterated reasoning, such as the Iterated Best Response (IBR) model \citep{franke,jaeger}. The IBR model represents speakers and listeners recursively reasoning about each other, as in the RSA model. The two main differences are that IBR specifies unbounded recursion between speaker and listener, while RSA as presented here specifies on one level, and the IBR specifies that optimal actions are chosen, rather than soft-max decisions. Neither of these differences is critical to either framework. We view it as an empirical question what degree of optimality and what level of recursive reasoning people actually display in language understanding.
+
+
+%\begin{itemize}
+%\item Frank and Goodman 2012, ref exprs. Reference via joint inference (effect of prior); salience. (Cf. Lewis "the cat".)
+%\item Extensions:
+%\subitem Representing speaker knowledge \cite{Goodman2013}.
+%\subitem Inferring QUD / non-literal language. more general goals?
+%\subitem noisy chanel?
+%\item relation to other things:
+%\subitem Our approach shares with other theories of implicature the need to place such restrictions on the set of relevant alternatives.
+%\subitem Relation to IBR and game-theoretic pragmatics. (Franke, Jaeger, Benz.)
+%\end{itemize}
+%%how about a match between '(bob sue) and '(dude alice), where 'dude is male with unknown name, and the utterance is "he's strong!"... "he" should be interpreted as 'dude since otherwise could have used "Bob". this is just like the FG setup.
+%%then do a version where there are two unnamed males, but only one of them was in the match... salience should enter to set "he" to guy just in a match.
+%
 
 
 
