@@ -354,7 +354,7 @@ Here the \lstinline{draw-n} ERP draws uniformly but without replacement from a l
 In addition to players and teams, we have matches: events that have two teams and a winner, the winner depends on how hard each team is pulling, which depends on how hard each team member is pulling.
 \begin{lstlisting}[mathescape]
 (define teams-in-match (mem ($\lambda$ (match) (draw-n 2 teams))))
-(define players-in-match ($\lambda$ (match) (apply append (map players-on-team (teams-in-match 'match1)))))
+(define players-in-match ($\lambda$ (match) (apply append (map players-on-team (teams-in-match match)))))
 (define pulling (mem ($\lambda$ (player match) 
                          (+ (strength player) (gaussian 0 0.5)))))
 (define team-pulling (mem ($\lambda$ (team match) 
@@ -383,7 +383,7 @@ Notice that the team pulling is simply the sum of how hard each member is pullin
 (define captain (mem ($\lambda$ (team) (uniform-draw (players-on-team team)))))
 
 (define teams-in-match (mem ($\lambda$ (match) (draw-n 2 teams))))
-(define players-in-match ($\lambda$ (match) (apply append (map players-on-team (teams-in-match 'match1)))))
+(define players-in-match ($\lambda$ (match) (apply append (map players-on-team (teams-in-match match)))))
 (define pulling (mem ($\lambda$ (player match) (+ (strength player) (gaussian 0 0.5)))))
 (define team-pulling (mem ($\lambda$ (team match) 
                           (sum (map ($\lambda$  (x) (pulling x match)) (players-on-team team))))))
