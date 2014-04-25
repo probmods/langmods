@@ -354,6 +354,7 @@ Here the \lstinline{draw-n} ERP draws uniformly but without replacement from a l
 In addition to players and teams, we have matches: events that have two teams and a winner, the winner depends on how hard each team is pulling, which depends on how hard each team member is pulling.
 \begin{lstlisting}[mathescape]
 (define teams-in-match (mem ($\lambda$ (match) (draw-n 2 teams))))
+(define players-in-match ($\lambda$ (match) (apply append (map players-on-team (teams-in-match 'match1)))))
 (define pulling (mem ($\lambda$ (player match) 
                          (+ (strength player) (gaussian 0 0.5)))))
 (define team-pulling (mem ($\lambda$ (team match) 
@@ -382,6 +383,7 @@ Notice that the team pulling is simply the sum of how hard each member is pullin
 (define captain (mem ($\lambda$ (team) (uniform-draw (players-on-team team)))))
 
 (define teams-in-match (mem ($\lambda$ (match) (draw-n 2 teams))))
+(define players-in-match ($\lambda$ (match) (apply append (map players-on-team (teams-in-match 'match1)))))
 (define pulling (mem ($\lambda$ (player match) (+ (strength player) (gaussian 0 0.5)))))
 (define team-pulling (mem ($\lambda$ (team match) 
                           (sum (map ($\lambda$  (x) (pulling x match)) (players-on-team team))))))
@@ -659,7 +661,7 @@ A one-place predicate such as \emph{player} or \emph{man} is interpreted as a fu
 Similarly, transitive verbs such as \emph{won} and relational nouns such as \emph{captain} denote two-place predicates. (We simplify throughout by ignoring tense.)
 \begin{itemize}
 \item  \sv{won}: \lstinline[mathescape]{($\lambda$ (match) ($\lambda$ (x) (equal? x (winner match))))}
-\item \sv{played\ in}:  \lstinline[mathescape]{($\lambda$ (match) ($\lambda$ (x) (element? x (teams-in-match match))))}
+\item \sv{played\ in}:  \lstinline[mathescape]{($\lambda$ (match) ($\lambda$ (x) (or (element? x (teams-in-match match)) (element? x (players-in-match match)))))}
 \item \sv{is\ on}:  \lstinline[mathescape]{($\lambda$ (team) ($\lambda$ (x) (element? x (players-on-team team))))}
 \item \sv{captain}: \lstinline[mathescape]{($\lambda$ (team) ($\lambda$ (x) (equal? x (captain team))))}
 \end{itemize}
