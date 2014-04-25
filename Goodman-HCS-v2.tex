@@ -690,7 +690,7 @@ For simplicity we have written the quantifiers in terms of set size; the \lstinl
 We take gradeable adjectives, such as \emph{strong}, to denote simply functions from individuals to degrees \citep[e.g.][]{neeleman2004degree}:
 \begin{itemize}
 \item \sv{strong}: \lstinline[mathescape]{($\lambda$ (x) (strength x))}
-\item \sv{weak}: \lstinline[mathescape]{($\lambda$ (x) (- (strength x)))}
+\item \sv{weak}: \lstinline[mathescape]{($\lambda$ (x) (- 0 (strength x)))}
 \end{itemize}
 This denotation will require an operator to bind the degree in any sentence interpretation. In the case of the relative and superlative forms this operator will be indicated by the corresponding morpheme.
 For instance, the superlative morpheme \emph{-est} is defined so that \emph{strongest player} will denote a property that is true of an individual when that individual's strength is equal to the maximum strength of all players: 
@@ -1036,7 +1036,7 @@ similarly for other such schematic subsections in the chapter.}
 The \lstinline{literal-listener} described above treats utterances as true information about the world, updating her beliefs accordingly. 
 In real language understanding, however, utterances are taken as speech acts that inform the listener indirectly by conveying a speaker's intention. In this section we describe a version of the \emph{rational speech acts} model \citep{goodman2013knowledge,frankgoodman12}, in which a sophisticated listener reasons about the intention of an informative speaker.
 
-First, imagine a speaker who wishes to convey that the question under discussion (\lstinline{QUD}) has a particular answer (or value). This can be viewed as an inference: what utterance is most likely to lead the (literal) listener to the correct interpretation?
+First, imagine a speaker who wishes to convey that the question under discussion (\lstinline{QUD}) has a particular answer (i.e.~value). This can be viewed as an inference: what utterance is most likely to lead the (literal) listener to the correct interpretation?
 \begin{lstlisting}
 (define (speaker val QUD)
   (query
@@ -1065,26 +1065,26 @@ A more sophisticated, pragmatic, listener can now be modeled as a Bayesian agent
     (equal? utterance (speaker val QUD))))
 \end{lstlisting}
 Notice that the prior over \lstinline{val} comes from evaluating the \lstinline{QUD} expression given the \lstinline{theory}, and the posterior comes from updating this prior given that the speaker has chosen \lstinline{utterance} to convey \lstinline{val}.
+
 The force of this model comes from the ability to call the \lstinline{query} function within itself \citep{Stuhlmueller2013}---each query models the inference made by one (imagined) communicator, and together they capture sophisticated pragmatic reasoning. 
 Several observations are worth making: First, alternative utterances will enter into the computation in sampling (or determining the probability of) the actual utterance from \lstinline{speaker}. 
 Similarly, alternative values are considered in the listener functions.
 Second, the notion of informativity captured in the \lstinline{speaker} model is not simply information transmitted by \lstinline{utterance}, but is \emph{new} information conveyed to the listener \emph{about} the \lstinline{QUD}. 
-Information which is not new to the listener or which is not relevant to the \lstinline{QUD} will not count in the speaker's utility.
+Information which is not new to the listener or which is not relevant to the \lstinline{QUD} will not contribute to the speaker's utility.
 
 We illustrate by considering quantity implicatures. 
 Take as an example the sentence ``Jane played in some match''. 
 This entails that Jane did not play in zero matches. 
 In many contexts, it would also be taken to suggest that Jane did not play in all of the matches. 
-However, there are many good reasons for thinking that the latter inference is not part of the basic, literal meaning of the sentence\citep{grice89,geurts2010quantity}. 
+However, there are many good reasons for thinking that the latter inference is not part of the basic, literal meaning of the sentence \citep{grice89,geurts2010quantity}. 
 Why then does it arise?
-
-
-\todo[inline]{Noah: Edit SI stuff. }
-
+%
 Quantity implicatures follow from our model due to the pragmatic listener's use of ``counterfactual'' reasoning to help reconstruct the speaker's intended message from his observed utterance choice.
-Suppose that the \lstinline{QUD} is ``How many matches did Jane play in?''
-\todo{Put in formal QUD.. \lstinline{(num-true (element? 'jane (map players-on-team (teams-in-match matches)))}}. 
-Then alternative utterance ``Jane played in all the matches'' would have been appropriate if it were in fact true. Then the speaker's preference for informative utterance would have caused him to (probabilistically) prefer this utterance to the less informative ``Jane played in some match'' if it were true. 
+Suppose that the \lstinline{QUD} is ``How many matches did Jane play in?'' (That is: 
+\lstinline[mathescape]{(sum (map ($\lambda$ (m) (element? 'jane (players-on-team (teams-in-match matches))))))}.\todo{fix me})
+%\lstinline{(num-true (element? 'jane (map players-on-team (teams-in-match matches)))}. 
+Then the alternative utterance ``Jane played in all the matches'' would have been appropriate if it were in fact true. 
+Then the speaker's preference for informative utterance would have caused him to (probabilistically) prefer this utterance to the less informative ``Jane played in some match'' if it were true. 
 This preference is generated by the fact that---as long as utterances $u$ over $u'$ are assigned equal probability by \lstinline{language-prior}, the probability that a knowledgeable speaker will choose $u$ over $u'$ given a question under discussion $Q$ is determined by the probability that the listener will choose the correct answer to $Q$ if the speaker chooses $u$.
 Since the speaker in fact chose a much less informative utterance in this case, the listener can use Bayesian reasoning to infer that some precondition for the stronger utterance's use---e.g., its truth---is probably not fulfilled. 
 That is, the listener can reasonable infer from the speaker's choice not to make the stronger claim that it is probably false.
