@@ -1073,8 +1073,9 @@ Similarly, alternative values are considered in the listener functions.
 Second, the notion of informativity captured in the \lstinline{speaker} model is not simply information transmitted by \lstinline{utterance}, but is \emph{new} information conveyed to the listener \emph{about} the \lstinline{QUD}. 
 Information which is not new to the listener or which is not relevant to the \lstinline{QUD} will not contribute to the speaker's utility.
 
-We illustrate by considering quantity implicatures. 
-Take as an example the sentence ``Jane played in some match''. 
+\subsection{Quantity implicatures}
+
+We illustrate by considering quantity implicatures: take as an example the sentence ``Jane played in some match''. 
 This entails that Jane did not play in zero matches. 
 In many contexts, it would also be taken to suggest that Jane did not play in all of the matches. 
 However, there are many good reasons for thinking that the latter inference is not part of the basic, literal meaning of the sentence \citep{grice89,geurts2010quantity}. 
@@ -1127,15 +1128,24 @@ Thus, our model yields a broadly Gricean explanation of quantity implicature. In
 \subsection{Extensions and related work}
 
 The simple Rational Speech Acts (RSA) framework sketched above has been fruitfully extended and applied to a number of phenomena in pragmatic understanding; many other extensions suggest themselves, but haven't yet been explored.
-In \citep{FG12} the RSA model was applied to explain the results of simple reference games in which a speaker attempted to communicate one of a set of objects to a listener by using a simple property to describe it (e.g.~\emph{blue} or \emph{square}). Here the intuitive theory can be seen as simply a prior distribution, \lstinline{(define ref (ref-prior objects))} over which object is the referent in the current trial, the \lstinline{QUD} is simply \lstinline{ref}, and the properties have their standard extensions. By measuring the \lstinline{ref-prior} empirically \citet{FG12} were able to predict the speaker and listener judgements with high quantitative accuracy (correlation around 0.99).
+In \citep{frankgoodman12} the RSA model was applied to explain the results of simple reference games in which a speaker attempted to communicate one of a set of objects to a listener by using a simple property to describe it (e.g.~\emph{blue} or \emph{square}). Here the intuitive theory can be seen as simply a prior distribution, \lstinline{(define ref (ref-prior objects))} over which object is the referent in the current trial, the \lstinline{QUD} is simply \lstinline{ref}, and the properties have their standard extensions. By measuring the \lstinline{ref-prior} empirically \citet{frankgoodman12} were able to predict the speaker and listener judgements with high quantitative accuracy (correlation around 0.99).
 
-In \citet{Goodman13} the RSA framework was extended to take into account the speaker's knowledge state. In this case the speaker should choose an utterance based on it's \emph{expected} informativity given the speaker's belief distribution. (Or, equivalently, the utility is based on the KL divergence of the listener's posterior beliefs from the speaker's.) This extended model makes the interesting prediction that listeners should not draw strong quantity implicatures from utterances by ignorant speakers. The experiments in \citet{Goodman13} show that this is the case, and that the quantitative predictions of the model are borne out.
+In \citet{goodman2013knowledge} the RSA framework was extended to take into account the speaker's belief state. In this case the speaker should choose an utterance based on it's \emph{expected} informativity under the speaker's belief distribution. (Or, equivalently, the speaker's utility is the negative KL divergence of the listener's posterior beliefs from the speaker's.) 
+%\begin{eqnarray}
+%P_S(u|b) &\propto& e^{-KL(P(s|b), P_L(s|u))}\\
+%&=& e^{-\sum_s (P(s|b) \log(P(s|b)/P_L(s|u)))}\\
+%&=& e^{-\sum_s (P(s|b) \log(P(s|b)))}   e^{\sum_s (P(s|b) \log(P_L(s|u)))}\\
+%&\propto& e^{\sum_s (P(s|b) \log(P_L(s|u)))}\\
+%&=& e^{E_{P(s|b)}  \log(P_L(s|u))}
+%\end{eqnarray}
+This extended model makes the interesting prediction that listeners should not draw strong quantity implicatures from utterances by ignorant speakers. The experiments in \citet{goodman2013knowledge} show that this is the case, and the quantitative predictions of the model are borne out.
 
-As a final example of extensions to the RSA framework, the \lstinline{QUD} itself can be an object of inference. If the pragmatic listener is unsure what topic the speaker is addressing, as must often be the case, then she should jointly infer the \lstinline{QUD} and it's \lstinline{val} under the assumption that the speaker chose an utterance to be informative about the topic (whatever it is). This simple extension can lead to striking predictions. In \citet{kao-metaphor,kao-hyperbole} such \lstinline{QUD} inference was shown to give rise to non-literal interpretations: hyperbolic and metaphoric usage.
+As a final example of extensions to the RSA framework, the \lstinline{QUD} itself can be an object of inference. If the pragmatic listener is unsure what topic the speaker is addressing, as must often be the case, then she should jointly infer the \lstinline{QUD} and it's \lstinline{val} under the assumption that the speaker chose an utterance to be informative about the topic (whatever that happens to be). This simple extension can lead to striking predictions. In \citet{kao-metaphor,kao-hyperbole} such \lstinline{QUD} inference was shown to give rise to non-literal interpretations: hyperbolic and metaphoric usage. 
+While the literal listener will draw an incorrect inference about the state of the world from an utterance such as ``I waited a million hours'', the speaker only cares if this results in correct information about the \lstinline{QUD}; the pragmatic listener knows this, and hence interprets the utterance as only conveying information about the \lstinline{QUD}. If the \lstinline{QUD} is inferred to be a non-standard aspect of the world, such as whether the speaker is irritated, then the utterance will convey only information about this aspect and not the (false) literal meaning of the utterance: the speaker waited longer than expected and is irritated about it.
 
 The RSA approach shares elements with a number of other formal approaches to pragmatics. 
 %For instance, like other theories of implicature the set of relevant alternatives must be specified
-It is most similar to game theoretic approaches to pragmatics. In particular to approaches that treat pragmatic inference as iterated reasoning, such as the Iterated Best Response (IBR) model \citep{franke,jaeger}. The IBR model represents speakers and listeners recursively reasoning about each other, as in the RSA model. The two main differences are that IBR specifies unbounded recursion between speaker and listener, while RSA as presented here specifies on one level, and the IBR specifies that optimal actions are chosen, rather than soft-max decisions. Neither of these differences is critical to either framework. We view it as an empirical question what degree of optimality and what level of recursive reasoning people actually display in language understanding.
+It is most similar to game theoretic approaches to pragmatics. In particular to approaches that treat pragmatic inference as iterated reasoning, such as the Iterated Best Response (IBR) model \citep{franke09,benzetal05}. The IBR model represents speakers and listeners recursively reasoning about each other, as in the RSA model. The two main differences are that IBR specifies unbounded recursion between speaker and listener, while RSA as presented here specifies one level, and the IBR specifies that optimal actions are chosen, rather than soft-max decisions. Neither of these differences is critical to either framework. We view it as an empirical question what degree of optimality and what level of recursive reasoning people actually display in language understanding.
 
 
 %\begin{itemize}
