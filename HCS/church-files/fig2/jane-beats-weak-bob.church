@@ -1,0 +1,131 @@
+;helper functions
+(define approx-strength
+  (lambda (a b)
+    (define epsilon 0.4)
+    (< (abs (- a b)) epsilon)))
+
+(define draw-n
+  (lambda
+    (n lst)
+    (define next-draw (uniform-draw lst))
+    (define rest-of-lst
+      (fold (lambda
+              (list-item cumulative-value)
+              (if
+               (equal? list-item next-draw)
+               cumulative-value
+               (append (list list-item) cumulative-value)))
+            '()
+            lst))
+    (if (= n 1)
+        (list next-draw)
+        (append (list next-draw) (draw-n (- n 1) rest-of-lst)))))
+
+;query
+(display (mh-query 10000 10
+ ;... ToW theory...
+ (define players '(Bob Jim Mary Sue Bill Evan Sally Tim Joe Jane Terrence Kate))
+ (define teams '(team1 team2 team3))
+ (define matches '(match1 match2 match3 match4))
+ (define individuals (append players teams matches))
+ (define gender (mem (lambda (p) (if (flip) 'male 'female))))
+ (define gender-mean-strength (mem (lambda (g) (gaussian 0 2))))
+ (define strength (mem (lambda (p) (gaussian (gender-mean-strength (gender p)) 1))))
+ (define team-size (uniform-draw '(1 2 3 4 5 6)))
+ (define players-on-team (mem (lambda (team) (draw-n team-size players))))
+ (define captain (mem (lambda (team) (uniform-draw (players-on-team team)))))
+ (define teams-in-match (mem (lambda (match) (draw-n 2 teams))))
+ (define pulling (mem (lambda (player match) (+ (strength player) (gaussian 0
+                                                                          0.5)))))
+ (define team-pulling (mem (lambda (team match)
+                               (sum (map (lambda (x) (pulling x match))
+                                       (players-on-team team))))))
+ (define (winner match)
+   (let ([ teamA (first (teams-in-match match)) ]
+          [ teamB (second (teams-in-match match)) ])
+     (if (> (team-pulling teamA match) (team-pulling teamB match))
+       teamA
+       teamB)))
+ 
+ (strength 'Jane) ; ; variable of interest
+
+ (and ; ; conditioning expression
+   (equal? (players-on-team 'team1) '(Jane))
+   (equal? (players-on-team 'team2) '(Bob))
+   (equal? (teams-in-match 'match1) '(team1 team2))
+   (equal? (winner 'match1) 'team1) ; observation: Bob beats Jim
+   (approx-strength (strength 'Bob) -3.0) ; observation: Bob beats Jim, Jim weak
+   )
+))
+
+(display (mh-query 10000 10
+ ;... ToW theory...
+ (define players '(Bob Jim Mary Sue Bill Evan Sally Tim Joe Jane Terrence Kate))
+ (define teams '(team1 team2 team3))
+ (define matches '(match1 match2 match3 match4))
+ (define individuals (append players teams matches))
+ (define gender (mem (lambda (p) (if (flip) 'male 'female))))
+ (define gender-mean-strength (mem (lambda (g) (gaussian 0 2))))
+ (define strength (mem (lambda (p) (gaussian (gender-mean-strength (gender p)) 1))))
+ (define team-size (uniform-draw '(1 2 3 4 5 6)))
+ (define players-on-team (mem (lambda (team) (draw-n team-size players))))
+ (define captain (mem (lambda (team) (uniform-draw (players-on-team team)))))
+ (define teams-in-match (mem (lambda (match) (draw-n 2 teams))))
+ (define pulling (mem (lambda (player match) (+ (strength player) (gaussian 0
+                                                                          0.5)))))
+ (define team-pulling (mem (lambda (team match)
+                               (sum (map (lambda (x) (pulling x match))
+                                       (players-on-team team))))))
+ (define (winner match)
+   (let ([ teamA (first (teams-in-match match)) ]
+          [ teamB (second (teams-in-match match)) ])
+     (if (> (team-pulling teamA match) (team-pulling teamB match))
+       teamA
+       teamB)))
+ 
+ (strength 'Jane) ; ; variable of interest
+
+ (and ; ; conditioning expression
+   (equal? (players-on-team 'team1) '(Jane))
+   (equal? (players-on-team 'team2) '(Bob))
+   (equal? (teams-in-match 'match1) '(team1 team2))
+   (equal? (winner 'match1) 'team1) ; observation: Bob beats Jim
+   (approx-strength (strength 'Bob) -3.0) ; observation: Bob beats Jim, Jim weak
+   )
+))
+
+(mh-query 10000 10
+ ;... ToW theory...
+ (define players '(Bob Jim Mary Sue Bill Evan Sally Tim Joe Jane Terrence Kate))
+ (define teams '(team1 team2 team3))
+ (define matches '(match1 match2 match3 match4))
+ (define individuals (append players teams matches))
+ (define gender (mem (lambda (p) (if (flip) 'male 'female))))
+ (define gender-mean-strength (mem (lambda (g) (gaussian 0 2))))
+ (define strength (mem (lambda (p) (gaussian (gender-mean-strength (gender p)) 1))))
+ (define team-size (uniform-draw '(1 2 3 4 5 6)))
+ (define players-on-team (mem (lambda (team) (draw-n team-size players))))
+ (define captain (mem (lambda (team) (uniform-draw (players-on-team team)))))
+ (define teams-in-match (mem (lambda (match) (draw-n 2 teams))))
+ (define pulling (mem (lambda (player match) (+ (strength player) (gaussian 0
+                                                                          0.5)))))
+ (define team-pulling (mem (lambda (team match)
+                               (sum (map (lambda (x) (pulling x match))
+                                       (players-on-team team))))))
+ (define (winner match)
+   (let ([ teamA (first (teams-in-match match)) ]
+          [ teamB (second (teams-in-match match)) ])
+     (if (> (team-pulling teamA match) (team-pulling teamB match))
+       teamA
+       teamB)))
+ 
+ (strength 'Jane) ; ; variable of interest
+
+ (and ; ; conditioning expression
+   (equal? (players-on-team 'team1) '(Jane))
+   (equal? (players-on-team 'team2) '(Bob))
+   (equal? (teams-in-match 'match1) '(team1 team2))
+   (equal? (winner 'match1) 'team1) ; observation: Bob beats Jim
+   (approx-strength (strength 'Bob) -3.0) ; observation: Bob beats Jim, Jim weak
+   )
+)

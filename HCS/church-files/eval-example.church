@@ -1,0 +1,3 @@
+(define expression '(flip bias))
+(define foo ((lambda  (bias) (lambda  (e) (eval e))) (uniform 0 1)))
+(foo expression)

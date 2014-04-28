@@ -1,0 +1,15 @@
+*.aux
+*.bbl
+*.blg
+*.log
+*.out
+*.pdf
+*.toc
+*.synctex.gz
+.dropbox
+TSWLatexianTemp*
+*.tdo
+.DS_Store
+.RData
+.Rapp.history
+.Rhistory
